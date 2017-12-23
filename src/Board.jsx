@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import Square from './Square'
+const X_ICON = 'X', O_ICON = 'O';
 
 export default class Board extends React.Component {
   constructor(props) {
@@ -25,7 +26,7 @@ export default class Board extends React.Component {
       return;
     }
     const squares = this.state.squares.slice();
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    squares[i] = this.state.xIsNext ? X_ICON : O_ICON;
     const n = getWinnerSquares(squares)
     if (n) {
       this.setState({
@@ -51,8 +52,8 @@ export default class Board extends React.Component {
   render() {
     const status =
       this.state.winners
-        ?  'Winner is: ' + (this.state.xIsNext ? 'O' : 'X') + '!'
-        : 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        ?  'Winner is: ' + (this.state.xIsNext ? O_ICON : X_ICON) + '!'
+        : 'Next player: ' + (this.state.xIsNext ? X_ICON : O_ICON);
 
     return (
       <div>
