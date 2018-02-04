@@ -18,18 +18,36 @@ ol, ul {
 }
 
 .square {
-  background: #fff;
-  border: 1px solid #999;
+  border: none;
   float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
+  height: 300px;
   padding: 0;
-  text-align: center;
-  width: 34px;
+  width: 51px;
+}
+
+.dark {
+  background-image: url(./images/spike_yellow.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.light {
+  background-image: url(./images/spike_red.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.flipvert {
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+}
+
+.bar {
+  width: 25px;
+  height: 300px;
+  background: black;
+  float: left;
+  display: inline;
 }
 
 .square:focus {

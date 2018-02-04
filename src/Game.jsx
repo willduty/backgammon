@@ -13,6 +13,6 @@ export default class Game extends React.Component {
           <ol>{/* TODO */}</ol>
         </div>
       </div>
-      );
+    );
   }
 }

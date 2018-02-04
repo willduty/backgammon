@@ -9,10 +9,14 @@ export default class Square extends React.Component {
   }
 
   render() {
+    const type = this.props.index < 12 ?
+      this.props.index%2 ? ' dark' : ' light' :
+      (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
+    const className = "square " + this.props.class + type;
     return (
-      <button className={"square " + this.props.class} onClick={() => this.props.onClick()}>
+      <div className={className} onClick={() => this.props.onClick()}>
         {this.props.value}
-      </button>
+      </div>
       );
   }
 }
