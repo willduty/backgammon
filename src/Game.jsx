@@ -10,7 +10,7 @@ export default class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>GAME STATUS...</div>
-          <ol>{/* TODO */}</ol>
+          <ol>TODO...{/* TODO */}</ol>
         </div>
       </div>
     );
