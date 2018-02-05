@@ -1,4 +1,5 @@
 import React from 'react';
+import Chip from './Chip';
 
 export default class Square extends React.Component {
   constructor(props) {
@@ -13,12 +14,19 @@ export default class Square extends React.Component {
       this.props.index%2 ? ' dark' : ' light' :
       (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
     const className = "square " + this.props.class + type;
-    const chipClass = "chip " + (Math.random() > .5 ? "chip_light" : "chip_dark");
 
+    let chips = [];
+    for (let i=0; i<1; i++) {
+      chips.push(
+        <Chip
+        parentIndex = {this.props.index}
+        style={{bottom: 40}}
+        />
+      )
+    }
     return (
       <div className={className} onClick={() => this.props.onClick()}>
-        {this.props.value}
-        <div className={chipClass} />
+        {chips}
       </div>
     );
   }

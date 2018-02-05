@@ -13,32 +13,29 @@ export default class Board extends React.Component {
       squares: arr,
       xIsNext: true,
       winners: null,
+      newGame: {
+          dark: {
+            4: 3,
+            6: 5,
+            12: 5,
+            23: 2
+          },
+          light: {
+
+          }
+        }
     }
   };
 
   handleClick(i) {
-    if (this.state.winners) {
-      return;
-    }
-
-    if (this.state.squares[i]) {
-      alert('taken!');
-      return;
-    }
-    const squares = this.state.squares.slice();
-    squares[i] = this.state.xIsNext ? X_ICON : O_ICON;
-
-    this.setState({
-      squares: squares,
-      xIsNext: !this.state.xIsNext,
-    });
+    alert('TODO: handle chip click')
   }
 
   renderSquare(i) {
     const className = (this.state.winners && this.state.winners.indexOf(i) !== -1) ? 'bold-square' : null;
     return (<Square
       index={i}
-      value={this.state.squares[i]}
+      chips={this.state.newGame[i]}
       onClick={() => this.handleClick(i)}
       class={className}
     />);
