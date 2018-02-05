@@ -1,6 +1,7 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
+  background-color: #fff;
 }
 
 ol, ul {
@@ -27,20 +28,39 @@ ol, ul {
   height: 300px;
   padding: 0;
   width: 51px;
+  /*border: 1px solid black;*/
+}
+
+.flip180 {
+    -moz-transform: scaleY(-1);
+    -o-transform: scaleY(-1);
+    -webkit-transform: scaleY(-1);
+    transform: scaleY(-1);
+    filter: FlipV;
+    -ms-filter: "FlipV";
 }
 
 .chip {
   /*border: 1px solid black;*/
   height: 51px;
-  width: 100%;
-  z-index: 100;
+  width: 51px;
+  z-index: 10;
   background-repeat: no-repeat;
   background-size: 51px 51px;
+  position: absolute;
+  start: 0;
+}
+
+.selectable {
+    -webkit-filter: brightness(200%)
+}
+
+.selectable:hover {
+    -webkit-filter: brightness(300%)
 }
 
 .chip_light {
   background-image: url(./images/chip_light.png);
-  /*border: solid 1px black;*/
 }
 
 .chip_dark {

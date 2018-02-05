@@ -6,37 +6,25 @@ const X_ICON = 'X', O_ICON = 'O';
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
-    let arr = Array(9);
-    _.each(arr, (a, i) => { arr[i] = null; })
 
     this.state = {
-      squares: arr,
-      xIsNext: true,
       winners: null,
-      newGame: {
-          dark: {
-            4: 3,
-            6: 5,
-            12: 5,
-            23: 2
-          },
-          light: {
-
-          }
-        }
+      game: this.props.game
     }
   };
 
-  handleClick(i) {
-    alert('TODO: handle chip click')
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.game !== prevState.game) {
+      this.setState({game: this.props.game})
+    }
   }
 
   renderSquare(i) {
     const className = (this.state.winners && this.state.winners.indexOf(i) !== -1) ? 'bold-square' : null;
     return (<Square
       index={i}
-      chips={this.state.newGame[i]}
-      onClick={() => this.handleClick(i)}
+      chips={{dark: (this.state.game.dark[i] || 0), light: (this.state.game.light[i] || 0)}}
+      player={this.state.game.currentPlayer}
       class={className}
     />);
   }
