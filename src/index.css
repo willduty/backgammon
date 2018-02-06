@@ -8,16 +8,6 @@ ol, ul {
   padding-left: 30px;
 }
 
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}
-
-.game-board {
-  text-align: center;
-}
-
 .status {
   margin-bottom: 10px;
 }
@@ -28,16 +18,15 @@ ol, ul {
   height: 300px;
   padding: 0;
   width: 51px;
-  /*border: 1px solid black;*/
 }
 
 .flip180 {
-    -moz-transform: scaleY(-1);
-    -o-transform: scaleY(-1);
-    -webkit-transform: scaleY(-1);
-    transform: scaleY(-1);
-    filter: FlipV;
-    -ms-filter: "FlipV";
+  -moz-transform: scaleY(-1);
+  -o-transform: scaleY(-1);
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+  filter: FlipV;
+  -ms-filter: "FlipV";
 }
 
 .chip {
@@ -86,12 +75,20 @@ ol, ul {
   transform: scaleY(-1);
 }
 
+.part div:first-child {
+  clear: both;
+}
+
 .bar {
   width: 25px;
-  height: 300px;
+  height: 600px;
   background: black;
   float: left;
-  display: inline;
+  /*display: inline;*/
+}
+
+.board-section {
+ float: left;
 }
 
 .square:focus {
@@ -102,9 +99,11 @@ ol, ul {
   background: #ddd;
 }
 
+.game-board {
+  text-align: center;
+}
+
 .game {
-  display: flex;
-  flex-direction: row;
 }
 
 .game-info {

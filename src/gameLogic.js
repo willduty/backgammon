@@ -6,7 +6,7 @@ export default class GameLogic {
   };
 
   standardGame = {
-    currentPlayer: 'light',
+    currentPlayer: 'dark',
       dark: {
       4: 3,
         6: 5,

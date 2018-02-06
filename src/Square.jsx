@@ -12,7 +12,7 @@ export default class Square extends React.Component {
 
   makeChips(count, type) {
     for (let i=0; i<count; i++) {
-      const active = (this.props.player == 'dark') && (i == count - 1 ? true : false);
+      const active = (this.props.player == 'dark') && (i == count - 1);
       this.state.chips.push(
         <Chip
           parentIndex = {this.props.index}

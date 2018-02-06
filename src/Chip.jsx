@@ -9,6 +9,11 @@ export default class Chip extends React.Component{
     alert('TODO: handle chip click')
   }
 
+  showMoves() {
+    const i = Math.random * 23
+    
+  }
+
   render() {
     const chipClass = "chip " +
       this.props.type +
@@ -16,15 +21,15 @@ export default class Chip extends React.Component{
       (this.props.active ? ' selectable ' : '');
 
     // TODO: hack, figure out a way to not need this
-    let top = this.props.offset + (this.props.parentIndex < 12 ? 30 : 0);
+    let top = this.props.offset + (this.props.parentIndex < 12 ? 20 : 0);
 
     return (
       <div
         className={chipClass}
         style={{top: top}}
          onClick={() => this.handleClick()}
+         onMouseOver={() => this.showMoves()}
         />
     )
   }
-
 }
