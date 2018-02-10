@@ -9,10 +9,6 @@ export default class Chip extends React.Component{
     alert('TODO: handle chip click')
   }
 
-  showMoves() {
-    const i = Math.random * 23
-    
-  }
 
   render() {
     const chipClass = "chip " +
@@ -28,7 +24,8 @@ export default class Chip extends React.Component{
         className={chipClass}
         style={{top: top}}
          onClick={() => this.handleClick()}
-         onMouseOver={() => this.showMoves()}
+         onMouseEnter={() => this.props.onMouseEnter()}
+         onMouseLeave={() => this.props.onMouseLeave()}
         />
     )
   }

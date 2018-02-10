@@ -1,31 +1,44 @@
 import React from 'react';
 import _ from 'lodash';
 import Square from './Square'
-const X_ICON = 'X', O_ICON = 'O';
 
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
+    this.showMoves = this.showMoves.bind(this);
+    this.hideMoves = this.hideMoves.bind(this);
 
     this.state = {
-      winners: null,
-      game: this.props.game
+      game: this.props.game,
+      highlightTargets: []
     }
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.game !== prevState.game) {
+    const changed = (prevState.highlightTargets.length !== this.state.highlightTargets.length);
+    const gameChanged = JSON.stringify(this.props.game) !== JSON.stringify(prevState.game);
+    if (gameChanged || changed) {
       this.setState({game: this.props.game})
     }
   }
 
+  showMoves() {
+    const i = Math.round(Math.random() * 23);
+    this.setState({highlightTargets: [2,3,5]});
+  }
+
+  hideMoves() {
+    this.setState({highlightTargets: []});
+  }
+
   renderSquare(i) {
-    const className = (this.state.winners && this.state.winners.indexOf(i) !== -1) ? 'bold-square' : null;
     return (<Square
       index={i}
       chips={{dark: (this.state.game.dark[i] || 0), light: (this.state.game.light[i] || 0)}}
       player={this.state.game.currentPlayer}
-      class={className}
+      onMouseEnter={this.showMoves}
+      onMouseLeave={this.hideMoves}
+      highlight={this.state.highlightTargets.indexOf(i) !== -1}
     />);
   }
 
@@ -42,7 +55,7 @@ export default class Board extends React.Component {
             {this.renderSquare(4)}
             {this.renderSquare(5)}
           </div>
-          <div className="part">
+          <div>
             {this.renderSquare(12)}
             {this.renderSquare(13)}
             {this.renderSquare(14)}
@@ -51,7 +64,7 @@ export default class Board extends React.Component {
             {this.renderSquare(17)}
           </div>
         </div>
-        <div class='bar'>&nbsp;</div>
+        <div className='bar'>&nbsp;</div>
         <div className="board-section">
           <div>
             {this.renderSquare(6)}
@@ -61,7 +74,7 @@ export default class Board extends React.Component {
             {this.renderSquare(10)}
             {this.renderSquare(11)}
           </div>
-          <div className="part">
+          <div>
             {this.renderSquare(18)}
             {this.renderSquare(19)}
             {this.renderSquare(20)}

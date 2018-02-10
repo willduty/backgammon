@@ -10,15 +10,24 @@ export default class Square extends React.Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const chipsUpdated = this.props.chips.dark !== nextProps.chips.dark ||
+      this.props.chips.light !== nextProps.chips.light;
+    const highlightChanged = this.props.highlight !== nextProps.highlight;
+    return chipsUpdated || highlightChanged;
+  }
+
   makeChips(count, type) {
     for (let i=0; i<count; i++) {
-      const active = (this.props.player == 'dark') && (i == count - 1);
+      const active = (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark');
       this.state.chips.push(
         <Chip
           parentIndex = {this.props.index}
           active = {active}
           offset = {(i * 30)}
           type = {type}
+          onMouseEnter={this.props.onMouseEnter}
+          onMouseLeave={this.props.onMouseLeave}
         />
       )
     }
@@ -29,7 +38,9 @@ export default class Square extends React.Component {
     const spikeType = this.props.index < 12 ?
       this.props.index%2 ? ' dark' : ' light' :
       (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
-    const className = 'square ' + this.props.class + spikeType;
+
+    const highlight = this.props.highlight ? ' highlightSquare ' : '';
+    const className = 'square ' + this.props.class + spikeType + highlight;
     this.makeChips(this.props.chips.dark, 'chip_dark')
     this.makeChips(this.props.chips.light, 'chip_light')
     return (

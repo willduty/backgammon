@@ -33,7 +33,6 @@ ol, ul {
   /*border: 1px solid black;*/
   height: 51px;
   width: 51px;
-  z-index: 10;
   background-repeat: no-repeat;
   background-size: 51px 51px;
   position: absolute;
@@ -60,23 +59,17 @@ ol, ul {
   background-image: url(./images/spike_yellow.png);
   background-repeat: no-repeat;
   background-size: cover;
-  z-index: -10;
 }
 
 .light {
   background-image: url(./images/spike_red.png);
   background-repeat: no-repeat;
   background-size: cover;
-  z-index: -10;
 }
 
 .flipvert {
   -webkit-transform: scaleY(-1);
   transform: scaleY(-1);
-}
-
-.part div:first-child {
-  clear: both;
 }
 
 .bar {
@@ -93,6 +86,10 @@ ol, ul {
 
 .square:focus {
   outline: none;
+}
+
+.highlightSquare {
+  -webkit-filter: brightness(200%)
 }
 
 .kbd-navigation .square:focus {
