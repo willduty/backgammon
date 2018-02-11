@@ -23,8 +23,16 @@ export default class GameLogic {
 
   start = function() {
     this.setGame(this.STANDARD_GAME);
-    this.rollDecidingDice()
-    alert((this.currentPlayer === 'dark' ? 'player' : 'computer') + ' gets to start the game')
+    while(true) {
+      const roll = this.rollDecidingDice();
+      if (roll[0] === roll[1]) {
+        alert("It's a tie. Roll again...")
+      } else {
+        this.currentPlayer = roll[0] > roll[1] ? 'dark' : 'light';
+        alert((this.currentPlayer === 'dark' ? 'player' : 'computer') + ' gets to start the game')
+        break;
+      }
+    }
   }
 
   // basic roll for player's turn
@@ -43,8 +51,7 @@ export default class GameLogic {
 
   // decides who gets first move
   rollDecidingDice = function() {
-    const roll = this.rollDice();
-    this.currentPlayer = roll[0] > roll[1] ? 'dark' : 'light';
+    return this.rollDice();
   }
 
   // utility method
