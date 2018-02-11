@@ -47,6 +47,41 @@ ol, ul {
     -webkit-filter: brightness(300%)
 }
 
+.die1,.die2,.die3,.die4,.die5,.die6 {
+    float: left;
+    height: 35px;
+    width: 35px;
+    background-size: 35px 35px;
+    margin-right: 20px;
+}
+
+.die1 {
+    background-image: url(./images/die1.png);
+}
+.die2 {
+    background-image: url(./images/die2.png);
+}
+.die3 {
+    background-image: url(./images/die3.png);
+}
+.die4 {
+    background-image: url(./images/die4.png);
+}
+.die5 {
+    background-image: url(./images/die5.png);
+}
+.die6 {
+    background-image: url(./images/die6.png);
+}
+
+.dice {
+  top: 300px;
+  left: 125px;
+  z-index: 1000;
+  position: absolute;
+}
+
+
 .chip_light {
   background-image: url(./images/chip_light.png);
 }

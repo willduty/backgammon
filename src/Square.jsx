@@ -35,14 +35,15 @@ export default class Square extends React.Component {
 
   render() {
     // build alternating board spikes
-    const spikeType = this.props.index < 12 ?
+    const spikeType = this.props.index > 11 ?
       this.props.index%2 ? ' dark' : ' light' :
       (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
 
     const highlight = this.props.highlight ? ' highlightSquare ' : '';
     const className = 'square ' + this.props.class + spikeType + highlight;
-    this.makeChips(this.props.chips.dark, 'chip_dark')
-    this.makeChips(this.props.chips.light, 'chip_light')
+    this.makeChips(this.props.chips.dark, 'chip_dark');
+    this.makeChips(this.props.chips.light, 'chip_light');
+
     return (
       <div className={className}>
         {this.state.chips}

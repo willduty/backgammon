@@ -9,12 +9,23 @@ export default class Game extends React.Component {
     let gameLogic = new GameLogic()
     this.state = {
       logic: gameLogic,
-      game: gameLogic.blankGame
+      game: gameLogic
     }
   }
 
   startNew() {
-    this.setState({game: this.state.logic.standardGame})
+    this.state.game.start();
+    setTimeout(function() {
+      const roll = this.state.game.rollPlayerDice();
+      this.setState({
+        game: this.state.game,
+      });
+    }.bind(this), 200);
+  }
+
+  updateStatus() {
+    const status = document.getElementById('status');
+    status.text = 'adfas';
   }
 
   render() {
@@ -25,7 +36,7 @@ export default class Game extends React.Component {
         </div>
         <div>
           <div>GAME STATUS...
-            <ol>TODO...{/* TODO */}</ol>
+            <ol id="status">current...{this.state.currentPlayer}</ol>
           </div>
         </div>
         <div>
