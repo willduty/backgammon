@@ -14,7 +14,8 @@ export default class Square extends React.Component {
     const chipsUpdated = this.props.chips.dark !== nextProps.chips.dark ||
       this.props.chips.light !== nextProps.chips.light;
     const highlightChanged = this.props.highlight !== nextProps.highlight;
-    return chipsUpdated || highlightChanged;
+    const stoppedRolling = this.props.rolling !== nextProps.rolling;
+    return chipsUpdated || highlightChanged || stoppedRolling;
   }
 
   makeChips(count, type) {
@@ -41,6 +42,8 @@ export default class Square extends React.Component {
 
     const highlight = this.props.highlight ? ' highlightSquare ' : '';
     const className = 'square ' + this.props.class + spikeType + highlight;
+
+    console.log(className)
     this.makeChips(this.props.chips.dark, 'chip_dark');
     this.makeChips(this.props.chips.light, 'chip_light');
 

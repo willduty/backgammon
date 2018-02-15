@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import Square from './Square'
 import Dice from './Dice'
 
@@ -16,10 +15,14 @@ export default class Board extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const changed = (prevState.highlightTargets.length !== this.state.highlightTargets.length);
-    const gameChanged = JSON.stringify(this.props.game) !== JSON.stringify(prevState.game);
+    const changed = (prevState.highlightTargets.length !== this.state.highlightTargets.length) ||
+      (prevState.game.player !== this.state.game.player);
+    const gameChanged = this.props.rolling !== prevProps.rolling;
     if (gameChanged || changed) {
-      this.setState({game: this.props.game})
+      this.setState({
+        game: this.props.game,
+        rolling: this.props.rolling
+      })
     }
   }
 
@@ -33,7 +36,6 @@ export default class Board extends React.Component {
   }
 
   renderSquare(i) {
-  //console.log(this.state.highlightTargets)
     let a = this.state.highlightTargets.indexOf(i) !== -1;
 
     return (<Square
@@ -43,13 +45,18 @@ export default class Board extends React.Component {
       onMouseEnter={this.showMoves}
       onMouseLeave={this.hideMoves}
       highlight={a}
+      rolling={this.state.rolling}
     />);
   }
 
   render() {
     const status = '';
+    // TODO make cover a component
     return (
-      <div>
+      <div className='test'>
+        <div className={this.state.rolling ? 'cover' : '' }>
+          <div>{this.state.rolling ? 'Rolling...' : ''}</div>
+        </div>
         <Dice game={this.state.game}/>
         <div className="board-section">
           <div>
@@ -90,7 +97,9 @@ export default class Board extends React.Component {
         </div>
         <div className="board-section">
           <div className="part">
-            TODO doubling cube and chip stashers
+            <div>box1</div>
+            <div>dcube</div>
+            <div>box2</div>
           </div>
         </div>
       </div>

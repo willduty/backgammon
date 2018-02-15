@@ -2,9 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 
 export default class Dice extends React.Component {
-  constructor(props) {
-    super(props)
-  }
 
   shouldComponentUpdate(nextProps, nextState) {
     return true;

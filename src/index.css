@@ -1,7 +1,7 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
   background-color: #fff;
+    margin: 0;;
 }
 
 ol, ul {
@@ -30,21 +30,31 @@ ol, ul {
 }
 
 .chip {
-  /*border: 1px solid black;*/
   height: 51px;
   width: 51px;
   background-repeat: no-repeat;
   background-size: 51px 51px;
   position: absolute;
-  start: 0;
+  -webkit-filter: drop-shadow(5px 5px 5px #222);
+  filter: drop-shadow(-2px 2px 1px #222);
 }
 
 .selectable {
-    -webkit-filter: brightness(200%)
+    animation-name: showMovableChips;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
 }
 
 .selectable:hover {
-    -webkit-filter: brightness(300%)
+    cursor: grab;
+    -webkit-filter: brightness(300%);
+}
+
+
+@keyframes showMovableChips {
+    0%   { -webkit-filter: brightness(300%); }
+    50%  { -webkit-filter: brightness(400%); }
+    100% { -webkit-filter: brightness(300%); }
 }
 
 .die1,.die2,.die3,.die4,.die5,.die6 {
@@ -53,6 +63,7 @@ ol, ul {
     width: 35px;
     background-size: 35px 35px;
     margin-right: 20px;
+    box-shadow: -3px 3px 8px #333;
 }
 
 .die1 {
@@ -74,13 +85,36 @@ ol, ul {
     background-image: url(./images/die6.png);
 }
 
+.cover {
+  display: table;
+  top: 0px;
+  left: 0px;
+  width: 700px;
+  height: 600px;
+  background-color: #333;
+  opacity: .5;
+  z-index: 900;
+  position: absolute;
+  color: white;
+}
+
+.cover div {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.test {
+  /*border: 2px solid black;*/
+  width: 700px;
+  height: 600px;
+}
+
 .dice {
-  top: 300px;
-  left: 125px;
+  top: 47%;
+  left: 10%;
   z-index: 1000;
   position: absolute;
 }
-
 
 .chip_light {
   background-image: url(./images/chip_light.png);
@@ -112,16 +146,12 @@ ol, ul {
   height: 600px;
   background: black;
   float: left;
-  /*display: inline;*/
 }
 
 .board-section {
  float: left;
 }
 
-.square:focus {
-  outline: none;
-}
 
 .highlightSquare {
   -webkit-filter: brightness(200%)
@@ -133,16 +163,18 @@ ol, ul {
 
 .game-board {
   text-align: center;
+  float: left;
+  padding: 0 0 0 0 ;
+    border: 0 0 0 0;
+    position: relative;
 }
 
 .game {
 }
 
 .game-info {
-  margin-left: 20px;
 }
 
 .bold-square {
-  border: 2px solid #090;
   background: #fee;
 }
