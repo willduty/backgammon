@@ -29,6 +29,7 @@ export default class Square extends React.Component {
           type = {type}
           onMouseEnter={this.props.onMouseEnter}
           onMouseLeave={this.props.onMouseLeave}
+          onMouseDown={this.props.onMouseDown}
         />
       )
     }
@@ -41,15 +42,14 @@ export default class Square extends React.Component {
       (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
 
     const highlight = this.props.highlight ? ' highlightSquare ' : '';
-    const className = 'square ' + this.props.class + spikeType + highlight;
+    const className = 'square ' + spikeType + highlight;
 
     this.state.chips = [];
-
     this.makeChips(this.props.chips.dark, 'chip_dark');
     this.makeChips(this.props.chips.light, 'chip_light');
 
     return (
-      <div className={className}>
+      <div className={className} id={'square_' + this.props.index}>
         {this.state.chips}
       </div>
     );

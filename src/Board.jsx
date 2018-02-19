@@ -1,16 +1,21 @@
 import React from 'react';
 import Square from './Square'
 import Dice from './Dice'
+import _ from 'lodash';
 
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
     this.showMoves = this.showMoves.bind(this);
     this.hideMoves = this.hideMoves.bind(this);
+    this.startDrag = this.startDrag.bind(this);
+    this.stopDrag = this.stopDrag.bind(this);
+    this.dragging = this.dragging.bind(this);
 
     this.state = {
       game: this.props.game,
-      highlightTargets: []
+      highlightTargets: [],
+      board: document.getElementById('draggableArea'),
     }
   };
 
@@ -35,8 +40,44 @@ export default class Board extends React.Component {
     this.setState({highlightTargets: []});
   }
 
+  startDrag(event, chipIndex) {
+    const square = document.getElementById('square_' + chipIndex);
+    const chip = _.find(square.children, function(e) {
+      return e.className.indexOf('selectable') !== -1
+    });
+    this.state.dragObjOriginalY = chip.style.top;
+    this.state.dragObjParentIndex = chipIndex;
+    this.state.dragObj = chip;
+
+    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY) - parseInt(event.pageY);
+    this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX);
+  }
+
+  stopDrag() {
+    if (this.state.dragObj) {
+      this.state.dragObj.style.left = null;
+      this.state.dragObj.style.top = this.state.dragObjOriginalY;
+      this.state.dragObj = null;
+    }
+  }
+
+  dragging(e) {
+    if(this.state.dragObj) {
+      const board = document.getElementById('draggableArea');
+      console.log(board.getBoundingClientRect().y, board.style.height);
+      let y = (this.state.dragObjParentIndex < 12) ? ( 1000 - e.pageY ) : e.pageY
+      y += this.state.dragCursorYOffset;
+
+      let x = e.pageX + this.state.dragCursorXOffset;
+
+      this.state.dragObj.style.zIndex = 100000;
+      this.state.dragObj.style.top = y + 'px';
+      this.state.dragObj.style.left = x + 'px';
+    }
+  }
+
   renderSquare(i) {
-    let a = this.state.highlightTargets.indexOf(i) !== -1;
+    let highlight = this.state.highlightTargets.indexOf(i) !== -1;
 
     return (<Square
       index={i}
@@ -44,7 +85,8 @@ export default class Board extends React.Component {
       player={this.state.game.currentPlayer}
       onMouseEnter={this.showMoves}
       onMouseLeave={this.hideMoves}
-      highlight={a}
+      onMouseDown={this.startDrag}
+      highlight={highlight}
       rolling={this.state.rolling}
     />);
   }
@@ -58,43 +100,47 @@ export default class Board extends React.Component {
           <div>{this.state.rolling ? 'Rolling...' : ''}</div>
         </div>
         <Dice game={this.state.game}/>
-        <div className="board-section">
-          <div>
-            {this.renderSquare(12)}
-            {this.renderSquare(13)}
-            {this.renderSquare(14)}
-            {this.renderSquare(15)}
-            {this.renderSquare(16)}
-            {this.renderSquare(17)}
+
+        <div id='draggableArea' onMouseMove={this.dragging} onMouseUp={this.stopDrag}>
+          <div className="board-section">
+            <div>
+              {this.renderSquare(12)}
+              {this.renderSquare(13)}
+              {this.renderSquare(14)}
+              {this.renderSquare(15)}
+              {this.renderSquare(16)}
+              {this.renderSquare(17)}
+            </div>
+            <div>
+              {this.renderSquare(11)}
+              {this.renderSquare(10)}
+              {this.renderSquare(9)}
+              {this.renderSquare(8)}
+              {this.renderSquare(7)}
+              {this.renderSquare(6)}
+            </div>
           </div>
-          <div>
-            {this.renderSquare(11)}
-            {this.renderSquare(10)}
-            {this.renderSquare(9)}
-            {this.renderSquare(8)}
-            {this.renderSquare(7)}
-            {this.renderSquare(6)}
+          <div className='bar'>&nbsp;</div>
+          <div className="board-section">
+            <div>
+              {this.renderSquare(18)}
+              {this.renderSquare(19)}
+              {this.renderSquare(20)}
+              {this.renderSquare(21)}
+              {this.renderSquare(22)}
+              {this.renderSquare(23)}
+            </div>
+            <div>
+              {this.renderSquare(5)}
+              {this.renderSquare(4)}
+              {this.renderSquare(3)}
+              {this.renderSquare(2)}
+              {this.renderSquare(1)}
+              {this.renderSquare(0)}
+            </div>
           </div>
         </div>
-        <div className='bar'>&nbsp;</div>
-        <div className="board-section">
-          <div>
-            {this.renderSquare(18)}
-            {this.renderSquare(19)}
-            {this.renderSquare(20)}
-            {this.renderSquare(21)}
-            {this.renderSquare(22)}
-            {this.renderSquare(23)}
-          </div>
-          <div>
-            {this.renderSquare(5)}
-            {this.renderSquare(4)}
-            {this.renderSquare(3)}
-            {this.renderSquare(2)}
-            {this.renderSquare(1)}
-            {this.renderSquare(0)}
-          </div>
-        </div>
+
         <div className="board-section">
           <div className="part">
             <div>box1</div>

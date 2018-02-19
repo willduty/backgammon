@@ -12,6 +12,10 @@ ol, ul {
   margin-bottom: 10px;
 }
 
+.top-area {
+  height: 20px;
+}
+
 .square {
   border: none;
   float: left;
@@ -49,7 +53,6 @@ ol, ul {
     cursor: grab;
     -webkit-filter: brightness(300%);
 }
-
 
 @keyframes showMovableChips {
     0%   { -webkit-filter: brightness(300%); }

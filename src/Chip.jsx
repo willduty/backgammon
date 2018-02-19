@@ -3,7 +3,7 @@ import React from 'react';
 export default class Chip extends React.Component{
 
   handleClick() {
-    alert('TODO: handle chip click');
+//    alert('TODO: handle chip click');
   }
 
   render() {
@@ -16,11 +16,12 @@ export default class Chip extends React.Component{
     let props = {
       className: chipClass,
       style: {top: this.props.offset},
-      onClick: (() => this.handleClick()),
+//      onClick: (() => this.handleClick()),
     }
     if (selectable) {
       props['onMouseEnter'] = (() => this.props.onMouseEnter(this.props.parentIndex))
       props['onMouseLeave'] = (() => this.props.onMouseLeave(this.props.parentIndex))
+      props['onMouseDown'] = ((e) => this.props.onMouseDown(e, this.props.parentIndex))
     }
 
     return (

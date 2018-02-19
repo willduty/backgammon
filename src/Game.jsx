@@ -5,10 +5,12 @@ import GameLogic from './gameLogic.js';
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
+    this.TIMEOUT = 400;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
     let gameLogic = new GameLogic();
+
     this.state = {
       game: gameLogic
     }
@@ -23,16 +25,16 @@ export default class Game extends React.Component {
       game: game,
       rolling: false,
     });
-    setTimeout(this.doDecidingRoll, 500);
+    setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
 
   doDecidingRoll() {
     const roll = this.state.game.decide();
     if (roll[0] === roll[1]) {
       console.log('oops, tie!');
-      setTimeout(this.doDecidingRoll, 1000);
+      setTimeout(this.doDecidingRoll, this.TIMEOUT);
     } else {
-      setTimeout(this.playerRoll, 500);
+      setTimeout(this.playerRoll, this.TIMEOUT);
     }
   }
 
@@ -55,7 +57,7 @@ export default class Game extends React.Component {
   render() {
     return (
       <div className="game">
-
+        <div className="top-area"></div>
         <div className="game-board">
           <Board
             game={this.state.game}
@@ -68,8 +70,12 @@ export default class Game extends React.Component {
             New Game...
           </button>
           <div>
-            <div>GAME STATUS...
-              <ol id="status">current...{this.state.currentPlayer}</ol>
+            <div>
+              <ol id="status">{
+                this.state.game.currentPlayer &&
+                (<span><b>Current Player:</b> {this.state.game.currentPlayer}</span>)
+              }
+              </ol>
             </div>
           </div>
         </div>
