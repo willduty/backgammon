@@ -43,7 +43,8 @@ export default class Square extends React.Component {
     const highlight = this.props.highlight ? ' highlightSquare ' : '';
     const className = 'square ' + this.props.class + spikeType + highlight;
 
-    console.log(className)
+    this.state.chips = [];
+
     this.makeChips(this.props.chips.dark, 'chip_dark');
     this.makeChips(this.props.chips.light, 'chip_light');
 
