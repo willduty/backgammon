@@ -157,8 +157,13 @@ ol, ul {
 
 
 .highlightSquare {
-  -webkit-filter: brightness(200%)
+  -webkit-filter: brightness(150%)
 }
+
+.dropTargetSquare {
+    -webkit-filter: brightness(200%)
+}
+
 
 .kbd-navigation .square:focus {
   background: #ddd;

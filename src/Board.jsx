@@ -16,6 +16,7 @@ export default class Board extends React.Component {
       game: this.props.game,
       highlightTargets: [],
       board: document.getElementById('draggableArea'),
+      currentDragTargetIndex: null,
     }
   };
 
@@ -53,19 +54,25 @@ export default class Board extends React.Component {
     this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX);
   }
 
-  stopDrag() {
+  stopDrag(e) {
+    console.log('-->', e.target.parentElement, e.clientX)
     if (this.state.dragObj) {
       this.state.dragObj.style.left = null;
       this.state.dragObj.style.top = this.state.dragObjOriginalY;
       this.state.dragObj = null;
+      this.setState({currentDragTargetIndex: null})
     }
   }
 
   dragging(e) {
     if(this.state.dragObj) {
-      const board = document.getElementById('draggableArea');
-      console.log(board.getBoundingClientRect().y, board.style.height);
-      let y = (this.state.dragObjParentIndex < 12) ? ( 1000 - e.pageY ) : e.pageY
+      const boardRect = document.getElementById('draggableArea').getBoundingClientRect();
+      const mouseX = Math.floor((e.pageX - boardRect.x)/51)
+      const mouseY = Math.floor((e.pageY - boardRect.y)/300);
+      const currentSq = (mouseY < 1) ? (mouseX + 12) : (11 - mouseX);
+      this.setState({currentDragTargetIndex: currentSq});
+
+      let y = (this.state.dragObjParentIndex < 12) ? ( 1000 - e.pageY ) : e.pageY;
       y += this.state.dragCursorYOffset;
 
       let x = e.pageX + this.state.dragCursorXOffset;
@@ -86,7 +93,9 @@ export default class Board extends React.Component {
       onMouseEnter={this.showMoves}
       onMouseLeave={this.hideMoves}
       onMouseDown={this.startDrag}
+      onMouseUp={this.stopDrag}
       highlight={highlight}
+      currentDragTargetIndex={this.state.currentDragTargetIndex}
       rolling={this.state.rolling}
     />);
   }
