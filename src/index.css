@@ -155,6 +155,10 @@ ol, ul {
  float: left;
 }
 
+.darken {
+  -webkit-filter: brightness(50%)
+}
+
 
 .highlightSquare {
   -webkit-filter: brightness(150%)

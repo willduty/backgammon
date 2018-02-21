@@ -17,17 +17,20 @@ export default class Square extends React.Component {
     const stoppedRolling = this.props.rolling !== nextProps.rolling;
     const isDropTarget = this.props.currentDragTargetIndex === this.props.index;
 
-    return chipsUpdated || highlightChanged || stoppedRolling || isDropTarget;
+    return chipsUpdated || highlightChanged || stoppedRolling || isDropTarget || this.props.hasMoves !== nextProps.hasMoves;
   }
 
   makeChips(count, type) {
     for (let i=0; i<count; i++) {
-      const active = (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark');
+
+      const active =
+        (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark') && (this.props.hasMoves);
+
       this.state.chips.push(
         <Chip
           parentIndex = {this.props.index}
           active = {active}
-          offset = {(i * 30)}
+          offset = {(i * 40)}
           type = {type}
           onMouseEnter={this.props.onMouseEnter}
           onMouseLeave={this.props.onMouseLeave}
@@ -39,23 +42,22 @@ export default class Square extends React.Component {
 
   render() {
     // build alternating board spikes
-    const spikeType = this.props.index > 11 ?
-      this.props.index%2 ? ' dark' : ' light' :
-      (this.props.index%2 ? ' light flipvert' : ' dark flipvert');
+    let classNames = this.props.index > 11 ?
+      this.props.index%2 ? ['dark'] : ['light'] :
+      (this.props.index%2 ? ['light', 'flipvert'] : ['dark', 'flipvert']);
 
+    // determine highlight
+    let highlight = '';
+    if (this.props.highlight) {
+      if(this.props.currentDragTargetIndex === this.props.index) {
+        classNames.push('dropTargetSquare');
+      } else  {
+        classNames.push('highlightSquare');
+      }
+    }
 
-
-    let highlight;
-    console.log(this.props.currentDragTargetIndex, this.props.index)
-    if(this.props.currentDragTargetIndex === this.props.index) {
-
-     highlight = ' dropTargetSquare ';
-    } else if (this.props.highlight) {
-      highlight = '  highlightSquare ';
-    } else { highlight = '' }
-
-    const className = 'square ' + spikeType + highlight;
-    console.log(className)
+    // basic square class
+    classNames.push('square');
 
     this.state.chips = [];
     this.makeChips(this.props.chips.dark, 'chip_dark');
@@ -63,7 +65,7 @@ export default class Square extends React.Component {
 
     return (
       <div
-        className={className}
+        className={classNames.join(' ')}
         id={'square_' + this.props.index}
         >
         {this.state.chips}

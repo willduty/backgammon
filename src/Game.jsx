@@ -9,6 +9,8 @@ export default class Game extends React.Component {
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
+    this.updateGame = this.updateGame.bind(this);
+
     let gameLogic = new GameLogic();
 
     this.state = {
@@ -49,6 +51,13 @@ export default class Game extends React.Component {
     });
   }
 
+  updateGame(change) {
+    let game = this.state.game;
+    if(game.attemptChange(change)) {
+      this.setState({game: game})
+    }
+  }
+
   updateStatus() {
     const status = document.getElementById('status');
     status.html = 'adfas';
@@ -62,6 +71,7 @@ export default class Game extends React.Component {
           <Board
             game={this.state.game}
             rolling={this.state.game.rolling}
+            updateGame={this.updateGame}
             />
         </div>
         <div>

@@ -2,10 +2,6 @@ import React from 'react';
 
 export default class Chip extends React.Component{
 
-  handleClick() {
-//    alert('TODO: handle chip click');
-  }
-
   render() {
     const selectable = this.props.active
     const chipClass = "chip " +
@@ -16,7 +12,6 @@ export default class Chip extends React.Component{
     let props = {
       className: chipClass,
       style: {top: this.props.offset},
-//      onClick: (() => this.handleClick()),
     }
     if (selectable) {
       props['onMouseEnter'] = (() => this.props.onMouseEnter(this.props.parentIndex))
