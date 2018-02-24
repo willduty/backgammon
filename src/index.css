@@ -1,7 +1,7 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   background-color: #fff;
-    margin: 0;;
+  margin: 0;;
 }
 
 ol, ul {
@@ -17,20 +17,35 @@ ol, ul {
 }
 
 .square {
-  border: none;
+  /*border: 1px solid black;*/
   float: left;
   height: 300px;
   padding: 0;
   width: 51px;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.flip180 {
-  -moz-transform: scaleY(-1);
-  -o-transform: scaleY(-1);
-  -webkit-transform: scaleY(-1);
-  transform: scaleY(-1);
-  filter: FlipV;
-  -ms-filter: "FlipV";
+.dark {
+  background-image: url(./images/spike_yellow.png);
+}
+
+.light {
+  background-image: url(./images/spike_red.png);
+}
+
+.dark-bottom {
+  background: url(./images/spike_yellow_bottom.png) 0 -55px no-repeat;
+  background-size: 51px 355px;
+}
+
+.light-bottom {
+  background: url(./images/spike_red_bottom.png) 0 -55px no-repeat;
+  background-size: 51px 355px;
+}
+
+.light-bottom .chip, .dark-bottom .chip {
+  top: 550px;
 }
 
 .chip {
@@ -44,48 +59,48 @@ ol, ul {
 }
 
 .selectable {
-    animation-name: showMovableChips;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
+  animation-name: showMovableChips;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
 
 .selectable:hover {
-    cursor: grab;
-    -webkit-filter: brightness(300%);
+  cursor: grab;
+  -webkit-filter: brightness(300%);
 }
 
 @keyframes showMovableChips {
-    0%   { -webkit-filter: brightness(300%); }
-    50%  { -webkit-filter: brightness(400%); }
-    100% { -webkit-filter: brightness(300%); }
+  0%   { -webkit-filter: brightness(300%); }
+  50%  { -webkit-filter: brightness(400%); }
+  100% { -webkit-filter: brightness(300%); }
 }
 
 .die1,.die2,.die3,.die4,.die5,.die6 {
-    float: left;
-    height: 35px;
-    width: 35px;
-    background-size: 35px 35px;
-    margin-right: 20px;
-    box-shadow: -3px 3px 8px #333;
+  float: left;
+  height: 35px;
+  width: 35px;
+  background-size: 35px 35px;
+  margin-right: 20px;
+  box-shadow: -3px 3px 8px #333;
 }
 
 .die1 {
-    background-image: url(./images/die1.png);
+  background-image: url(./images/die1.png);
 }
 .die2 {
-    background-image: url(./images/die2.png);
+  background-image: url(./images/die2.png);
 }
 .die3 {
-    background-image: url(./images/die3.png);
+  background-image: url(./images/die3.png);
 }
 .die4 {
-    background-image: url(./images/die4.png);
+  background-image: url(./images/die4.png);
 }
 .die5 {
-    background-image: url(./images/die5.png);
+  background-image: url(./images/die5.png);
 }
 .die6 {
-    background-image: url(./images/die6.png);
+  background-image: url(./images/die6.png);
 }
 
 .cover {
@@ -127,23 +142,6 @@ ol, ul {
   background-image: url(./images/chip_dark.png);
 }
 
-.dark {
-  background-image: url(./images/spike_yellow.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.light {
-  background-image: url(./images/spike_red.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.flipvert {
-  -webkit-transform: scaleY(-1);
-  transform: scaleY(-1);
-}
-
 .bar {
   width: 25px;
   height: 600px;
@@ -159,13 +157,12 @@ ol, ul {
   -webkit-filter: brightness(50%)
 }
 
-
 .highlightSquare {
   -webkit-filter: brightness(150%)
 }
 
 .dropTargetSquare {
-    -webkit-filter: brightness(200%)
+  -webkit-filter: brightness(200%)
 }
 
 
@@ -177,8 +174,8 @@ ol, ul {
   text-align: center;
   float: left;
   padding: 0 0 0 0 ;
-    border: 0 0 0 0;
-    position: relative;
+  border: 0 0 0 0;
+  position: relative;
 }
 
 .game {

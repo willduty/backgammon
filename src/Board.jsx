@@ -56,40 +56,50 @@ export default class Board extends React.Component {
 
   stopDrag(e) {
     if (this.state.dragObj) {
-      this.state.dragObj.style.left = null;
-      this.state.dragObj.style.top = this.state.dragObjOriginalY;
-      this.state.dragObj = null;
       this.props.updateGame({
         move: {from: this.state.dragObjParentIndex, to: this.state.currentDragTargetIndex}
       });
+
       this.setState({
         currentDragTargetIndex: null,
         dragObjParentIndex: null,
+        dragObj: null,
+        highlightTargets: [],
       });
     }
   }
 
   dragging(e) {
     if(this.state.dragObj) {
+
       const boardRect = this.state.boardRect || document.getElementById('draggableArea').getBoundingClientRect();
 
       const leftBoard = document.getElementById('left-board').getBoundingClientRect();
       const rightBoard = document.getElementById('right-board').getBoundingClientRect();
-
       const mouseY = Math.floor((e.pageY - boardRect.y) / 300);
 
-      let mouseX;
+      let currentSq;
       if(rightBoard.x < e.pageX && rightBoard.x + rightBoard.width > e.pageX) {
-        mouseX = Math.floor((e.pageX - rightBoard.left) / 51) + ((mouseY < 1) ? 18 : 0);
+        if (mouseY < 1) {
+                currentSq = Math.floor((e.pageX - rightBoard.left) / 51) + 18;
+
+        } else {
+                currentSq = Math.floor((rightBoard.right - e.pageX) / 51);
+
+        }
+
       } else if (leftBoard.x < e.pageX && leftBoard.x + leftBoard.width > e.pageX) {
-        mouseX = Math.floor((e.pageX - leftBoard.left) / 51) + ((mouseY < 1) ? 12 : -6);
+        if (mouseY < 1) {
+               currentSq = Math.floor((e.pageX - leftBoard.left) / 51) + 12;
+        } else {
+               currentSq = Math.floor((leftBoard.right - e.pageX) / 51) + 6;
+        }
       }
 
-      const currentSq = mouseX;
 
       this.setState({currentDragTargetIndex: currentSq});
 
-      let y = (this.state.dragObjParentIndex < 12) ? ( 950 - e.pageY ) : e.pageY;
+      let y = e.pageY;
       y += this.state.dragCursorYOffset;
 
       let x = e.pageX + this.state.dragCursorXOffset;

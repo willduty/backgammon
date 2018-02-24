@@ -30,6 +30,7 @@ export default class Game extends React.Component {
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
 
+  // decide who goes first
   doDecidingRoll() {
     const roll = this.state.game.decide();
     if (roll[0] === roll[1]) {

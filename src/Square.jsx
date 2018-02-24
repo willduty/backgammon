@@ -16,7 +16,6 @@ export default class Square extends React.Component {
     const highlightChanged = this.props.highlight !== nextProps.highlight;
     const stoppedRolling = this.props.rolling !== nextProps.rolling;
     const isDropTarget = this.props.currentDragTargetIndex === this.props.index;
-
     return chipsUpdated || highlightChanged || stoppedRolling || isDropTarget || this.props.hasMoves !== nextProps.hasMoves;
   }
 
@@ -44,7 +43,7 @@ export default class Square extends React.Component {
     // build alternating board spikes
     let classNames = this.props.index > 11 ?
       this.props.index%2 ? ['dark'] : ['light'] :
-      (this.props.index%2 ? ['light', 'flipvert'] : ['dark', 'flipvert']);
+      (this.props.index%2 ? ['light-bottom'] : ['dark-bottom']);
 
     // determine highlight
     let highlight = '';
