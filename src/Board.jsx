@@ -12,6 +12,7 @@ export default class Board extends React.Component {
     this.startDrag = this.startDrag.bind(this);
     this.stopDrag = this.stopDrag.bind(this);
     this.dragging = this.dragging.bind(this);
+    this.SQUARE_WIDTH = 51;
 
     this.state = {
       game: this.props.game,
@@ -72,33 +73,27 @@ export default class Board extends React.Component {
 
   dragging(e) {
     if(this.state.dragObj) {
-
       const boardRect = this.state.boardRect || document.getElementById('draggableArea').getBoundingClientRect();
-
-      const leftBoard = document.getElementById('left-board').getBoundingClientRect();
-      const rightBoard = document.getElementById('right-board').getBoundingClientRect();
+      const leftBoard = this.state.leftBoard || document.getElementById('left-board').getBoundingClientRect();
+      const rightBoard = this.state.rightBoard || document.getElementById('right-board').getBoundingClientRect();
       const mouseY = Math.floor((e.pageY - boardRect.y) / 300);
 
       let currentSq;
       if(rightBoard.x < e.pageX && rightBoard.x + rightBoard.width > e.pageX) {
         if (mouseY < 1) {
-                currentSq = Math.floor((e.pageX - rightBoard.left) / 51) + 18;
-
+          currentSq = Math.floor((e.pageX - rightBoard.left) / this.SQUARE_WIDTH) + 18;
         } else {
-                currentSq = Math.floor((rightBoard.right - e.pageX) / 51);
-
+          currentSq = Math.floor((rightBoard.right - e.pageX) / this.SQUARE_WIDTH);
         }
 
       } else if (leftBoard.x < e.pageX && leftBoard.x + leftBoard.width > e.pageX) {
         if (mouseY < 1) {
-               currentSq = Math.floor((e.pageX - leftBoard.left) / 51) + 12;
+          currentSq = Math.floor((e.pageX - leftBoard.left) / this.SQUARE_WIDTH) + 12;
         } else {
-               currentSq = Math.floor((leftBoard.right - e.pageX) / 51) + 6;
+          currentSq = Math.floor((leftBoard.right - e.pageX) / this.SQUARE_WIDTH) + 6;
         }
       }
 
-
-      this.setState({currentDragTargetIndex: currentSq});
 
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
@@ -106,9 +101,19 @@ export default class Board extends React.Component {
       let x = ((this.state.dragObjParentIndex < 12) ? ( e.pageX  ) : e.pageX );
       x += this.state.dragCursorXOffset;
 
-      this.state.dragObj.style.zIndex = 100000;
-      this.state.dragObj.style.top = y + 'px';
-      this.state.dragObj.style.left = x + 'px';
+      let dragObj = this.state.dragObj;
+      dragObj.style.zIndex = 100000;
+      dragObj.style.top = y + 'px';
+      dragObj.style.left = x + 'px';
+
+      this.setState({
+        dragObj: dragObj,
+        boardRect: boardRect,
+        leftBoard: leftBoard,
+        rightBoard: rightBoard,
+        currentDragTargetIndex: currentSq,
+      });
+
     }
   }
 

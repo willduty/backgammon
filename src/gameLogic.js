@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 
 export default class GameLogic {
@@ -11,7 +10,8 @@ export default class GameLogic {
 
   // standard initial game
   STANDARD_OPENING = {
-    currentPlayer: null,
+    currentPlayer: null, // either 'dark' or 'light'
+    opponent: null, // opposite of currentPlayer
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 3, 23: 5},
     darkMoves: {},
@@ -38,6 +38,7 @@ export default class GameLogic {
       return roll;
     } else {
       this.currentPlayer = roll[0] > roll[1] ? 'dark' : 'light';
+      this.opponent = (this.currentPlayer === 'dark') ? 'light' : 'dark';
       return roll;
     }
   }
@@ -58,7 +59,7 @@ export default class GameLogic {
 
   setPossibleMoves = function() {
 
-    for(var sq in this.dark) {
+    for(var sq in this[this.currentPlayer]) {
 
       // Logic for which moves can be made from each occupied spike
       const curr = parseInt(sq, 10),
@@ -84,7 +85,7 @@ export default class GameLogic {
       // exclude moves occupied by opponent, and offboard unless player can bear-off.
       let allowedMoves = [];
       for(var i in possibleMoves) {
-        const occ = this.light[possibleMoves[i]] || 0,
+        const occ = this[this.opponent][possibleMoves[i]] || 0,
           isOffboard = possibleMoves[i] > 23 && !this.canOffboard();
 
         if (!isOffboard && (!occ || (occ < 2))) {
@@ -92,7 +93,7 @@ export default class GameLogic {
         }
       }
 
-      this.darkMoves[sq] = allowedMoves
+      this[this.currentPlayer + 'Moves'][sq] = allowedMoves;
     }
   }
 
@@ -101,14 +102,10 @@ export default class GameLogic {
   }
 
   attemptChange = function(change) {
-
-    // TODO: implement move types (switch or ifs)
-    // TODO: implement if move allowed
-    // TODO: implement change in available dice & moves
-
     if (change.move) {
-      this.dark[change.move.to] = this.dark[change.move.to] ? (this.dark[change.move.to] + 1) : 1;
-      this.dark[change.move.from]--;
+      this[this.currentPlayer][change.move.to] =
+        this[this.currentPlayer][change.move.to] ? (this[this.currentPlayer][change.move.to] + 1) : 1;
+      this[this.currentPlayer][change.move.from]--;
 
       const diff = change.move.to - change.move.from;
       this.lastRoll.splice(this.lastRoll.indexOf(diff), 1);
