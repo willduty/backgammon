@@ -70,9 +70,9 @@ ol, ul {
 }
 
 @keyframes showMovableChips {
-  0%   { -webkit-filter: brightness(300%); }
-  50%  { -webkit-filter: brightness(400%); }
-  100% { -webkit-filter: brightness(300%); }
+  0%   { -webkit-filter: brightness(400%) hue-rotate(30deg); }
+  50%  { -webkit-filter: brightness(600%) hue-rotate(230deg); }
+  100% { -webkit-filter: brightness(400%) hue-rotate(30deg); }
 }
 
 .die1,.die2,.die3,.die4,.die5,.die6 {
@@ -121,7 +121,7 @@ ol, ul {
   vertical-align: middle;
 }
 
-.test {
+.board {
   /*border: 2px solid black;*/
   width: 700px;
   height: 600px;
@@ -149,6 +149,13 @@ ol, ul {
   float: left;
 }
 
+.sep {
+  width: 13px;
+  height: 600px;
+  background: black;
+  float: left;
+}
+
 .board-section {
  float: left;
 }
@@ -164,7 +171,6 @@ ol, ul {
 .dropTargetSquare {
   -webkit-filter: brightness(200%)
 }
-
 
 .kbd-navigation .square:focus {
   background: #ddd;
@@ -186,4 +192,18 @@ ol, ul {
 
 .bold-square {
   background: #fee;
+}
+
+.cube {
+    height: 50px;
+    width: 50px;
+    background: #111;
+}
+
+.holder {
+    height: 275px;
+    width: 50px;
+    /*background: #225022;*/
+    background: #224022;
+    vertical-align: bottom;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import Square from './Square'
 import Dice from './Dice'
+import Holder from './Holder'
 import _ from 'lodash';
 
 export default class Board extends React.Component {
@@ -102,7 +103,8 @@ export default class Board extends React.Component {
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
 
-      let x = e.pageX + this.state.dragCursorXOffset;
+      let x = ((this.state.dragObjParentIndex < 12) ? ( e.pageX  ) : e.pageX );
+      x += this.state.dragCursorXOffset;
 
       this.state.dragObj.style.zIndex = 100000;
       this.state.dragObj.style.top = y + 'px';
@@ -136,7 +138,7 @@ export default class Board extends React.Component {
     const status = '';
     // TODO make cover a component
     return (
-      <div className='test'>
+      <div className='board'>
         <div className={this.state.rolling ? 'cover' : '' }>
           <div>{this.state.rolling ? 'Rolling...' : ''}</div>
         </div>
@@ -181,12 +183,13 @@ export default class Board extends React.Component {
             </div>
           </div>
         </div>
+        <div className='sep'>&nbsp;</div>
 
         <div className="board-section">
           <div className="part">
-            <div>box1</div>
-            <div>dcube</div>
-            <div>box2</div>
+            <Holder />
+            <div className='cube'>dcube</div>
+            <Holder />
           </div>
         </div>
       </div>
