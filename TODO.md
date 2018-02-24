@@ -13,5 +13,5 @@ Game
 
 General
 - use redux
-- set up on digital ocean
+- set up hosting, etc digital ocean
 - implement remote player
