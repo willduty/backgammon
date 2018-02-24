@@ -45,7 +45,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [1, 5]; // TESTING
+//    lastRoll = [6, 6]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -81,16 +81,23 @@ export default class GameLogic {
         }
       }
 
-      // exclude moves occupied by opponent
+      // exclude moves occupied by opponent, and offboard unless player can bear-off.
+      let allowedMoves = [];
       for(var i in possibleMoves) {
-        const occ = this.light[possibleMoves[i]] || 0;
-        if (occ && occ > 1) {
-          possibleMoves.splice(i, 1)
+        const occ = this.light[possibleMoves[i]] || 0,
+          isOffboard = possibleMoves[i] > 23 && !this.canOffboard();
+
+        if (!isOffboard && (!occ || (occ < 2))) {
+          allowedMoves.push(possibleMoves[i]);
         }
       }
 
-      this.darkMoves[sq] = possibleMoves
+      this.darkMoves[sq] = allowedMoves
     }
+  }
+
+  canOffboard = function () {
+    return false; // TODO implement
   }
 
   attemptChange = function(change) {
