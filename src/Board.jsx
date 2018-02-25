@@ -68,6 +68,11 @@ export default class Board extends React.Component {
         dragObj: null,
         highlightTargets: [],
       });
+
+      const moves = this.state.game.lastRoll
+      if (moves.length === 0) {
+        setTimeout(this.props.turnComplete, 800);
+      }
     }
   }
 
@@ -85,7 +90,6 @@ export default class Board extends React.Component {
         } else {
           currentSq = Math.floor((rightBoard.right - e.pageX) / this.SQUARE_WIDTH);
         }
-
       } else if (leftBoard.x < e.pageX && leftBoard.x + leftBoard.width > e.pageX) {
         if (mouseY < 1) {
           currentSq = Math.floor((e.pageX - leftBoard.left) / this.SQUARE_WIDTH) + 12;
@@ -141,12 +145,18 @@ export default class Board extends React.Component {
 
   render() {
     const status = '';
+    const rollingText = this.state.rolling ?
+      ((this.state.game.currentPlayer == 'light' ? 'Computer ' : 'Player ') + 'Rolling...') :
+      '';
+
     // TODO make cover a component
     return (
       <div className='board'>
-        <div className={this.state.rolling ? 'cover' : '' }>
-          <div>{this.state.rolling ? 'Rolling...' : ''}</div>
+        <div className={this.state.rolling ? 'cover' : '' } />
+        <div className={this.state.rolling ? 'rolling' : ''}>
+          {rollingText}
         </div>
+
         <Dice game={this.state.game}/>
 
         <div id='draggableArea'  onMouseUp={this.stopDrag}>

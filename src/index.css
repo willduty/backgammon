@@ -104,7 +104,7 @@ ol, ul {
 }
 
 .board, .cover {
-    width: 725px;
+  width: 725px;
 }
 
 .cover {
@@ -113,15 +113,24 @@ ol, ul {
   left: 0px;
   height: 600px;
   background-color: #333;
-  opacity: .4;
+  opacity: .7;
   z-index: 900;
   position: absolute;
   color: white;
 }
 
-.cover div {
+.rolling {
   display: table-cell;
   vertical-align: middle;
+  position: absolute;
+  top: 300px;
+  left: 200px;
+  height: 50px;
+  width: 260px;
+  color: white;
+  background: transparent;
+  font: 18px "Century Gothic", Futura, sans-serif;
+  z-index: 10000;
 }
 
 .board {
@@ -224,3 +233,4 @@ ol, ul {
     /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
     /*filter: drop-shadow(-2px 2px 1px #222);*/
 }
+

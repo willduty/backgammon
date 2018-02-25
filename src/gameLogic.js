@@ -11,7 +11,7 @@ export default class GameLogic {
   // standard initial game
   STANDARD_OPENING = {
     currentPlayer: null, // either 'dark' or 'light'
-    opponent: null, // opposite of currentPlayer
+    opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 3, 23: 5},
     darkMoves: {},
@@ -37,16 +37,22 @@ export default class GameLogic {
     if (roll[0] === roll[1]) {
       return roll;
     } else {
-      this.currentPlayer = roll[0] > roll[1] ? 'dark' : 'light';
+      this.currentPlayer = (roll[0] > roll[1]) ? 'dark' : 'light';
       this.opponent = (this.currentPlayer === 'dark') ? 'light' : 'dark';
       return roll;
     }
   }
 
+  nextTurn = function () {
+    const current = this.currentPlayer;
+    this.currentPlayer = this.opponent;
+    this.opponent = current;
+  }
+
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [6, 6]; // TESTING
+//    lastRoll = [2, 3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -58,13 +64,38 @@ export default class GameLogic {
   }
 
   setPossibleMoves = function() {
-
+    this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
     for(var sq in this[this.currentPlayer]) {
-
       // Logic for which moves can be made from each occupied spike
-      const curr = parseInt(sq, 10),
-        first = parseInt(this.lastRoll[0], 10),
-        sec = parseInt(this.lastRoll[1], 10);
+      const curr = parseInt(sq, 10);
+      let   first = parseInt(this.lastRoll[0], 10),
+       sec = parseInt(this.lastRoll[1], 10);
+
+      // opponent goes backwards
+      if (this.currentPlayer === 'light') {
+        first = -first;
+        sec = - sec;
+      }
+
+      // TODO object needs playerMoves to become highlightableMoves and moves
+      // TODO object needs currentPlayer to autopoint to moves
+  /*
+      currentPlayer: method,
+      _currentPlayer: dark/light
+      opponent: null, // opposite of currentPlayer
+      dark: {
+        chips: {0: 2, 11: 5, 16: 3, 18: 5},
+        moves: {},
+        highlightMoves: {}
+      }
+      light: {
+        chips: {5: 5, 7: 3, 12: 3, 23: 5},
+        moves: {},
+        highlightMoves: {}
+      }
+      lastRoll: [],
+      lastInitialRoll: [],
+  */
 
       let possibleMoves;
 
@@ -72,9 +103,7 @@ export default class GameLogic {
         possibleMoves = _.map(this.lastRoll, function(val, i) {
           return (curr + (val * (i + 1)));
         });
-
       } else {
-
         if(first && sec) {
           possibleMoves = [curr + first, curr + sec, curr + first + sec];
         } else {
@@ -85,14 +114,13 @@ export default class GameLogic {
       // exclude moves occupied by opponent, and offboard unless player can bear-off.
       let allowedMoves = [];
       for(var i in possibleMoves) {
-        const occ = this[this.opponent][possibleMoves[i]] || 0,
-          isOffboard = possibleMoves[i] > 23 && !this.canOffboard();
+        const taken = this[this.opponent][possibleMoves[i]] || 0,
+          isOffboard = (possibleMoves[i] > 23 || possibleMoves[i] < 0) && !this.canOffboard();
 
-        if (!isOffboard && (!occ || (occ < 2))) {
+        if (!isOffboard && (!taken || (taken < 2))) {
           allowedMoves.push(possibleMoves[i]);
         }
       }
-
       this[this.currentPlayer + 'Moves'][sq] = allowedMoves;
     }
   }
@@ -101,7 +129,8 @@ export default class GameLogic {
     return false; // TODO implement
   }
 
-  attemptChange = function(change) {
+  // TODO: have args be to, from
+  doMove = function(change) {
     if (change.move) {
       this[this.currentPlayer][change.move.to] =
         this[this.currentPlayer][change.move.to] ? (this[this.currentPlayer][change.move.to] + 1) : 1;
@@ -111,9 +140,28 @@ export default class GameLogic {
       this.lastRoll.splice(this.lastRoll.indexOf(diff), 1);
       this.setPossibleMoves();
     }
-
-    // TODO: return true or false appropriately
     return true;
+  }
+
+  selectRandomMove = function() {
+    // this.lightMoves needs to distinguish individual vs compound moves
+    const possibleMoves = this.lightMoves,
+      movablePieceKeys = Object.keys(this.lightMoves);
+
+    const whichKey = movablePieceKeys[Math.floor(Math.random() * movablePieceKeys.length)];
+    let index = Math.floor(Math.random() * possibleMoves[whichKey].length);
+
+    return [parseInt(whichKey), possibleMoves[whichKey][index]];
+  }
+
+  automatedMoves = function() {
+    let moves = [];
+
+    for (var i in this.lastRoll) {
+      moves.push(this.selectRandomMove());
+      this.setPossibleMoves();
+    }
+    return moves;
   }
 
   // decides who gets first move

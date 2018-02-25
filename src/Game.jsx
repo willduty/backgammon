@@ -5,11 +5,13 @@ import GameLogic from './gameLogic.js';
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
-    this.TIMEOUT = 400;
+    this.TIMEOUT = 800;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
     this.updateGame = this.updateGame.bind(this);
+    this.turnComplete = this.turnComplete.bind(this);
+    this.doAutomatedMove = this.doAutomatedMove.bind(this);
 
     let gameLogic = new GameLogic();
 
@@ -50,13 +52,40 @@ export default class Game extends React.Component {
     this.setState({
       game: game,
     });
+
+    if (game.currentPlayer == 'light') {
+      setTimeout(this.doAutomatedMove, this.TIMEOUT);
+    }
+  }
+
+  doAutomatedMove() {
+    const m = this.state.game.automatedMoves();
+    for (var i in m) {
+      console.log('moving computer->> ', m[i])
+      this.updateGame({move: {from: m[i][0], to: m[i][1]}})
+    }
+
+    // TODO: start computer move animation
+
+    setTimeout( this.turnComplete, this.TIMEOUT);
   }
 
   updateGame(change) {
     let game = this.state.game;
-    if(game.attemptChange(change)) {
+    if(game.doMove(change)) {
       this.setState({game: game})
     }
+  }
+
+  turnComplete() {
+    var game = this.state.game;
+    game.rolling = true;
+    game.nextTurn();
+    this.setState({
+      game: game,
+    });
+
+    setTimeout(this.playerRoll, this.TIMEOUT);
   }
 
   updateStatus() {
@@ -73,6 +102,7 @@ export default class Game extends React.Component {
             game={this.state.game}
             rolling={this.state.game.rolling}
             updateGame={this.updateGame}
+            turnComplete={this.turnComplete}
             />
         </div>
         <div>
