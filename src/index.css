@@ -103,14 +103,17 @@ ol, ul {
   background-image: url(./images/die6.png);
 }
 
+.board, .cover {
+    width: 725px;
+}
+
 .cover {
   display: table;
   top: 0px;
   left: 0px;
-  width: 700px;
   height: 600px;
   background-color: #333;
-  opacity: .5;
+  opacity: .4;
   z-index: 900;
   position: absolute;
   color: white;
@@ -122,8 +125,6 @@ ol, ul {
 }
 
 .board {
-  /*border: 2px solid black;*/
-  width: 700px;
   height: 600px;
 }
 
@@ -194,16 +195,32 @@ ol, ul {
   background: #fee;
 }
 
+.cube, .holder {
+    width: 75px;
+}
+
 .cube {
     height: 50px;
-    width: 50px;
     background: #111;
 }
 
 .holder {
-    height: 275px;
-    width: 50px;
-    /*background: #225022;*/
-    background: #224022;
-    vertical-align: bottom;
+  height: 275px;
+  background: #242;
+}
+
+.holder div:first-child {
+    height: 12px;
+}
+
+.holder .chips {
+  /*margin: 10px 5px 0 5px;*/
+    -webkit-box-shadow: inset 0 1em 2em -2em ;
+  height: 250px;
+  width: 60px;
+  background: #224022;
+    margin: 0 auto;
+    position: relative;
+    /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
+    /*filter: drop-shadow(-2px 2px 1px #222);*/
 }
