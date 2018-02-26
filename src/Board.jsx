@@ -35,7 +35,13 @@ export default class Board extends React.Component {
   }
 
   showMoves(rolloverIndex) {
-    const targets = this.state.game.darkMoves[rolloverIndex] || [];
+    const thing = this.state.game.darkMoves[rolloverIndex]
+    let targets = [];
+    if(Array.isArray(thing)) {
+      targets = thing.map(function(item) {
+        return Array.isArray(item) ? item[item.length - 1] : item;
+      });
+    }
     this.setState({highlightTargets: targets});
   }
 
@@ -46,7 +52,7 @@ export default class Board extends React.Component {
   startDrag(event, chipIndex) {
     const square = document.getElementById('square_' + chipIndex);
     const chip = _.find(square.children, function(e) {
-      return e.className.indexOf('selectable') !== -1
+      return e.className.indexOf('selectable') !== -1;
     });
     this.state.dragObjOriginalY = chip.style.top;
     this.state.dragObjParentIndex = chipIndex;
@@ -58,9 +64,7 @@ export default class Board extends React.Component {
 
   stopDrag(e) {
     if (this.state.dragObj) {
-      this.props.updateGame({
-        move: {from: this.state.dragObjParentIndex, to: this.state.currentDragTargetIndex}
-      });
+      this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
 
       this.setState({
         currentDragTargetIndex: null,
@@ -124,7 +128,8 @@ export default class Board extends React.Component {
   renderSquare(i) {
     let highlight = this.state.highlightTargets.indexOf(i) !== -1;
 
-    const dm = this.state.game.darkMoves;
+    const dm = this.state.game.darkMoves; // TODO set this to currentPlayer
+
     let hasMoves = (this.state.game.lastRoll && this.state.game.lastRoll.length === 0) ? false :
       (dm && dm[i] && dm[i].length > 0);
 

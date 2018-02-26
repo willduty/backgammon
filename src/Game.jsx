@@ -61,8 +61,7 @@ export default class Game extends React.Component {
   doAutomatedMove() {
     const m = this.state.game.automatedMoves();
     for (var i in m) {
-      console.log('moving computer->> ', m[i])
-      this.updateGame({move: {from: m[i][0], to: m[i][1]}})
+      this.updateGame(m[i][0], m[i][1]);
     }
 
     // TODO: start computer move animation
@@ -70,9 +69,9 @@ export default class Game extends React.Component {
     setTimeout( this.turnComplete, this.TIMEOUT);
   }
 
-  updateGame(change) {
+  updateGame(from, to) {
     let game = this.state.game;
-    if(game.doMove(change)) {
+    if(game.doMove(from, to)) {
       this.setState({game: game})
     }
   }

@@ -14,7 +14,7 @@ export default class GameLogic {
     opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 3, 23: 5},
-    darkMoves: {},
+    darkMoves: {}, // maybe should be an object with methods
     lightMoves: {},
     lastRoll: [],
     lastInitialRoll: [],
@@ -52,7 +52,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [2, 3]; // TESTING
+    lastRoll = [2, 3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -101,11 +101,27 @@ export default class GameLogic {
 
       if (first === sec) {
         possibleMoves = _.map(this.lastRoll, function(val, i) {
-          return (curr + (val * (i + 1)));
+          let move = (curr + (val * (i + 1)));
+
+          switch(i) {
+            case 0:
+              move = curr + val;
+              break;
+            case 1:
+              move = [curr + val, curr + (val * 2)];
+              break;
+            case 2:
+              move = [curr + val, curr + (val * 2), curr + (val * 3)];
+              break;
+            case 3:
+              move = [curr + val, curr + (val * 2), curr + (val * 3), curr + (val * 4)];
+              break;
+          }
+          return move;
         });
       } else {
         if(first && sec) {
-          possibleMoves = [curr + first, curr + sec, curr + first + sec];
+          possibleMoves = [curr + first, curr + sec, [curr + first, curr + first + sec]];
         } else {
           possibleMoves = [curr + first];
         }
@@ -113,9 +129,17 @@ export default class GameLogic {
 
       // exclude moves occupied by opponent, and offboard unless player can bear-off.
       let allowedMoves = [];
+      const opponentSpikes = this[this.opponent];
+
       for(var i in possibleMoves) {
-        const taken = this[this.opponent][possibleMoves[i]] || 0,
-          isOffboard = (possibleMoves[i] > 23 || possibleMoves[i] < 0) && !this.canOffboard();
+
+        let moveIndex = possibleMoves[i];
+        if (Array.isArray(moveIndex)) {
+          moveIndex = moveIndex[moveIndex.length - 1];
+        }
+
+        const taken = opponentSpikes[moveIndex] || 0,
+          isOffboard = (moveIndex > 23 || moveIndex < 0) && !this.canOffboard();
 
         if (!isOffboard && (!taken || (taken < 2))) {
           allowedMoves.push(possibleMoves[i]);
@@ -129,17 +153,29 @@ export default class GameLogic {
     return false; // TODO implement
   }
 
-  // TODO: have args be to, from
-  doMove = function(change) {
-    if (change.move) {
-      this[this.currentPlayer][change.move.to] =
-        this[this.currentPlayer][change.move.to] ? (this[this.currentPlayer][change.move.to] + 1) : 1;
-      this[this.currentPlayer][change.move.from]--;
+  doMove = function(from, to) {
+    const spikes = this[this.currentPlayer];
+    spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
+    spikes[from]--;
 
-      const diff = change.move.to - change.move.from;
-      this.lastRoll.splice(this.lastRoll.indexOf(diff), 1);
-      this.setPossibleMoves();
-    }
+    const possibleMoves = this[this.currentPlayer + 'Moves'][from];
+    const move = _.find(possibleMoves, function (item) {
+      const test = Array.isArray(item) ? item[item.length - 1] : item;
+      return test === to;
+    });
+
+    if (Array.isArray(move)) {
+      if (this.lastInitialRoll.length === 2) {
+        this.lastRoll = [];
+      } else {
+        for(var i in move) {
+          this.lastRoll.pop();
+        }
+      }
+    } else {
+      this.lastRoll.splice(this.lastRoll.indexOf(to - from), 1);
+    };
+    this.setPossibleMoves();
     return true;
   }
 
