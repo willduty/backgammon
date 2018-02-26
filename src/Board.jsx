@@ -54,17 +54,24 @@ export default class Board extends React.Component {
     const chip = _.find(square.children, function(e) {
       return e.className.indexOf('selectable') !== -1;
     });
+
     this.state.dragObjOriginalY = chip.style.top;
+    this.state.dragObjOriginalX = chip.style.left;
     this.state.dragObjParentIndex = chipIndex;
     this.state.dragObj = chip;
 
-    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY) - parseInt(event.pageY);
-    this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX);
+    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY, 10) - parseInt(event.pageY, 10);
+    this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX, 10);
   }
 
   stopDrag(e) {
     if (this.state.dragObj) {
-      this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
+
+      const update = this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
+      if (!update) {
+        this.state.dragObj.style.top = this.state.dragObjOriginalY;
+        this.state.dragObj.style.left = this.state.dragObjOriginalX;
+      }
 
       this.setState({
         currentDragTargetIndex: null,

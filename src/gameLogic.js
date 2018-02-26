@@ -52,7 +52,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-    lastRoll = [2, 3]; // TESTING
+//    lastRoll = [2, 3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -77,32 +77,13 @@ export default class GameLogic {
         sec = - sec;
       }
 
-      // TODO object needs playerMoves to become highlightableMoves and moves
-      // TODO object needs currentPlayer to autopoint to moves
-  /*
-      currentPlayer: method,
-      _currentPlayer: dark/light
-      opponent: null, // opposite of currentPlayer
-      dark: {
-        chips: {0: 2, 11: 5, 16: 3, 18: 5},
-        moves: {},
-        highlightMoves: {}
-      }
-      light: {
-        chips: {5: 5, 7: 3, 12: 3, 23: 5},
-        moves: {},
-        highlightMoves: {}
-      }
-      lastRoll: [],
-      lastInitialRoll: [],
-  */
-
       let possibleMoves;
 
       if (first === sec) {
         possibleMoves = _.map(this.lastRoll, function(val, i) {
           let move = (curr + (val * (i + 1)));
 
+          // TODO: simplify
           switch(i) {
             case 0:
               move = curr + val;
@@ -127,7 +108,7 @@ export default class GameLogic {
         }
       }
 
-      // exclude moves occupied by opponent, and offboard unless player can bear-off.
+      // exclude moves occupied by opponent (2 or more chips) and offboard moves, unless player can bear-off.
       let allowedMoves = [];
       const opponentSpikes = this[this.opponent];
 
@@ -154,10 +135,6 @@ export default class GameLogic {
   }
 
   doMove = function(from, to) {
-    const spikes = this[this.currentPlayer];
-    spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
-    spikes[from]--;
-
     const possibleMoves = this[this.currentPlayer + 'Moves'][from];
     const move = _.find(possibleMoves, function (item) {
       const test = Array.isArray(item) ? item[item.length - 1] : item;
@@ -172,15 +149,24 @@ export default class GameLogic {
           this.lastRoll.pop();
         }
       }
-    } else {
+    } else if (move) {
       this.lastRoll.splice(this.lastRoll.indexOf(to - from), 1);
     };
-    this.setPossibleMoves();
-    return true;
+
+    const spikes = this[this.currentPlayer];
+
+    if (move) {
+      spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
+      spikes[from]--;
+      this.setPossibleMoves();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   selectRandomMove = function() {
-    // this.lightMoves needs to distinguish individual vs compound moves
+    // TODO this.lightMoves needs to distinguish individual vs compound moves
     const possibleMoves = this.lightMoves,
       movablePieceKeys = Object.keys(this.lightMoves);
 

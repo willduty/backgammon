@@ -45,8 +45,6 @@ export default class Square extends React.Component {
       this.props.index%2 ? ['dark'] : ['light'] :
       (this.props.index%2 ? ['light-bottom'] : ['dark-bottom']);
 
-    // determine highlight
-    let highlight = '';
     if (this.props.highlight) {
       if(this.props.currentDragTargetIndex === this.props.index) {
         classNames.push('dropTargetSquare');

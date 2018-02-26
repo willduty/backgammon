@@ -44,7 +44,7 @@ export default class Game extends React.Component {
   }
 
   playerRoll() {
-    const roll = this.state.game.rollPlayerDice();
+    this.state.game.rollPlayerDice();
     this.updateStatus();
     var game = this.state.game;
     game.rolling = false;
@@ -53,7 +53,7 @@ export default class Game extends React.Component {
       game: game,
     });
 
-    if (game.currentPlayer == 'light') {
+    if (game.currentPlayer === 'light') {
       setTimeout(this.doAutomatedMove, this.TIMEOUT);
     }
   }
@@ -73,6 +73,9 @@ export default class Game extends React.Component {
     let game = this.state.game;
     if(game.doMove(from, to)) {
       this.setState({game: game})
+    } else {
+      this.setState({game: game})
+      // TODO reset chip
     }
   }
 
