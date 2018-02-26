@@ -197,8 +197,9 @@ export default class GameLogic {
   }
 
   setGame = function(setting) {
-    for(var property in setting) {
-      this[property] = setting[property]
+    const obj = JSON.parse(JSON.stringify(setting));
+    for(var property in obj) {
+      this[property] = obj[property]
     }
   }
 }
