@@ -26,12 +26,13 @@ export default class Game extends React.Component {
     let text;
     const game = this.state.game;
     if (this.state.game.rolling) {
-      text =  (this.state.showDecision) ?
-        (this.state.showDecision + ((game.currentPlayer == 'dark') ? ' player ' : ' computer ') + 'starts...') :
+      const decidingRoll = this.state.showDecision;
+      text = (decidingRoll) ?
+        (decidingRoll[0] + ', ' + decidingRoll[1] + ((game.currentPlayer == 'dark') ? ' Player ' : ' Computer ') + 'starts...') :
         (game.currentPlayer == 'light' ? 'Computer ' : 'Player ') + 'Rolling...';
 
       if (!game.currentPlayer) {
-        text = this.props.tie ? 'OOPS! TIE! Rolling again' : 'Deciding start...';
+        text = this.props.tie ? 'OOPS! TIE! Rolling again' : 'Opening roll...';
       }
     }
     return text;
