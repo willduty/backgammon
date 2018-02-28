@@ -8,6 +8,8 @@ export default class Square extends React.Component {
       value: null,
       chips: []
     }
+    this.CHIP_SPACING = 40;
+    this.MAX_UNSPACED = 250;
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -24,12 +26,13 @@ export default class Square extends React.Component {
 
       const active =
         (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark') && (this.props.hasMoves);
+      const spacing = (count > 6 ? this.MAX_UNSPACED / count : this.CHIP_SPACING);
 
       this.state.chips.push(
         <Chip
           parentIndex = {this.props.index}
           active = {active}
-          offset = {(i * 40)}
+          offset = {i * spacing}
           type = {type}
           onMouseEnter={this.props.onMouseEnter}
           onMouseLeave={this.props.onMouseLeave}

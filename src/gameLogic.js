@@ -32,8 +32,8 @@ export default class GameLogic {
   }
 
   decide = function() {
-    const roll = this.rollDecidingDice();
-//    const roll = [5,5]; // TESTING forces dark player first
+//    const roll = this.rollDecidingDice();
+    const roll = [5, 1]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;
     } else {
@@ -52,7 +52,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [2, 3]; // TESTING
+//    lastRoll = [2, 2]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]

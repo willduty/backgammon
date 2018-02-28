@@ -109,7 +109,6 @@ export default class Board extends React.Component {
         }
       }
 
-
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
 
@@ -159,10 +158,11 @@ export default class Board extends React.Component {
     const status = '';
     let rollingText = '';
     const game = this.state.game;
+    document.body.onmouseup = this.stopDrag
 
     // TODO make cover a component
     return (
-      <div className='board'>
+      <div className='board' >
         <div className={this.props.rollingText ? ' cover ' : '' } />
         <div className='rolling'>
           {this.props.rollingText}
@@ -173,7 +173,7 @@ export default class Board extends React.Component {
           showDecision={this.props.showDecision}
         />
 
-        <div id='draggableArea'  onMouseUp={this.stopDrag}>
+        <div id='draggableArea' >
           <div className="board-section" id="left-board" onMouseMove={this.dragging}>
             <div>
               {this.renderSquare(12)}
