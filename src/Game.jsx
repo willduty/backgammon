@@ -6,6 +6,7 @@ export default class Game extends React.Component {
   constructor(props) {
     super(props);
     this.TIMEOUT = 1000;
+    this.SHORT_TIMEOUT = 500;
     this.LONG_TIMEOUT = 2000;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
@@ -81,19 +82,21 @@ export default class Game extends React.Component {
     });
 
     if (game.currentPlayer === 'light') {
-      setTimeout(this.doAutomatedMove, this.TIMEOUT);
+      setTimeout(this.doAutomatedMove, this.SHORT_TIMEOUT);
     }
   }
 
   doAutomatedMove() {
-    const m = this.state.game.automatedMoves();
-    for (var i in m) {
-      this.updateGame(m[i][0], m[i][1]);
+    if (this.state.game.canMove()) {
+      const m = this.state.game.automatedMove();
+      this.updateGame(m[0][0], m[0][1]);
+      // TODO: start "computer move" animation
+      // TODO: figure out why this cycle times unevenly..
+
+      setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT);
+    } else {
+      setTimeout( this.turnComplete, this.TIMEOUT);
     }
-
-    // TODO: start computer move animation
-
-    setTimeout( this.turnComplete, this.TIMEOUT);
   }
 
   updateGame(from, to) {
