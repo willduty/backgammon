@@ -5,7 +5,8 @@ import GameLogic from './gameLogic.js';
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
-    this.TIMEOUT = 800;
+    this.TIMEOUT = 1000;
+    this.LONG_TIMEOUT = 2000;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
@@ -16,8 +17,24 @@ export default class Game extends React.Component {
     let gameLogic = new GameLogic();
 
     this.state = {
-      game: gameLogic
+      game: gameLogic,
+      tie: false,
     }
+  }
+
+  coverText() {
+    let text;
+    const game = this.state.game;
+    if (this.state.game.rolling) {
+      text =  (this.state.showDecision) ?
+        (this.state.showDecision + ((game.currentPlayer == 'dark') ? ' player ' : ' computer ') + 'starts...') :
+        (game.currentPlayer == 'light' ? 'Computer ' : 'Player ') + 'Rolling...';
+
+      if (!game.currentPlayer) {
+        text = this.props.tie ? 'OOPS! TIE! Rolling again' : 'Deciding start...';
+      }
+    }
+    return text;
   }
 
   startNew() {
@@ -27,19 +44,27 @@ export default class Game extends React.Component {
 
     this.setState({
       game: game,
-      rolling: false,
     });
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
 
   // decide who goes first
   doDecidingRoll() {
+    this.setState({showDecision: null})
     const roll = this.state.game.decide();
     if (roll[0] === roll[1]) {
-      console.log('oops, tie!');
+      this.setState({
+        tie: true,
+        showDecision: roll
+      })
       setTimeout(this.doDecidingRoll, this.TIMEOUT);
     } else {
-      setTimeout(this.playerRoll, this.TIMEOUT);
+      this.setState({
+        tie: false,
+        showDecision: roll
+      });
+
+    setTimeout(this.playerRoll, this.LONG_TIMEOUT);
     }
   }
 
@@ -51,6 +76,7 @@ export default class Game extends React.Component {
 
     this.setState({
       game: game,
+      showDecision: null,
     });
 
     if (game.currentPlayer === 'light') {
@@ -105,6 +131,9 @@ export default class Game extends React.Component {
             rolling={this.state.game.rolling}
             updateGame={this.updateGame}
             turnComplete={this.turnComplete}
+            tie={this.state.tie}
+            showDecision={this.state.showDecision}
+            rollingText={this.coverText()}
             />
         </div>
         <div>

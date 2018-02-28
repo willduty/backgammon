@@ -157,19 +157,21 @@ export default class Board extends React.Component {
 
   render() {
     const status = '';
-    const rollingText = this.state.rolling ?
-      ((this.state.game.currentPlayer == 'light' ? 'Computer ' : 'Player ') + 'Rolling...') :
-      '';
+    let rollingText = '';
+    const game = this.state.game;
 
     // TODO make cover a component
     return (
       <div className='board'>
-        <div className={this.state.rolling ? 'cover' : '' } />
-        <div className={this.state.rolling ? 'rolling' : ''}>
-          {rollingText}
+        <div className={this.props.rollingText ? ' cover ' : '' } />
+        <div className='rolling'>
+          {this.props.rollingText}
         </div>
 
-        <Dice game={this.state.game}/>
+        <Dice
+          game={this.state.game}
+          showDecision={this.props.showDecision}
+        />
 
         <div id='draggableArea'  onMouseUp={this.stopDrag}>
           <div className="board-section" id="left-board" onMouseMove={this.dragging}>

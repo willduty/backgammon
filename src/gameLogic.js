@@ -32,8 +32,8 @@ export default class GameLogic {
   }
 
   decide = function() {
-//    const roll = this.rollDecidingDice();
-    const roll = [5,4]; // TESTING forces dark player first
+    const roll = this.rollDecidingDice();
+//    const roll = [5,5]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;
     } else {
