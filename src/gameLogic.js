@@ -13,7 +13,7 @@ export default class GameLogic {
     currentPlayer: null, // either 'dark' or 'light'
     opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
-    light: {5: 5, 7: 3, 12: 3, 23: 5},
+    light: {5: 5, 7: 3, 12: 5, 23: 2},
     darkMoves: {}, // maybe should be an object with methods
     lightMoves: {},
     lastRoll: [],
