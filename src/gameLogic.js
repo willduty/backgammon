@@ -55,7 +55,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [6, 1]; // TESTING
+//    lastRoll = [1,2]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -71,9 +71,9 @@ export default class GameLogic {
 
     let barHash = {};
     barHash[this.currentPlayer === 'dark' ? '-1' : 24] = this.bar[this.currentPlayer];
-    const thing = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
+    const movablePieceContainers = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
 
-    for(var sq in thing) {
+    for(var sq in movablePieceContainers) {
       // Logic for which moves can be made from each occupied spike
       const curr = parseInt(sq, 10);
       const light = (this.currentPlayer === 'light');
@@ -90,23 +90,14 @@ export default class GameLogic {
 
       if (first === sec) {
         possibleMoves = _.map(this.lastRoll, function(val, i) {
-          let move;
           const n = light ? -val : val;
+          let move = curr + n;
 
-          // TODO: simplify
-          switch(i) {
-            case 0:
-              move = curr + n;
-              break;
-            case 1:
-              move = [curr + n, curr + (n * 2)];
-              break;
-            case 2:
-              move = [curr + n, curr + (n * 2), curr + (n * 3)];
-              break;
-            case 3:
-              move = [curr + n, curr + (n * 2), curr + (n * 3), curr + (n * 4)];
-              break;
+          if (i > 0) {
+            move = [move];
+            for(var z = 1; z < i; z++) {
+              move.push(curr + (n * (z + 1)));
+            }
           }
           return move;
         });
@@ -210,7 +201,7 @@ export default class GameLogic {
   }
 
   random = function(val) {
-    return Math.floor(Math.random() * val)
+    return Math.floor(Math.random() * val);
   }
 
   selectRandomMove = function() {
@@ -228,18 +219,15 @@ export default class GameLogic {
     let index = this.random(possibleMoves[whichKey].length);
     let to = possibleMoves[whichKey][index];
     to = Array.isArray(to) ? to[to.length - 1] : to;
-    return [parseInt(whichKey), to];
+    return [parseInt(whichKey, 10), to];
   }
 
   automatedMove = function() {
-    if (!this.lastRoll.length) {
-      return;
-    }
-
-    const move = this.selectRandomMove();
-    if (move) {
-      // TODO just return move and adjust usages;
-      return [move];
+    if (this.lastRoll.length) {
+      const move = this.selectRandomMove();
+      if (move) {
+        return move;
+      }
     }
   }
 

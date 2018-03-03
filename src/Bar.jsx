@@ -15,6 +15,7 @@ export default class Bar extends React.Component {
       const active = this.props.active;
       chips.push(
         <Chip
+          key={i}
           parentIndex = {type === 'chip_dark' ? -1 : 24}
           active = {(i === count -1) && active && type === 'chip_dark'}
           offset = {i * this.CHIP_SPACING}

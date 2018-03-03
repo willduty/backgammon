@@ -6,7 +6,6 @@ export default class Square extends React.Component {
     super(props);
     this.state = {
       value: null,
-      chips: []
     }
     this.CHIP_SPACING = 40;
     this.MAX_UNSPACED = 250;
@@ -22,14 +21,16 @@ export default class Square extends React.Component {
   }
 
   makeChips(count, type) {
+    let items = [];
     for (let i=0; i<count; i++) {
 
       const active =
         (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark') && (this.props.hasMoves);
       const spacing = (count > 6 ? this.MAX_UNSPACED / count : this.CHIP_SPACING);
 
-      this.state.chips.push(
+      items.push(
         <Chip
+          key={i}
           parentIndex = {this.props.index}
           active = {active}
           offset = {i * spacing}
@@ -40,6 +41,7 @@ export default class Square extends React.Component {
         />
       )
     }
+    return items;
   }
 
   render() {
@@ -59,16 +61,15 @@ export default class Square extends React.Component {
     // basic square class
     classNames.push('square');
 
-    this.state.chips = [];
-    this.makeChips(this.props.chips.dark, 'chip_dark');
-    this.makeChips(this.props.chips.light, 'chip_light');
+    let chips = this.makeChips(this.props.chips.dark, 'chip_dark');
+    chips = chips.concat(this.makeChips(this.props.chips.light, 'chip_light'));
 
     return (
       <div
-        className={classNames.join(' ')}
-        id={'square_' + this.props.index}
+          className={classNames.join(' ')}
+          id={'square_' + this.props.index}
         >
-        {this.state.chips}
+        {chips}
       </div>
     );
   }

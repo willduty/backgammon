@@ -14,8 +14,10 @@ export default class Dice extends React.Component {
 
     let className = 'dice'
     if (this.props.showDecision) {
-      _.each(this.props.showDecision, function(val) {
-        dice.push(<div className={'die' + val} />)
+      _.each(this.props.showDecision, function(val, i) {
+        dice.push(<div
+          key={i}
+          className={'die' + val} />)
       });
       className = 'deciding-dice'
     } else if (lastInitialRoll) {
@@ -24,18 +26,21 @@ export default class Dice extends React.Component {
         used.splice(used.indexOf(item), 1)
       });
 
-      _.each(lastInitialRoll, function(val) {
+      _.each(lastInitialRoll, function(val, i) {
         const darken = _.includes(used, val);
         if (darken) {
           used.splice(used.indexOf(val), 1);
         }
 
-        dice.push(<div className={'die' + val + ' ' + (darken ? ' darken ' : '')} />)
+        dice.push(<div
+          key={i}
+          className={'die' + val + ' ' + (darken ? ' darken ' : '')} />)
       })
     }
 
     return(
-      <div className={className}>
+      <div
+        className={className}>
         {dice}
       </div>
     )

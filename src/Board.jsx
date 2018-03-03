@@ -55,28 +55,32 @@ export default class Board extends React.Component {
   }
 
   startDrag(event, chipIndex) {
-    const square = this.isBarIndex(chipIndex)  ?
+    const dragObjParent = this.isBarIndex(chipIndex)  ?
      document.getElementById('bar-holder-' + this.state.game.currentPlayer) :
      document.getElementById('square_' + chipIndex);
 
-    const chip = _.find(square.children, function(e) {
+    const chip = _.find(dragObjParent.children, function(e) {
       return e.className.indexOf('selectable') !== -1;
     });
 
-    this.state.dragObjOriginalX = chip.style.left;
-    this.state.dragObjOriginalY = chip.style.top || 0;
-    this.state.dragObjParentIndex = chipIndex;
-    this.state.dragObj = chip;
-    this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX, 10);
-    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY, 10) - parseInt(event.pageY, 10);
+    const dragObjOriginalY = chip.style.top || 0;
+    this.setState({
+      dragObjOriginalX: chip.style.left,
+      dragObjOriginalY: dragObjOriginalY,
+      dragObj: chip,
+      dragCursorXOffset: dragObjParent.getBoundingClientRect().x - parseInt(event.pageX, 10),
+      dragCursorYOffset: parseInt(dragObjOriginalY, 10) - parseInt(event.pageY, 10),
+      dragObjParentIndex: chipIndex,
+    })
   }
 
   stopDrag(e) {
     if (this.state.dragObj) {
       const update = this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
       if (!update) {
-        this.state.dragObj.style.top = this.state.dragObjOriginalY;
-        this.state.dragObj.style.left = this.state.dragObjOriginalX;
+        const dragObj = this.state.dragObj;
+        dragObj.style.top = this.state.dragObjOriginalY;
+        dragObj.style.left = this.state.dragObjOriginalX;
       }
 
       this.setState({
@@ -165,9 +169,6 @@ export default class Board extends React.Component {
   }
 
   render() {
-    const status = '';
-    let rollingText = '';
-    const game = this.state.game;
     const barChipActive = !this.props.rollingText &&
       this.state.game.currentPlayer === 'dark' &&
       this.state.game.darkMoves &&
