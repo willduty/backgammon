@@ -34,8 +34,8 @@ export default class GameLogic {
   }
 
   decide = function() {
-//    const roll = this.rollDecidingDice();
-    const roll = [3, 6]; // TESTING forces computer player first
+    const roll = this.rollDecidingDice();
+//    const roll = [3, 6]; // TESTING forces computer player first
 //    const roll = [6, 3]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;
@@ -69,9 +69,8 @@ export default class GameLogic {
   setPossibleMoves = function() {
     this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
 
-    const barHash = this.currentPlayer === 'dark' ?
-      {'-1': this.bar[this.currentPlayer]} :
-      {24: this.bar[this.currentPlayer]};
+    let barHash = {};
+    barHash[this.currentPlayer === 'dark' ? '-1' : 24] = this.bar[this.currentPlayer];
     const thing = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
 
     for(var sq in thing) {
@@ -222,7 +221,7 @@ export default class GameLogic {
 
     // TODO shouldn't really need this. setPossibleMoves shouldn't populate key if there's no moves
     if (!movablePieceKeys || !_.find(movablePieceKeys, function(i) { return possibleMoves[i] }) ) {
-      return
+      return;
     }
 
     const whichKey = movablePieceKeys[this.random(movablePieceKeys.length)];

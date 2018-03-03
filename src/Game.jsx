@@ -29,8 +29,8 @@ export default class Game extends React.Component {
     if (this.state.game.rolling) {
       const decidingRoll = this.state.showDecision;
       text = (decidingRoll) ?
-        (decidingRoll[0] + ', ' + decidingRoll[1] + ((game.currentPlayer == 'dark') ? ' Player ' : ' Computer ') + 'starts...') :
-        (game.currentPlayer == 'light' ? 'Computer ' : 'Player ') + 'Rolling...';
+        (decidingRoll[0] + ', ' + decidingRoll[1] + ((game.currentPlayer === 'dark') ? ' Player ' : ' Computer ') + 'starts...') :
+        (game.currentPlayer === 'light' ? 'Computer ' : 'Player ') + 'Rolling...';
 
       if (!game.currentPlayer) {
         text = this.props.tie ? 'OOPS! TIE! Rolling again' : 'Opening roll...';

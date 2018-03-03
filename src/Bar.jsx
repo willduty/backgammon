@@ -12,15 +12,11 @@ export default class Bar extends React.Component {
   makeChips(count, type) {
     let chips = [];
     for (let i=0; i<count; i++) {
-
       const active = this.props.active;
-
-     // TODO send 24 back for white bar chip
-      const spacing = 10;
       chips.push(
         <Chip
-          parentIndex = {-1}
-          active = {(i === count -1) && active}
+          parentIndex = {type === 'chip_dark' ? -1 : 24}
+          active = {(i === count -1) && active && type === 'chip_dark'}
           offset = {i * this.CHIP_SPACING}
           type = {type}
           onMouseEnter={this.props.onMouseEnter}

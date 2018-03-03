@@ -36,7 +36,6 @@ export default class Board extends React.Component {
   }
 
   showMoves(rolloverIndex) {
-    // TODO sending in 24 for light bar chip should resolve incorrectly show moves on bar light chip hover
     const thing = this.state.game.darkMoves[rolloverIndex]
     let targets = [];
     if(Array.isArray(thing)) {
@@ -51,8 +50,12 @@ export default class Board extends React.Component {
     this.setState({highlightTargets: []});
   }
 
+  isBarIndex = function(i) {
+    return i === -1 || i === 24;
+  }
+
   startDrag(event, chipIndex) {
-    const square = chipIndex == -1 ?
+    const square = this.isBarIndex(chipIndex)  ?
      document.getElementById('bar-holder-' + this.state.game.currentPlayer) :
      document.getElementById('square_' + chipIndex);
 
@@ -64,7 +67,6 @@ export default class Board extends React.Component {
     this.state.dragObjOriginalY = chip.style.top || 0;
     this.state.dragObjParentIndex = chipIndex;
     this.state.dragObj = chip;
-
     this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX, 10);
     this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY, 10) - parseInt(event.pageY, 10);
   }
@@ -136,7 +138,6 @@ export default class Board extends React.Component {
         rightBoard: rightBoard,
         currentDragTargetIndex: currentSq,
       });
-
     }
   }
 
@@ -171,6 +172,7 @@ export default class Board extends React.Component {
       this.state.game.currentPlayer === 'dark' &&
       this.state.game.darkMoves &&
       this.state.game.darkMoves[-1];
+
     document.body.onmouseup = this.stopDrag
 
     // TODO make cover a component
