@@ -8,12 +8,16 @@ export default class Chip extends React.Component{
       this.props.type +
       (selectable ? ' selectable ' : '');
 
-    let top = (this.props.parentIndex < 12 ? 550 - this.props.offset : this.props.offset) ;
-
     let props = {
       className: chipClass,
-      style: {top: top},
     }
+
+    props['style'] = {
+      top: (this.props.parentIndex > -1) ?
+        (this.props.parentIndex < 12 ? 550 - this.props.offset : this.props.offset) :
+        this.props.offset
+    }
+
     if (selectable) {
       props['onMouseEnter'] = (() => this.props.onMouseEnter(this.props.parentIndex))
       props['onMouseLeave'] = (() => this.props.onMouseLeave(this.props.parentIndex))

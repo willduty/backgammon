@@ -49,6 +49,7 @@ ol, ul {
 }
 
 .chip {
+    /*border: 1px solid black;*/
   height: 51px;
   width: 51px;
   background-repeat: no-repeat;
@@ -107,6 +108,10 @@ ol, ul {
   width: 725px;
 }
 
+.hide {
+  display: none;
+}
+
 .cover {
   display: table;
   top: 0px;
@@ -114,12 +119,13 @@ ol, ul {
   height: 600px;
   background-color: #333;
   opacity: .7;
-  z-index: 900;
+  z-index: 10001;
   position: absolute;
   color: white;
 }
 
-.rolling {
+/* TODO use .cover-text and remove .rolling from usage */
+.rolling, .cover-text {
   display: table-cell;
   vertical-align: middle;
   position: absolute;
@@ -130,7 +136,7 @@ ol, ul {
   color: white;
   background: transparent;
   font: 18px "Century Gothic", Futura, sans-serif;
-  z-index: 10000;
+  z-index: 10002;
 }
 
 .board {
@@ -160,10 +166,26 @@ ol, ul {
 }
 
 .bar {
-  width: 25px;
+  width: 35px;
+  position: relative;
   height: 600px;
   background: black;
   float: left;
+}
+
+.bar-holder-light, .bar-holder-dark {
+  position: absolute;
+  color: white;
+  left: -8px;
+  z-index: 10000;
+}
+
+.bar-holder-light {
+  top: 35%;
+}
+
+.bar-holder-dark {
+  top: 50%;
 }
 
 .sep {
@@ -212,7 +234,7 @@ ol, ul {
 }
 
 .cube, .holder {
-    width: 75px;
+    width: 65px;
 }
 
 .cube {
@@ -233,10 +255,10 @@ ol, ul {
   /*margin: 10px 5px 0 5px;*/
     -webkit-box-shadow: inset 0 1em 2em -2em ;
   height: 250px;
-  width: 60px;
+  width: 48px;
   background: #224022;
     margin: 0 auto;
-    position: relative;
+    /*position: relative;*/
     /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
     /*filter: drop-shadow(-2px 2px 1px #222);*/
 }

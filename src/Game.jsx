@@ -87,8 +87,8 @@ export default class Game extends React.Component {
   }
 
   doAutomatedMove() {
-    if (this.state.game.canMove()) {
-      const m = this.state.game.automatedMove();
+    const m = this.state.game.automatedMove();
+    if (m) {
       this.updateGame(m[0][0], m[0][1]);
       // TODO: start "computer move" animation
       // TODO: figure out why this cycle times unevenly..

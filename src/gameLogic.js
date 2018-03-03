@@ -6,6 +6,7 @@ export default class GameLogic {
     currentPlayer: null,
     dark: {},
     light: {},
+    bar: {dark: 0, light: 0},
   };
 
   // standard initial game
@@ -18,6 +19,7 @@ export default class GameLogic {
     lightMoves: {},
     lastRoll: [],
     lastInitialRoll: [],
+    bar: {dark: 0, light: 0},
   };
 
   constructor() {
@@ -53,7 +55,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [2, 2]; // TESTING
+//    lastRoll = [6, 1]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -66,7 +68,13 @@ export default class GameLogic {
 
   setPossibleMoves = function() {
     this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
-    for(var sq in this[this.currentPlayer]) {
+
+    const barHash = this.currentPlayer === 'dark' ?
+      {'-1': this.bar[this.currentPlayer]} :
+      {24: this.bar[this.currentPlayer]};
+    const thing = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
+
+    for(var sq in thing) {
       // Logic for which moves can be made from each occupied spike
       const curr = parseInt(sq, 10);
       const light = (this.currentPlayer === 'light');
@@ -113,7 +121,6 @@ export default class GameLogic {
 
       // exclude moves occupied by opponent (2 or more chips) and offboard moves, unless player can bear-off.
       let allowedMoves = [];
-      const opponentSpikes = this[this.opponent];
 
       for(var i in possibleMoves) {
 
@@ -122,7 +129,7 @@ export default class GameLogic {
           moveIndex = moveIndex[moveIndex.length - 1];
         }
 
-        const taken = opponentSpikes[moveIndex] || 0,
+        const taken = this.opponentSpikes()[moveIndex] || 0,
           isOffboard = (moveIndex > 23 || moveIndex < 0) && !this.canOffboard();
 
         if (!isOffboard && (!taken || (taken < 2))) {
@@ -135,6 +142,27 @@ export default class GameLogic {
 
   canOffboard = function () {
     return false; // TODO implement
+  }
+
+  // TODO these should take an argument for index, else return all
+  opponentSpikes = function() {
+    return this[this.opponent];
+  }
+
+  currentPlayerSpikes = function() {
+    return this[this.currentPlayer];
+  }
+
+  increaseBar = function(position) {
+    // TODO make decrement fn
+    this.opponentSpikes()[position]--;
+    this.opponentSpikes()[position] === 0 && (delete this.opponentSpikes()[position])
+
+    this.bar[this.opponent]++;
+  }
+
+  removeFromBar = function() {
+    this.bar[this.currentPlayer]--;
   }
 
   doMove = function(from, to) {
@@ -152,15 +180,29 @@ export default class GameLogic {
           this.lastRoll.pop();
         }
       }
-    } else if (move) {
+    } else if (typeof move !== 'undefined') {
       this.lastRoll.splice(this.lastRoll.indexOf(to - from), 1);
     };
 
-    const spikes = this[this.currentPlayer];
+    let spikes = this.currentPlayerSpikes();
 
-    if (move) {
+    if (typeof move !== 'undefined') {
+      // blot
+      if (this.opponentSpikes()[to] === 1) {
+        this.increaseBar(to);
+      }
+
+      // chip from bar
+      if (from === -1 || from === 24) {
+        this.removeFromBar();
+      }
+
       spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
+
+      // TODO make decrement fn
       spikes[from]--;
+      spikes[from] === 0 && (delete spikes[from]);
+
       this.setPossibleMoves();
       return true;
     } else {
@@ -174,8 +216,14 @@ export default class GameLogic {
 
   selectRandomMove = function() {
     // TODO this.lightMoves needs to distinguish individual vs compound moves
+    // TODO use this.currentPlayerMoves();
     const possibleMoves = this.lightMoves,
       movablePieceKeys = Object.keys(this.lightMoves);
+
+    // TODO shouldn't really need this. setPossibleMoves shouldn't populate key if there's no moves
+    if (!movablePieceKeys || !_.find(movablePieceKeys, function(i) { return possibleMoves[i] }) ) {
+      return
+    }
 
     const whichKey = movablePieceKeys[this.random(movablePieceKeys.length)];
     let index = this.random(possibleMoves[whichKey].length);
@@ -184,15 +232,16 @@ export default class GameLogic {
     return [parseInt(whichKey), to];
   }
 
-  canMove = function() {
-    // TODO: distinguish no moves available
-    return this.lastRoll.length;
-  }
-
   automatedMove = function() {
-    let moves = [];
-    moves.push(this.selectRandomMove());
-    return moves;
+    if (!this.lastRoll.length) {
+      return;
+    }
+
+    const move = this.selectRandomMove();
+    if (move) {
+      // TODO just return move and adjust usages;
+      return [move];
+    }
   }
 
   // decides who gets first move

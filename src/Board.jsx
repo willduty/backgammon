@@ -1,6 +1,7 @@
 import React from 'react';
 import Square from './Square'
 import Dice from './Dice'
+import Bar from './Bar'
 import Holder from './Holder'
 import _ from 'lodash';
 
@@ -35,6 +36,7 @@ export default class Board extends React.Component {
   }
 
   showMoves(rolloverIndex) {
+    // TODO sending in 24 for light bar chip should resolve incorrectly show moves on bar light chip hover
     const thing = this.state.game.darkMoves[rolloverIndex]
     let targets = [];
     if(Array.isArray(thing)) {
@@ -50,23 +52,25 @@ export default class Board extends React.Component {
   }
 
   startDrag(event, chipIndex) {
-    const square = document.getElementById('square_' + chipIndex);
+    const square = chipIndex == -1 ?
+     document.getElementById('bar-holder-' + this.state.game.currentPlayer) :
+     document.getElementById('square_' + chipIndex);
+
     const chip = _.find(square.children, function(e) {
       return e.className.indexOf('selectable') !== -1;
     });
 
-    this.state.dragObjOriginalY = chip.style.top;
     this.state.dragObjOriginalX = chip.style.left;
+    this.state.dragObjOriginalY = chip.style.top || 0;
     this.state.dragObjParentIndex = chipIndex;
     this.state.dragObj = chip;
 
-    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY, 10) - parseInt(event.pageY, 10);
     this.state.dragCursorXOffset = square.getBoundingClientRect().x - parseInt(event.pageX, 10);
+    this.state.dragCursorYOffset = parseInt(this.state.dragObjOriginalY, 10) - parseInt(event.pageY, 10);
   }
 
   stopDrag(e) {
     if (this.state.dragObj) {
-
       const update = this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
       if (!update) {
         this.state.dragObj.style.top = this.state.dragObjOriginalY;
@@ -113,6 +117,11 @@ export default class Board extends React.Component {
       y += this.state.dragCursorYOffset;
 
       let x = ((this.state.dragObjParentIndex < 12) ? ( e.pageX  ) : e.pageX );
+
+      // TODO why is this so slow?
+      if(this.state.dragObjParentIndex === -1) {
+        x -= 300;
+      }
       x += this.state.dragCursorXOffset;
 
       let dragObj = this.state.dragObj;
@@ -158,13 +167,17 @@ export default class Board extends React.Component {
     const status = '';
     let rollingText = '';
     const game = this.state.game;
+    const barChipActive = !this.props.rollingText &&
+      this.state.game.currentPlayer === 'dark' &&
+      this.state.game.darkMoves &&
+      this.state.game.darkMoves[-1];
     document.body.onmouseup = this.stopDrag
 
     // TODO make cover a component
     return (
       <div className='board' >
-        <div className={this.props.rollingText ? ' cover ' : '' } />
-        <div className='rolling'>
+        <div className={this.props.rollingText ? 'cover' : 'hide' } />
+        <div className={this.props.rollingText ? 'rolling' : 'hide'}>
           {this.props.rollingText}
         </div>
 
@@ -192,7 +205,14 @@ export default class Board extends React.Component {
               {this.renderSquare(6)}
             </div>
           </div>
-          <div className='bar' id='bar'>&nbsp;</div>
+          <Bar
+            bar={this.state.game.bar}
+            active={barChipActive}
+            onMouseEnter={this.showMoves}
+            onMouseLeave={this.hideMoves}
+            onMouseDown={this.startDrag}
+            onMouseUp={this.stopDrag}
+          />
           <div className="board-section" id="right-board" onMouseMove={this.dragging}>
             <div>
               {this.renderSquare(18)}
