@@ -26,16 +26,16 @@ export default class Game extends React.Component {
   coverText() {
     let text;
     const game = this.state.game;
+    const addressee = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
     if (this.state.noMoves) {
-      text = 'NO MOVES!';
+      text = addressee + ' has no moves..';
     } else if (this.state.game.rolling) {
       const decidingRoll = this.state.showDecision;
       text = (decidingRoll) ?
-        (decidingRoll[0] + ', ' + decidingRoll[1] + ((game.currentPlayer === 'dark') ? ' Player ' : ' Computer ') + 'starts...') :
-        (game.currentPlayer === 'light' ? 'Computer ' : 'Player ') + 'Rolling...';
-
+        (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
+        addressee + 'Rolling...';
       if (!game.currentPlayer) {
-        text = this.props.tie ? 'OOPS! TIE! Rolling again' : 'Opening roll...';
+        text = this.state.tie ? 'OOPS! TIE! Rolling again' : 'Opening roll...';
       }
     }
     return text;
@@ -56,20 +56,12 @@ export default class Game extends React.Component {
   doDecidingRoll() {
     this.setState({showDecision: null})
     const roll = this.state.game.decide();
-    if (roll[0] === roll[1]) {
-      this.setState({
-        tie: true,
-        showDecision: roll
-      })
-      setTimeout(this.doDecidingRoll, this.TIMEOUT);
-    } else {
-      this.setState({
-        tie: false,
-        showDecision: roll
-      });
-
-    setTimeout(this.playerRoll, this.LONG_TIMEOUT);
-    }
+    const tie = roll[0] === roll[1];
+    this.setState({
+      tie: tie,
+      showDecision: roll
+    })
+    setTimeout( tie ? this.doDecidingRoll : this.playerRoll, this.LONG_TIMEOUT);
   }
 
   playerRoll() {
