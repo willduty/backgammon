@@ -15,8 +15,6 @@ export default class GameLogic {
     opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 5, 23: 2},
-    // TESTING no-moves
-//    light: {1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 12: 4, 13: 4, 14: 4, 15: 4, 17: 4, 19: 4, 20: 4, 21: 4, 22: 1, 23: 4 },
     darkMoves: {}, // maybe should be an object with methods
     lightMoves: {},
     lastRoll: [],
