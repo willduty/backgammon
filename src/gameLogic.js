@@ -15,8 +15,6 @@ export default class GameLogic {
     opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 5, 23: 2},
-    // TESTING no-moves
-//    light: {1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 12: 4, 13: 4, 14: 4, 15: 4, 17: 4, 19: 4, 20: 4, 21: 4, 22: 1, 23: 4 },
     darkMoves: {}, // maybe should be an object with methods
     lightMoves: {},
     lastRoll: [],
@@ -57,7 +55,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [3,3]; // TESTING
+//    lastRoll = [5,1]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -77,11 +75,13 @@ export default class GameLogic {
 
     let barHash = {};
     barHash[this.currentPlayer === 'dark' ? '-1' : 24] = this.bar[this.currentPlayer];
+
+    // Possible moves are always either from board positions, or from the bar, but never both.
     const movablePieceContainers = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
 
-    for(var sq in movablePieceContainers) {
+    for(var index in movablePieceContainers) {
       // Logic for which moves can be made from each occupied spike
-      const curr = parseInt(sq, 10);
+      const curr = parseInt(index, 10);
       const light = (this.currentPlayer === 'light');
       let   first = parseInt(this.lastRoll[0], 10),
        sec = parseInt(this.lastRoll[1], 10);
@@ -134,7 +134,7 @@ export default class GameLogic {
       }
 
       if (allowedMoves && allowedMoves.length) {
-        this.currentPlayerMoves()[sq] = allowedMoves;
+        this.currentPlayerMoves()[index] = allowedMoves;
       }
     }
   }
@@ -165,6 +165,7 @@ export default class GameLogic {
   }
 
   doMove = function(from, to) {
+
     const possibleMoves = this.currentPlayerMoves()[from];
     const move = _.find(possibleMoves, function (item) {
       const test = Array.isArray(item) ? item[item.length - 1] : item;
@@ -176,7 +177,7 @@ export default class GameLogic {
         this.lastRoll = [];
       } else {
         for(var i in move) {
-          this.lastRoll.pop();
+          this.lastRoll = this.lastRoll.splice(i, 1);
         }
       }
     } else if (typeof move !== 'undefined') {
@@ -198,9 +199,12 @@ export default class GameLogic {
 
       spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
 
-      // TODO make decrement fn
+      // TODO make decrement fn for this nonsense..
       spikes[from]--;
-      spikes[from] === 0 && (delete spikes[from]);
+      if(spikes[from] === 0 || !spikes[from]) {
+        delete spikes[from]
+        delete spikes[from.toString()];
+      }
 
       this.setPossibleMoves();
       return true;
@@ -231,8 +235,10 @@ export default class GameLogic {
     return [parseInt(whichKey, 10), to];
   }
 
+  // returns a randomly selected move of those available for the current player,
+  // or undefined if current player has no moves.
   automatedMove = function() {
-    if (this.lastRoll.length) {
+    if (this.lastRoll && this.lastRoll.length) {
       const move = this.selectRandomMove();
       if (move) {
         return move;
