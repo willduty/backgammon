@@ -89,11 +89,6 @@ export default class Board extends React.Component {
         dragObj: null,
         highlightTargets: [],
       });
-
-      const moves = this.state.game.lastRoll
-      if (moves.length === 0) {
-        setTimeout(this.props.turnComplete, 800);
-      }
     }
   }
 

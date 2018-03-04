@@ -15,6 +15,8 @@ export default class GameLogic {
     opponent: null, // opposite of `currentPlayer`
     dark: {0: 2, 11: 5, 16: 3, 18: 5},
     light: {5: 5, 7: 3, 12: 5, 23: 2},
+    // TESTING no-moves
+//    light: {1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 12: 4, 13: 4, 14: 4, 15: 4, 17: 4, 19: 4, 20: 4, 21: 4, 22: 1, 23: 4 },
     darkMoves: {}, // maybe should be an object with methods
     lightMoves: {},
     lastRoll: [],
@@ -27,16 +29,16 @@ export default class GameLogic {
     this.setGame(this.BLANK_GAME);
   }
 
-  rolling = false;
+  rolling = false; // TODO move this into game presets
 
   start = function() {
     this.setGame(this.STANDARD_OPENING);
   }
 
   decide = function() {
-    const roll = this.rollDecidingDice();
-//    const roll = [3, 6]; // TESTING forces computer player first
-//    const roll = [6, 3]; // TESTING forces dark player first
+    let roll = this.rollDecidingDice();
+//     roll = [3, 6]; // TESTING forces computer player first
+//     roll = [6, 3]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;
     } else {
@@ -55,7 +57,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [1,2]; // TESTING
+//    lastRoll = [3,3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -64,6 +66,10 @@ export default class GameLogic {
     this.lastInitialRoll = lastRoll.slice();
     this.lastRoll = lastRoll.slice();
     this.setPossibleMoves();
+  }
+
+  currentPlayerMoves = function() {
+    return this[this.currentPlayer + 'Moves'];
   }
 
   setPossibleMoves = function() {
@@ -95,7 +101,7 @@ export default class GameLogic {
 
           if (i > 0) {
             move = [move];
-            for(var z = 1; z < i; z++) {
+            for(var z = 1; z <= i; z++) {
               move.push(curr + (n * (z + 1)));
             }
           }
@@ -126,7 +132,10 @@ export default class GameLogic {
           allowedMoves.push(possibleMoves[i]);
         }
       }
-      this[this.currentPlayer + 'Moves'][sq] = allowedMoves;
+
+      if (allowedMoves && allowedMoves.length) {
+        this.currentPlayerMoves()[sq] = allowedMoves;
+      }
     }
   }
 
@@ -156,7 +165,7 @@ export default class GameLogic {
   }
 
   doMove = function(from, to) {
-    const possibleMoves = this[this.currentPlayer + 'Moves'][from];
+    const possibleMoves = this.currentPlayerMoves()[from];
     const move = _.find(possibleMoves, function (item) {
       const test = Array.isArray(item) ? item[item.length - 1] : item;
       return test === to;
@@ -207,8 +216,8 @@ export default class GameLogic {
   selectRandomMove = function() {
     // TODO this.lightMoves needs to distinguish individual vs compound moves
     // TODO use this.currentPlayerMoves();
-    const possibleMoves = this.lightMoves,
-      movablePieceKeys = Object.keys(this.lightMoves);
+    const possibleMoves = this.currentPlayerMoves(),
+      movablePieceKeys = Object.keys(this.currentPlayerMoves());
 
     // TODO shouldn't really need this. setPossibleMoves shouldn't populate key if there's no moves
     if (!movablePieceKeys || !_.find(movablePieceKeys, function(i) { return possibleMoves[i] }) ) {
@@ -229,6 +238,10 @@ export default class GameLogic {
         return move;
       }
     }
+  }
+
+  canMove = function() {
+    return !!this.automatedMove();
   }
 
   // decides who gets first move

@@ -26,7 +26,9 @@ export default class Game extends React.Component {
   coverText() {
     let text;
     const game = this.state.game;
-    if (this.state.game.rolling) {
+    if (this.state.noMoves) {
+      text = 'NO MOVES!';
+    } else if (this.state.game.rolling) {
       const decidingRoll = this.state.showDecision;
       text = (decidingRoll) ?
         (decidingRoll[0] + ', ' + decidingRoll[1] + ((game.currentPlayer === 'dark') ? ' Player ' : ' Computer ') + 'starts...') :
@@ -50,7 +52,7 @@ export default class Game extends React.Component {
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
 
-  // decide who goes first
+  // decide who gets opening move
   doDecidingRoll() {
     this.setState({showDecision: null})
     const roll = this.state.game.decide();
@@ -81,19 +83,25 @@ export default class Game extends React.Component {
       showDecision: null,
     });
 
-    if (game.currentPlayer === 'light') {
+    if(!game.canMove()) {
+      if (game.lastRoll && game.lastRoll.length) {
+        this.setState({noMoves: true})
+      }
+      setTimeout(this.turnComplete, this.TIMEOUT);
+    } else if (game.currentPlayer === 'light') {
       setTimeout(this.doAutomatedMove, this.SHORT_TIMEOUT);
     }
   }
 
   doAutomatedMove() {
-    const m = this.state.game.automatedMove();
+    const game = this.state.game;
+
+    const m = game.automatedMove();
     if (m) {
       this.updateGame(m[0], m[1]);
       // TODO: start "computer move" animation
       // TODO: figure out why this cycle times unevenly..
 
-      setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT);
     } else {
       setTimeout( this.turnComplete, this.TIMEOUT);
     }
@@ -103,6 +111,18 @@ export default class Game extends React.Component {
     let game = this.state.game;
     if(game.doMove(from, to)) {
       this.setState({game: game})
+
+      if(game.canMove()) {
+        if(game.currentPlayer === 'light') {
+          setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT)
+        }
+      } else {
+        if (game.lastRoll && game.lastRoll.length) {
+          this.setState({noMoves: true})
+        }
+        setTimeout(this.turnComplete, this.TIMEOUT);
+      }
+
     } else {
       this.setState({game: game})
       // TODO reset chip
@@ -110,10 +130,11 @@ export default class Game extends React.Component {
   }
 
   turnComplete() {
-    var game = this.state.game;
+    const game = this.state.game;
     game.rolling = true;
     game.nextTurn();
     this.setState({
+      noMoves: false,
       game: game,
     });
 
@@ -134,7 +155,6 @@ export default class Game extends React.Component {
             game={this.state.game}
             rolling={this.state.game.rolling}
             updateGame={this.updateGame}
-            turnComplete={this.turnComplete}
             tie={this.state.tie}
             showDecision={this.state.showDecision}
             rollingText={this.coverText()}
