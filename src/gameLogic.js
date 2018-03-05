@@ -75,11 +75,13 @@ export default class GameLogic {
 
     let barHash = {};
     barHash[this.currentPlayer === 'dark' ? '-1' : 24] = this.bar[this.currentPlayer];
+
+    // Possible moves are always either from board positions, or from the bar, but never both.
     const movablePieceContainers = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
 
-    for(var sq in movablePieceContainers) {
+    for(var index in movablePieceContainers) {
       // Logic for which moves can be made from each occupied spike
-      const curr = parseInt(sq, 10);
+      const curr = parseInt(index, 10);
       const light = (this.currentPlayer === 'light');
       let   first = parseInt(this.lastRoll[0], 10),
        sec = parseInt(this.lastRoll[1], 10);
@@ -132,7 +134,7 @@ export default class GameLogic {
       }
 
       if (allowedMoves && allowedMoves.length) {
-        this.currentPlayerMoves()[sq] = allowedMoves;
+        this.currentPlayerMoves()[index] = allowedMoves;
       }
     }
   }
@@ -163,6 +165,7 @@ export default class GameLogic {
   }
 
   doMove = function(from, to) {
+
     const possibleMoves = this.currentPlayerMoves()[from];
     const move = _.find(possibleMoves, function (item) {
       const test = Array.isArray(item) ? item[item.length - 1] : item;
@@ -196,9 +199,12 @@ export default class GameLogic {
 
       spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
 
-      // TODO make decrement fn
+      // TODO make decrement fn for this nonsense..
       spikes[from]--;
-      spikes[from] === 0 && (delete spikes[from]);
+      if(spikes[from] === 0 || !spikes[from]) {
+        delete spikes[from]
+        delete spikes[from.toString()];
+      }
 
       this.setPossibleMoves();
       return true;
@@ -229,8 +235,10 @@ export default class GameLogic {
     return [parseInt(whichKey, 10), to];
   }
 
+  // returns a randomly selected move of those available for the current player,
+  // or undefined if current player has no moves.
   automatedMove = function() {
-    if (this.lastRoll.length) {
+    if (this.lastRoll && this.lastRoll.length) {
       const move = this.selectRandomMove();
       if (move) {
         return move;
