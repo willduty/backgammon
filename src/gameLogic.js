@@ -55,7 +55,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice = function() {
     let lastRoll = this.rollDice();
-//    lastRoll = [3,3]; // TESTING
+//    lastRoll = [5,1]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -177,7 +177,7 @@ export default class GameLogic {
         this.lastRoll = [];
       } else {
         for(var i in move) {
-          this.lastRoll.pop();
+          this.lastRoll = this.lastRoll.splice(i, 1);
         }
       }
     } else if (typeof move !== 'undefined') {
