@@ -171,7 +171,6 @@ export default class Board extends React.Component {
 
     document.body.onmouseup = this.stopDrag
 
-    // TODO make cover a component
     return (
       <div className='board' >
         <div className={this.props.rollingText ? 'cover' : 'hide' } />

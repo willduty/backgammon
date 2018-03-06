@@ -221,7 +221,6 @@ export default class GameLogic {
 
   selectRandomMove() {
     // TODO this.lightMoves needs to distinguish individual vs compound moves
-    // TODO use this.currentPlayerMoves();
     const possibleMoves = this.currentPlayerMoves(),
       movablePieceKeys = Object.keys(this.currentPlayerMoves());
 

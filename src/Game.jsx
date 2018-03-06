@@ -93,7 +93,6 @@ export default class Game extends React.Component {
     if (m) {
       this.updateGame(m[0], m[1]);
       // TODO: start "computer move" animation
-      // TODO: figure out why this cycle times unevenly..
 
     } else {
       setTimeout( this.turnComplete, this.TIMEOUT);
