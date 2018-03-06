@@ -73,6 +73,7 @@ export default class Game extends React.Component {
     this.setState({
       game: game,
       showDecision: null,
+      clearDice: false,
     });
 
     if(!game.canMove()) {
@@ -128,6 +129,7 @@ export default class Game extends React.Component {
     this.setState({
       noMoves: false,
       game: game,
+      clearDice: true,
     });
 
     setTimeout(this.playerRoll, this.TIMEOUT);
@@ -150,6 +152,7 @@ export default class Game extends React.Component {
             tie={this.state.tie}
             showDecision={this.state.showDecision}
             rollingText={this.coverText()}
+            clearDice={this.state.clearDice}
             />
         </div>
         <div>

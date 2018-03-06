@@ -182,6 +182,7 @@ export default class Board extends React.Component {
         <Dice
           game={this.state.game}
           showDecision={this.props.showDecision}
+          clearDice={this.props.clearDice}
         />
 
         <div id='draggableArea' >

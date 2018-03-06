@@ -26,15 +26,18 @@ export default class Dice extends React.Component {
         used.splice(used.indexOf(item), 1)
       });
 
+      const show = !this.props.clearDice;
       _.each(lastInitialRoll, function(val, i) {
         const darken = _.includes(used, val);
         if (darken) {
           used.splice(used.indexOf(val), 1);
         }
 
-        dice.push(<div
-          key={i}
-          className={'die' + val + ' ' + (darken ? ' darken ' : '')} />)
+        if(show) {
+          dice.push(<div
+            key={i}
+            className={'die' + val + ' ' + (darken ? ' darken ' : '')} />)
+        }
       })
     }
 
