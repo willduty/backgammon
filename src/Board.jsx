@@ -50,7 +50,7 @@ export default class Board extends React.Component {
     this.setState({highlightTargets: []});
   }
 
-  isBarIndex = function(i) {
+  isBarIndex(i) {
     return i === -1 || i === 24;
   }
 
