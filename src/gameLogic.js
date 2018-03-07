@@ -3,7 +3,6 @@ import _ from 'lodash';
 export default class GameLogic {
 
   constructor() {
-
     this.BLANK_GAME = {
       currentPlayer: null,
       dark: {},
@@ -30,11 +29,14 @@ export default class GameLogic {
     this.setGame(this.BLANK_GAME);
   }
 
-
+  // Sets board with standard chips in place.
+  // Does not set currentPlayer... call decide() to set who starts.
   start() {
     this.setGame(this.STANDARD_OPENING);
   }
 
+  // Sets who starts the game. ie, sets this.currentPlayer and this.opponent
+  // Does not start the turn, which happens on rollPlayerDice().
   decide() {
     let roll = this.rollDecidingDice();
 //     roll = [3, 6]; // TESTING forces computer player first
@@ -48,13 +50,16 @@ export default class GameLogic {
     }
   }
 
+  // Switches the opponent to be the current player and vice versa.
   nextTurn() {
     const current = this.currentPlayer;
     this.currentPlayer = this.opponent;
     this.opponent = current;
   }
 
-  // basic roll for player's turn
+  // Roll for current player's turn.
+  // Sets lastRoll, lastInitialRoll, and the player's possible moves.
+  // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
 //    lastRoll = [5,5]; // TESTING
@@ -72,6 +77,7 @@ export default class GameLogic {
     return this[this.currentPlayer + 'Moves'];
   }
 
+  // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
   setPossibleMoves() {
     this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
 
@@ -166,6 +172,8 @@ export default class GameLogic {
     this.bar[this.currentPlayer]--;
   }
 
+  // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
+  // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
 
     const possibleMoves = this.currentPlayerMoves()[from];

@@ -81,6 +81,7 @@ export default class Board extends React.Component {
         const dragObj = this.state.dragObj;
         dragObj.style.top = this.state.dragObjOriginalY;
         dragObj.style.left = this.state.dragObjOriginalX;
+        dragObj.style.zIndex = null;
       }
 
       this.setState({

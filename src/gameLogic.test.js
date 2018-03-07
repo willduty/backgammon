@@ -1,60 +1,81 @@
 import GameLogic from './gameLogic';
 
 describe('game setup', () => {
-  let gameLogic;
+  let gl;
   beforeEach(() => {
-    gameLogic = new GameLogic;
+    gl = new GameLogic;
   });
 
   test('currentPlayer is initially null', () => {
-    expect(gameLogic.currentPlayer).toBe(null);
+    expect(gl.currentPlayer).toBe(null);
   });
 
-  test('currentPlayer is null after start', () => {
-    gameLogic.start();
-    expect(gameLogic.currentPlayer).toBe(null);
+  describe('start()', () => {
+    test('currentPlayer is null after start', () => {
+      gl.start();
+      expect(gl.currentPlayer).toBe(null);
+    });
+
+    test('game is set to standard opening values after start', () => {
+      gl.start();
+      expect(gl.currentPlayer).toBe(null);
+    });
   });
 
   test('currentPlayer is not null after decide', () => {
-    gameLogic.start();
-    gameLogic.decide();
-    expect(gameLogic.currentPlayer).not.toBe(null);
+    gl.start();
+    gl.decide();
+    expect(gl.currentPlayer).not.toBe(null);
+  });
+
+  test('currentPlayer switched to opponent on nextTurn', () => {
+    gl.start();
+    gl.decide();
+    const before = gl.currentPlayer;
+    const expected = (before === 'dark' ? 'light' : 'dark');
+
+    gl.nextTurn();
+    expect(gl.currentPlayer).toEqual(expected);
+    expect(gl.opponent).toEqual(before);
   });
 });
 
-describe('dice rolls, rollPlayerDice', () => {
-  let gameLogic,
-    rollDiceMock = jest.fn();
+describe('turns and dice rolls', () => {
+  let gl, rollDiceMock = jest.fn();
 
   beforeEach(() => {
     rollDiceMock.mockReturnValue([5, 5]);
-    gameLogic = new GameLogic;
-    gameLogic.rollDice = rollDiceMock;
-    setDarkPlayerFirst(gameLogic);
-    gameLogic.start();
-    gameLogic.decide();
+    gl = new GameLogic;
+    gl.rollDice = rollDiceMock;
+    setDarkPlayerFirst(gl);
+    gl.start();
+    gl.decide();
   });
 
-  test('doubles dice on a double', () => {
-    gameLogic.rollPlayerDice();
-    expect(gameLogic.lastRoll).toEqual([5,5,5,5]);
+  describe('rollPlayerDice()', () => {
+    test('doubles dice on a double', () => {
+      gl.rollPlayerDice();
+      expect(gl.lastRoll).toEqual([5,5,5,5]);
+    });
   });
 
-  test('doMove does one at a time', () => {
-    gameLogic.rollPlayerDice();
-    gameLogic.doMove(11, 16);
-    expect(gameLogic.lastRoll).toEqual([5,5,5]);
-    gameLogic.doMove(11, 16);
-    expect(gameLogic.lastRoll).toEqual([5,5]);
-    gameLogic.doMove(11, 16);
-    expect(gameLogic.lastRoll).toEqual([5]);
-    gameLogic.doMove(11, 16);
-    expect(gameLogic.lastRoll).toEqual([]);
+  describe('doMove()', () => {
+    test('doMove does one at a time', () => {
+      gl.rollPlayerDice();
+      gl.doMove(11, 16);
+      expect(gl.lastRoll).toEqual([5,5,5]);
+      gl.doMove(11, 16);
+      expect(gl.lastRoll).toEqual([5,5]);
+      gl.doMove(11, 16);
+      expect(gl.lastRoll).toEqual([5]);
+      gl.doMove(11, 16);
+      expect(gl.lastRoll).toEqual([]);
+    });
   });
 });
 
-function setDarkPlayerFirst(gameLogic) {
+function setDarkPlayerFirst(gl) {
   let rollDecidingDiceMock = jest.fn();
   rollDecidingDiceMock.mockReturnValue([6, 3]);
-  gameLogic.rollDecidingDice = rollDecidingDiceMock;
+  gl.rollDecidingDice = rollDecidingDiceMock;
 }
