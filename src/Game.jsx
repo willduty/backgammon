@@ -20,6 +20,7 @@ export default class Game extends React.Component {
     this.state = {
       game: gameLogic,
       tie: false,
+      startButton: true,
     }
   }
 
@@ -35,7 +36,7 @@ export default class Game extends React.Component {
         (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
         addressee + 'Rolling...';
       if (!game.currentPlayer) {
-        text = this.state.tie ? 'OOPS! TIE! Rolling again' : 'Opening roll...';
+        text = this.state.tie ? 'OOPS! Tie! Rolling again' : 'Opening roll...';
       }
     }
     return text;
@@ -48,6 +49,7 @@ export default class Game extends React.Component {
 
     this.setState({
       game: game,
+      startButton: false,
     });
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
@@ -140,6 +142,8 @@ export default class Game extends React.Component {
   }
 
   render() {
+    // TODO componentize start button or general button
+    const coverText = this.coverText();
     return (
       <div className="game">
         <div className="top-area"></div>
@@ -150,15 +154,19 @@ export default class Game extends React.Component {
             updateGame={this.updateGame}
             tie={this.state.tie}
             showDecision={this.state.showDecision}
-            rollingText={this.coverText()}
+            showCover={this.state.startButton || coverText}
+            coverText={coverText}
+            startButton={this.state.startButton &&
+              <div
+                className='cover-button'
+                onClick={() => this.startNew()}>
+                Start Game..
+              </div>
+            }
             clearDice={this.state.clearDice}
             />
         </div>
         <div>
-          <button
-            onClick={() => this.startNew()}>
-            New Game...
-          </button>
           <div>
             <div>
               <ol id="status">{

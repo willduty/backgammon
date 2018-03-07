@@ -164,7 +164,7 @@ export default class Board extends React.Component {
   }
 
   render() {
-    const barChipActive = !this.props.rollingText &&
+    const barChipActive = !this.props.coverText &&
       this.state.game.currentPlayer === 'dark' &&
       this.state.game.darkMoves &&
       this.state.game.darkMoves[-1];
@@ -173,9 +173,9 @@ export default class Board extends React.Component {
 
     return (
       <div className='board' >
-        <div className={this.props.rollingText ? 'cover' : 'hide' } />
-        <div className={this.props.rollingText ? 'rolling' : 'hide'}>
-          {this.props.rollingText}
+        <div className={this.props.showCover ? 'cover' : 'hide'} />
+        <div className={this.props.showCover ? 'rolling' : 'hide'}>
+          {this.props.startButton || this.props.coverText}
         </div>
 
         <Dice

@@ -124,6 +124,14 @@ ol, ul {
   color: white;
 }
 
+.cover-button {
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 10px 0 10px 0;
+  border: 1px solid white;
+  background: #000;
+}
+
 /* TODO use .cover-text and remove .rolling from usage */
 .rolling, .cover-text {
   display: table-cell;
