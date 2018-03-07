@@ -57,7 +57,7 @@ export default class GameLogic {
   // basic roll for player's turn
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [5,1]; // TESTING
+//    lastRoll = [5,5]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -170,8 +170,8 @@ export default class GameLogic {
 
     const possibleMoves = this.currentPlayerMoves()[from];
     const move = _.find(possibleMoves, function (item) {
-      const test = Array.isArray(item) ? item[item.length - 1] : item;
-      return test === to;
+      const target = Array.isArray(item) ? item[item.length - 1] : item;
+      return target === to;
     });
 
     if (Array.isArray(move)) {
@@ -179,7 +179,7 @@ export default class GameLogic {
         this.lastRoll = [];
       } else {
         for(var i in move) {
-          this.lastRoll = this.lastRoll.splice(i, 1);
+          this.lastRoll.pop();
         }
       }
     } else if (typeof move !== 'undefined') {
