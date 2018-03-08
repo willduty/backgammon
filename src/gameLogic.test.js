@@ -74,6 +74,76 @@ describe('turns and dice rolls', () => {
   });
 });
 
+describe('move calculation', () => {
+  let gl;
+
+  beforeEach(() => {
+    gl = new GameLogic;
+    setDarkPlayerFirst(gl);
+    gl.start();
+    gl.decide();
+  });
+
+  describe('setPossibleMoves()', () => {
+    test('sets up simple and compound moves', () => {
+      gl.dark = { '0': 2 };
+      gl.light = {};
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {"0": [2, 3, [2, 5]]});
+    });
+
+    test('does not set up moves where opponent has 2 or more chips', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {"0": [2, [2, 5]]});
+    });
+
+    test('does not set up compound moves where opponent has 2 or more chips on compound target', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 5: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {"0": [2, 3]});
+    });
+
+    test('does not set up compound moves where opponent has 2 or more chips on intermediate target', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 2: 2, 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {});
+    });
+
+    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 4: 2 };
+      setPossibleMovesWithRoll(gl, [2, 2]);
+      expect(gl.darkMoves).toEqual( {"0": [2]});
+    });
+
+    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll later', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 6: 2 };
+      setPossibleMovesWithRoll(gl, [2, 2]);
+      expect(gl.darkMoves).toEqual( {"0": [2, [2, 4]]});
+    });
+
+    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll later later', () => {
+      gl.dark = { '0': 2 };
+      gl.light = { 8: 2 };
+      setPossibleMovesWithRoll(gl, [2, 2]);
+      expect(gl.darkMoves).toEqual( {"0": [2, [2, 4], [2, 4, 6]]});
+    });
+  });
+});
+
+function setPossibleMovesWithRoll(gl, roll) {
+  let rollDiceMock = jest.fn();
+  rollDiceMock.mockReturnValue(roll);
+  gl.rollDice = rollDiceMock;
+  gl.rollPlayerDice();
+  gl.setPossibleMoves();
+}
+
 function setDarkPlayerFirst(gl) {
   let rollDecidingDiceMock = jest.fn();
   rollDecidingDiceMock.mockReturnValue([6, 3]);

@@ -62,7 +62,7 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [5,5]; // TESTING
+//    lastRoll = [1,5]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -127,21 +127,30 @@ export default class GameLogic {
       let allowedMoves = [];
 
       for(var i in possibleMoves) {
+        let moveTarget = possibleMoves[i];
+        let compound;
 
-        let moveIndex = possibleMoves[i];
-        if (Array.isArray(moveIndex)) {
-          moveIndex = moveIndex[moveIndex.length - 1];
+        if (Array.isArray(moveTarget)) {
+          compound = true;
+          moveTarget = moveTarget[moveTarget.length - 1];
         }
 
-        const taken = this.opponentSpikes()[moveIndex] || 0,
-          isOffboard = (moveIndex > 23 || moveIndex < 0) && !this.canOffboard();
+        let taken = this.opponentSpikes()[moveTarget] || 0;
+        if (compound) {
+          const opponentSpikes = this.opponentSpikes();
+          taken = _.find(possibleMoves[i], function(point) {
+            return opponentSpikes[point] > 1;
+          });
+        }
+
+        const isOffboard = (moveTarget > 23 || moveTarget < 0) && !this.canOffboard();
 
         if (!isOffboard && (!taken || (taken < 2))) {
           allowedMoves.push(possibleMoves[i]);
         }
       }
 
-      if (allowedMoves && allowedMoves.length) {
+      if (allowedMoves.length) {
         this.currentPlayerMoves()[index] = allowedMoves;
       }
     }
