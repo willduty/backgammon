@@ -62,7 +62,7 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [1,5]; // TESTING
+//    lastRoll = [5,3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -73,8 +73,12 @@ export default class GameLogic {
     this.setPossibleMoves();
   }
 
-  currentPlayerMoves() {
-    return this[this.currentPlayer + 'Moves'];
+  currentPlayerMoves(index) {
+    if (arguments.length) {
+      return this[this.currentPlayer + 'Moves'][index];
+    } else {
+      return this[this.currentPlayer + 'Moves'];
+    }
   }
 
   // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
@@ -151,12 +155,12 @@ export default class GameLogic {
       }
 
       if (allowedMoves.length) {
-        this.currentPlayerMoves()[index] = allowedMoves;
+        this[this.currentPlayer + 'Moves'][index] = allowedMoves;
       }
     }
   }
 
-  canOffboard () {
+  canOffboard() {
     return false; // TODO implement
   }
 
@@ -174,6 +178,7 @@ export default class GameLogic {
     this.opponentSpikes()[position]--;
     this.opponentSpikes()[position] === 0 && (delete this.opponentSpikes()[position])
 
+    // TODO get rid of bar altogether
     this.bar[this.opponent]++;
   }
 
@@ -185,7 +190,7 @@ export default class GameLogic {
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
 
-    const possibleMoves = this.currentPlayerMoves()[from];
+    const possibleMoves = this.currentPlayerMoves(from);
     const move = _.find(possibleMoves, function (item) {
       const target = Array.isArray(item) ? item[item.length - 1] : item;
       return target === to;

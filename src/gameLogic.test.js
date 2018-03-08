@@ -133,7 +133,32 @@ describe('move calculation', () => {
       setPossibleMovesWithRoll(gl, [2, 2]);
       expect(gl.darkMoves).toEqual( {"0": [2, [2, 4], [2, 4, 6]]});
     });
+
+    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll, from bar', () => {
+      gl.dark = { '-1': 1 };
+      gl.light = { 5: 2 };
+      setPossibleMovesWithRoll(gl, [2, 2]);
+      expect(gl.darkMoves).toEqual( {"-1": [1, [1, 3]]});
+    });
+
   });
+
+  describe('currentPlayerMoves()', () => {
+    test('gets moves', () => {
+      gl.dark = { '0': 1 };
+      gl.light = {};
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.currentPlayerMoves()).toEqual( {"0": [2, 3, [2, 5]]});
+    });
+
+    test('gets moves by index', () => {
+      gl.dark = { '0': 1, 6: 1 };
+      gl.light = {};
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.currentPlayerMoves(6)).toEqual([8, 9, [8, 11]]);
+    });
+  });
+
 });
 
 function setPossibleMovesWithRoll(gl, roll) {

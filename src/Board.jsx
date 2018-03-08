@@ -144,10 +144,9 @@ export default class Board extends React.Component {
   renderSquare(i) {
     let highlight = this.state.highlightTargets.indexOf(i) !== -1;
 
-    const dm = this.state.game.darkMoves; // TODO set this to currentPlayer
-
-    let hasMoves = (this.state.game.lastRoll && this.state.game.lastRoll.length === 0) ? false :
-      (dm && dm[i] && dm[i].length > 0);
+    const dm = this.state.game.currentPlayerMoves();
+    // TODO allow passing in index to canMove for moves on i
+    let hasMoves = this.state.game.canMove() && (dm && dm[i] && dm[i].length > 0);
 
     return (<Square
       index={i}
@@ -167,8 +166,8 @@ export default class Board extends React.Component {
   render() {
     const barChipActive = !this.props.coverText &&
       this.state.game.currentPlayer === 'dark' &&
-      this.state.game.darkMoves &&
-      this.state.game.darkMoves[-1];
+      this.state.game.currentPlayerMoves() &&
+      this.state.game.currentPlayerMoves(-1);
 
     document.body.onmouseup = this.stopDrag
 
