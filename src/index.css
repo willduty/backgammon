@@ -129,7 +129,6 @@ ol, ul {
   border-radius: 5px;
   padding: 10px 0 10px 0;
   border: 1px solid white;
-  background: #000;
 }
 
 /* TODO use .cover-text and remove .rolling from usage */
@@ -137,7 +136,7 @@ ol, ul {
   display: table-cell;
   vertical-align: middle;
   position: absolute;
-  top: 300px;
+  top: 270px;
   left: 200px;
   height: 50px;
   width: 260px;
