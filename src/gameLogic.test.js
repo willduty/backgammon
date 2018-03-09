@@ -141,6 +141,14 @@ describe('move calculation', () => {
       expect(gl.darkMoves).toEqual( {"-1": [1, [1, 3]]});
     });
 
+    test('does not set up compound moves where opponent has 2 or more chips on compound target, light player', () => {
+      gl.dark = {0: 2};
+      gl.light = {5: 5};
+      gl.nextTurn();
+      setPossibleMovesWithRoll(gl, [4, 1]);
+      expect(gl.lightMoves).toEqual( {5: [1, 4]});
+    });
+
   });
 
   describe('currentPlayerMoves()', () => {

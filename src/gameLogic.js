@@ -60,7 +60,7 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [5,3]; // TESTING
+//    lastRoll = [2,2]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
@@ -151,9 +151,12 @@ export default class GameLogic {
         let taken = this.opponentSpikes()[moveTarget] || 0;
         if (compound) {
           const opponentSpikes = this.opponentSpikes();
-          taken = _.find(possibleMoves[i], function(point) {
-            return opponentSpikes[point] > 1;
+          const point = _.find(possibleMoves[i], function(point) {
+            return opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point] > 1;
           });
+          if (point) {
+            taken = opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point]
+          }
         }
 
         const isOffboard = (moveTarget > 23 || moveTarget < 0) && !this.canOffboard();
