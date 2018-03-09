@@ -36,10 +36,10 @@ export default class Board extends React.Component {
   }
 
   showMoves(rolloverIndex) {
-    const thing = this.state.game.darkMoves[rolloverIndex]
+    const moves = this.state.game.currentPlayerMoves(rolloverIndex);
     let targets = [];
-    if(Array.isArray(thing)) {
-      targets = thing.map(function(item) {
+    if(Array.isArray(moves)) {
+      targets = moves.map(function(item) {
         return Array.isArray(item) ? item[item.length - 1] : item;
       });
     }
@@ -166,8 +166,7 @@ export default class Board extends React.Component {
   render() {
     const barChipActive = !this.props.coverText &&
       this.state.game.currentPlayer === 'dark' &&
-      this.state.game.currentPlayerMoves() &&
-      this.state.game.currentPlayerMoves(-1);
+      this.state.game.currentPlayerMoves('-1');
 
     document.body.onmouseup = this.stopDrag
 
