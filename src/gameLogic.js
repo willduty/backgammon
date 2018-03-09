@@ -7,7 +7,6 @@ export default class GameLogic {
       currentPlayer: null,
       dark: {},
       light: {},
-      bar: {dark: 0, light: 0},
     };
 
     // standard initial game
@@ -20,7 +19,6 @@ export default class GameLogic {
       lightMoves: {},
       lastRoll: [],
       lastInitialRoll: [],
-      bar: {dark: 0, light: 0},
     };
 
     this.rolling = false;
@@ -74,22 +72,33 @@ export default class GameLogic {
   }
 
   currentPlayerMoves(index) {
-    if (arguments.length) {
-      return this[this.currentPlayer + 'Moves'][index];
-    } else {
-      return this[this.currentPlayer + 'Moves'];
+    const moves = this[this.currentPlayer + 'Moves'];
+    return arguments.length ? moves[index] : moves;
+  }
+
+  bar() {
+    let hash = {'dark' : 0, 'light' : 0};
+    if (this.currentPlayerSpikes()) {
+      hash['dark'] = this.dark['-1'] || 0;
+      hash['light'] = this.light[24] || 0;
     }
+    return hash;
   }
 
   // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
   setPossibleMoves() {
     this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
 
-    let barHash = {};
-    barHash[this.currentPlayer === 'dark' ? '-1' : 24] = this.bar[this.currentPlayer];
+    let barHash;
+    const val = this.bar()[this.currentPlayer];
+    if (val > 0) {
+      const idx = [this.currentPlayer === 'dark' ? '-1' : 24];
+      barHash = {};
+      barHash[idx] = this.currentPlayerSpikes()[idx];
+    }
 
     // Possible moves are always either from board positions, or from the bar, but never both.
-    const movablePieceContainers = this.bar[this.currentPlayer] > 0 ? barHash : this.currentPlayerSpikes();
+    const movablePieceContainers = barHash || this.currentPlayerSpikes();
 
     for(var index in movablePieceContainers) {
       // Logic for which moves can be made from each occupied spike
@@ -173,19 +182,6 @@ export default class GameLogic {
     return this[this.currentPlayer];
   }
 
-  increaseBar(position) {
-    // TODO make decrement fn
-    this.opponentSpikes()[position]--;
-    this.opponentSpikes()[position] === 0 && (delete this.opponentSpikes()[position])
-
-    // TODO get rid of bar altogether
-    this.bar[this.opponent]++;
-  }
-
-  removeFromBar() {
-    this.bar[this.currentPlayer]--;
-  }
-
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
@@ -213,12 +209,12 @@ export default class GameLogic {
     if (typeof move !== 'undefined') {
       // blot
       if (this.opponentSpikes()[to] === 1) {
-        this.increaseBar(to);
-      }
-
-      // chip from bar
-      if (from === -1 || from === 24) {
-        this.removeFromBar();
+        // TODO make decrement fn
+        this.opponentSpikes()[to]--;
+        this.opponentSpikes()[to] === 0 && (delete this.opponentSpikes()[to])
+        const opponentBarIndex = this.opponent === 'dark' ? '-1' : 24;
+        const curr = this.opponentSpikes()[opponentBarIndex];
+        this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
       }
 
       spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;

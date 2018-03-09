@@ -159,7 +159,20 @@ describe('move calculation', () => {
     });
   });
 
+  describe('blotting', () => {
+    test('knocks opponent onto bar', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 1: 1 };
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      gl.doMove(0, 1);
+      expect(gl.currentPlayerSpikes()).toEqual( {1: 1});
+      expect(gl.opponentSpikes()).toEqual( {24: 1});
+    });
+
+    // TODO test light blotting dark also
+  });
 });
+
 
 function setPossibleMovesWithRoll(gl, roll) {
   let rollDiceMock = jest.fn();

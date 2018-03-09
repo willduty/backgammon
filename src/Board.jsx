@@ -204,7 +204,7 @@ export default class Board extends React.Component {
             </div>
           </div>
           <Bar
-            bar={this.state.game.bar}
+            bar={this.state.game.bar()}
             active={barChipActive}
             onMouseEnter={this.showMoves}
             onMouseLeave={this.hideMoves}
