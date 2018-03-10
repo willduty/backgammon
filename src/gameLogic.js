@@ -71,11 +71,31 @@ export default class GameLogic {
     this.setPossibleMoves();
   }
 
+  // Return moves hash or array depending on whether 'index' is provided.
+  // if provided, returns just the array of moves from 'index'
+  // if not provided, a hash of all 'from' indices with value array of moves is returned
+  // array of moves is either target (a number) or array of numbers which are the steps in a compound move
   currentPlayerMoves(index) {
     const moves = this[this.currentPlayer + 'Moves'];
     if (moves) {
       return arguments.length ? moves[index] : moves;
     }
+  }
+
+  // Returns only the possible target points. 'index' is required.
+  currentPlayerTargets(index) {
+    const moves = this.currentPlayerMoves(index);
+    let targets = [];
+    if(Array.isArray(moves)) {
+      targets = moves.map(function(item) {
+        return Array.isArray(item) ? item[item.length - 1] : item;
+      });
+    }
+    return targets;
+  }
+
+  isBarIndex(index) {
+    return index === -1 || index === 24;
   }
 
   bar() {
@@ -85,6 +105,13 @@ export default class GameLogic {
       hash['light'] = this.light[24] || 0;
     }
     return hash;
+  }
+
+  playerHasBarMove(player) {
+    const test =
+      this.currentPlayer === player &&
+      this.currentPlayerMoves(player === 'dark' ? '-1' : 24);
+    return test;
   }
 
   // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
@@ -172,6 +199,10 @@ export default class GameLogic {
         this[this.currentPlayer + 'Moves'][index] = allowedMoves;
       }
     }
+  }
+
+  gameActive() {
+    return true; // TODO implement
   }
 
   canOffboard() {
@@ -272,6 +303,8 @@ export default class GameLogic {
       }
     }
   }
+
+  // TODO move all these public type methods towards the top of file
 
   // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
   //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove

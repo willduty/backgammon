@@ -36,13 +36,7 @@ export default class Board extends React.Component {
   }
 
   showMoves(rolloverIndex) {
-    const moves = this.state.game.currentPlayerMoves(rolloverIndex);
-    let targets = [];
-    if(Array.isArray(moves)) {
-      targets = moves.map(function(item) {
-        return Array.isArray(item) ? item[item.length - 1] : item;
-      });
-    }
+    const targets = this.state.game.currentPlayerTargets(rolloverIndex);
     this.setState({highlightTargets: targets});
   }
 
@@ -50,14 +44,11 @@ export default class Board extends React.Component {
     this.setState({highlightTargets: []});
   }
 
-  isBarIndex(i) {
-    return i === -1 || i === 24;
-  }
-
   startDrag(event, chipIndex) {
-    const dragObjParent = this.isBarIndex(chipIndex)  ?
-     document.getElementById('bar-holder-' + this.state.game.currentPlayer) :
-     document.getElementById('square_' + chipIndex);
+    const game = this.state.game;
+    const dragObjParent = game.isBarIndex(chipIndex)  ?
+      document.getElementById('bar-holder-' + game.currentPlayer) :
+      document.getElementById('square_' + chipIndex);
 
     const chip = _.find(dragObjParent.children, function(e) {
       return e.className.indexOf('selectable') !== -1;
@@ -159,8 +150,7 @@ export default class Board extends React.Component {
 
   render() {
     const barChipActive = !this.props.coverText &&
-      this.state.game.currentPlayer === 'dark' &&
-      this.state.game.currentPlayerMoves('-1');
+      this.state.game.playerHasBarMove('dark');
 
     document.body.onmouseup = this.stopDrag
 
