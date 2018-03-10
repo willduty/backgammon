@@ -73,7 +73,9 @@ export default class GameLogic {
 
   currentPlayerMoves(index) {
     const moves = this[this.currentPlayer + 'Moves'];
-    return arguments.length ? moves[index] : moves;
+    if (moves) {
+      return arguments.length ? moves[index] : moves;
+    }
   }
 
   bar() {
@@ -210,9 +212,11 @@ export default class GameLogic {
     let spikes = this.currentPlayerSpikes();
 
     if (typeof move !== 'undefined') {
-      // blot
+
+      // TODO make decrement fn for the deletes below
+
+      // if blot occurred...
       if (this.opponentSpikes()[to] === 1) {
-        // TODO make decrement fn
         this.opponentSpikes()[to]--;
         this.opponentSpikes()[to] === 0 && (delete this.opponentSpikes()[to])
         const opponentBarIndex = this.opponent === 'dark' ? '-1' : 24;
@@ -220,9 +224,8 @@ export default class GameLogic {
         this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
       }
 
+      // increase decrease chip counts..
       spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
-
-      // TODO make decrement fn for this nonsense..
       spikes[from]--;
       if(spikes[from] === 0 || !spikes[from]) {
         delete spikes[from]
@@ -240,36 +243,40 @@ export default class GameLogic {
     return Math.floor(Math.random() * val);
   }
 
-  selectRandomMove() {
-    // TODO this.lightMoves needs to distinguish individual vs compound moves
-    const possibleMoves = this.currentPlayerMoves(),
-      movablePieceKeys = Object.keys(this.currentPlayerMoves());
+  selectRandomMove(index) {
+    const possibleMoves = this.currentPlayerMoves();
+    let movablePieceKeys  = Object.keys(this.currentPlayerMoves());
 
     // TODO shouldn't really need this. setPossibleMoves shouldn't populate key if there's no moves
     if (!movablePieceKeys || !_.find(movablePieceKeys, function(i) { return possibleMoves[i] }) ) {
       return;
     }
 
-    const whichKey = movablePieceKeys[this.random(movablePieceKeys.length)];
-    let index = this.random(possibleMoves[whichKey].length);
-    let to = possibleMoves[whichKey][index];
+    const whichKey = (typeof arguments[0] !== 'undefined' ) ? index : movablePieceKeys[this.random(movablePieceKeys.length)];
+    if (!possibleMoves[whichKey]) {
+      return;
+    }
+    let target = this.random(possibleMoves[whichKey].length);
+    let to = possibleMoves[whichKey][target];
     to = Array.isArray(to) ? to[to.length - 1] : to;
     return [parseInt(whichKey, 10), to];
   }
 
   // returns a randomly selected move of those available for the current player,
   // or undefined if current player has no moves.
-  automatedMove() {
+  automatedMove(from) {
     if (this.lastRoll && this.lastRoll.length) {
-      const move = this.selectRandomMove();
+      const move = this.selectRandomMove(from);
       if (move) {
         return move;
       }
     }
   }
 
-  canMove() {
-    return !!this.automatedMove();
+  // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
+  //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove
+  canMove(from) {
+    return !!this.automatedMove(from);
   }
 
   // decides who gets first move

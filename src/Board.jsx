@@ -142,12 +142,6 @@ export default class Board extends React.Component {
   }
 
   renderSquare(i) {
-    let highlight = this.state.highlightTargets.indexOf(i) !== -1;
-
-    const dm = this.state.game.currentPlayerMoves();
-    // TODO allow passing in index to canMove for moves on i
-    let hasMoves = this.state.game.canMove() && (dm && dm[i] && dm[i].length > 0);
-
     return (<Square
       index={i}
       chips={{dark: (this.state.game.dark[i] || 0), light: (this.state.game.light[i] || 0)}}
@@ -156,8 +150,8 @@ export default class Board extends React.Component {
       onMouseLeave={this.hideMoves}
       onMouseDown={this.startDrag}
       onMouseUp={this.stopDrag}
-      highlight={highlight}
-      hasMoves={hasMoves}
+      highlight={this.state.highlightTargets.indexOf(i) !== -1}
+      hasMoves={this.state.game.canMove(i)}
       currentDragTargetIndex={this.state.currentDragTargetIndex}
       rolling={this.state.rolling}
     />);

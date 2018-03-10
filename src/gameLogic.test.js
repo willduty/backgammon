@@ -167,6 +167,36 @@ describe('move calculation', () => {
     });
   });
 
+  describe('canMove()', () => {
+    test('no index provided: returns true when at least some move possible', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.canMove()).toBeTruthy();
+    });
+
+    test('no index provided: returns false when no moves possible', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 2: 2, 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.canMove()).toBeFalsy();
+    });
+
+    test('index provided: returns true when moves possible from index', () => {
+      gl.dark = { '0': 1, 5: 1};
+      gl.light = { 2: 2, 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.canMove(5)).toBeTruthy();
+    });
+
+    test('index provided: returns false when no moves possible from index', () => {
+      gl.dark = { '0': 1, 5: 1};
+      gl.light = { 2: 2, 3: 2 };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.canMove(0)).toBeFalsy();
+    });
+  });
+
   describe('blotting', () => {
     test('knocks opponent onto bar', () => {
       gl.dark = { '0': 1 };
