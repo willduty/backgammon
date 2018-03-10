@@ -21,6 +21,7 @@ export default class Game extends React.Component {
       game: gameLogic,
       tie: false,
       startButton: true,
+      rolling: false,
     }
   }
 
@@ -30,7 +31,7 @@ export default class Game extends React.Component {
     const addressee = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
     if (this.state.noMoves) {
       text = addressee + ' has no moves..';
-    } else if (this.state.game.rolling) {
+    } else if (this.state.rolling) {
       const decidingRoll = this.state.showDecision;
       text = (decidingRoll) ?
         (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
@@ -45,11 +46,11 @@ export default class Game extends React.Component {
   startNew() {
     var game = this.state.game;
     game.start();
-    game.rolling = true;
 
     this.setState({
       game: game,
       startButton: false,
+      rolling: true,
     });
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
   }
@@ -70,12 +71,12 @@ export default class Game extends React.Component {
     this.state.game.rollPlayerDice();
     this.updateStatus();
     var game = this.state.game;
-    game.rolling = false;
 
     this.setState({
       game: game,
       showDecision: null,
       clearDice: false,
+      rolling: false,
     });
 
     if(!game.canMove()) {
@@ -125,12 +126,12 @@ export default class Game extends React.Component {
 
   turnComplete() {
     const game = this.state.game;
-    game.rolling = true;
     game.nextTurn();
     this.setState({
       noMoves: false,
       game: game,
       clearDice: true,
+      rolling: true,
     });
 
     setTimeout(this.playerRoll, this.TIMEOUT);
@@ -150,7 +151,7 @@ export default class Game extends React.Component {
         <div className="game-board">
           <Board
             game={this.state.game}
-            rolling={this.state.game.rolling}
+            rolling={this.state.rolling}
             updateGame={this.updateGame}
             tie={this.state.tie}
             showDecision={this.state.showDecision}

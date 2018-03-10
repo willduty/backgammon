@@ -4,9 +4,6 @@ import Chip from './Chip';
 export default class Square extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      value: null,
-    }
     this.CHIP_SPACING = 40;
     this.MAX_UNSPACED = 250;
   }

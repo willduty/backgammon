@@ -21,8 +21,6 @@ export default class GameLogic {
       lastInitialRoll: [],
     };
 
-    this.rolling = false;
-
     this.lastRoll = null;
     this.setGame(this.BLANK_GAME);
   }
