@@ -13,13 +13,14 @@ export default class Holder extends React.Component {
     }
     className = className.join(' ');
 
+    // side holder chips
     let chips = [];
     for (var i = 0; i < this.props.count; i++) {
       chips.push(<div className='off-chip' key={i}></div>)
     }
 
     return (
-      <div className={'holder'}>
+      <div className='holder'>
         <div ></div>
         <div
           className={className}
