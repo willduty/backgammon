@@ -114,9 +114,8 @@ export default class Board extends React.Component {
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
 
-      let x = ((this.state.dragObjParentIndex < 12) ? ( e.pageX  ) : e.pageX );
+      let x = e.pageX ;
 
-      // TODO why is this so slow?
       if(this.state.dragObjParentIndex === -1) {
         x -= 300;
       }
@@ -158,10 +157,11 @@ export default class Board extends React.Component {
       this.state.game.playerHasBarMove('dark');
 
     const darkPlayer = this.state.game.currentPlayer === 'dark',
-      canOffboard = this.state.highlightTargets.indexOf('off') !== -1;
+      canOffboard = this.state.highlightTargets.indexOf('off') !== -1,
+      holderHover = this.state.currentDragTargetIndex === 'off';
 
-    // TODO: needed?
-    document.body.onmouseup = this.stopDrag
+    document.body.onmouseup = this.stopDrag;
+    document.body.onmousemove = this.dragging;
 
     return (
       <div className='board' >
@@ -177,7 +177,7 @@ export default class Board extends React.Component {
         />
 
         <div id='draggableArea' >
-          <div className="board-section" id="left-board" onMouseMove={this.dragging}>
+          <div className="board-section" id="left-board">
             <div>
               {this.renderSquare(12)}
               {this.renderSquare(13)}
@@ -203,7 +203,7 @@ export default class Board extends React.Component {
             onMouseDown={this.startDrag}
             onMouseUp={this.stopDrag}
           />
-          <div className="board-section" id="right-board" onMouseMove={this.dragging}>
+          <div className="board-section" id="right-board">
             <div>
               {this.renderSquare(18)}
               {this.renderSquare(19)}
@@ -228,12 +228,14 @@ export default class Board extends React.Component {
           <div className="part">
             <Holder
               highlighted={darkPlayer && canOffboard}
+              isDropTarget={darkPlayer && holderHover && canOffboard}
               count={this.state.game.darkOff}
               player='dark'
             />
             <div className='cube'>dcube</div>
             <Holder
               highlighted={!darkPlayer && canOffboard}
+              isDropTarget={!darkPlayer && holderHover}
               count={this.state.game.lightOff}
               player='light'
             />

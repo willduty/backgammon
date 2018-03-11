@@ -8,7 +8,9 @@ export default class Holder extends React.Component {
 
   render() {
     let className = ['chips'];
-		if (this.props.highlighted) {
+    if (this.props.isDropTarget) {
+      className.push('drop-target');
+    } else if (this.props.highlighted) {
       className.push('highlighted');
     }
     className = className.join(' ');
