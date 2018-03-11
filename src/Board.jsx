@@ -67,7 +67,9 @@ export default class Board extends React.Component {
 
   stopDrag(e) {
     if (this.state.dragObj) {
-      const update = this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
+      const update = !this.state.currentDragTargetIndex ? null :
+        this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
+
       if (!update) {
         const dragObj = this.state.dragObj;
         dragObj.style.top = this.state.dragObjOriginalY;
@@ -89,6 +91,7 @@ export default class Board extends React.Component {
       const boardRect = this.state.boardRect || document.getElementById('draggableArea').getBoundingClientRect();
       const leftBoard = this.state.leftBoard || document.getElementById('left-board').getBoundingClientRect();
       const rightBoard = this.state.rightBoard || document.getElementById('right-board').getBoundingClientRect();
+      const currOffboard = this.state.currOffboard || document.getElementById(this.state.game.currentPlayer + '-offboard').getBoundingClientRect();
       const mouseY = Math.floor((e.pageY - boardRect.y) / 300);
 
       let currentSq;
@@ -104,6 +107,8 @@ export default class Board extends React.Component {
         } else {
           currentSq = Math.floor((leftBoard.right - e.pageX) / this.SQUARE_WIDTH) + 6;
         }
+      } else if (currOffboard.x < e.pageX && currOffboard.x + currOffboard.width > e.pageX) {
+        currentSq = 'off';
       }
 
       let y = e.pageY;
@@ -152,6 +157,10 @@ export default class Board extends React.Component {
     const barChipActive = !this.props.coverText &&
       this.state.game.playerHasBarMove('dark');
 
+    const darkPlayer = this.state.game.currentPlayer === 'dark',
+      canOffboard = this.state.highlightTargets.indexOf('off') !== -1;
+
+    // TODO: needed?
     document.body.onmouseup = this.stopDrag
 
     return (
@@ -213,13 +222,21 @@ export default class Board extends React.Component {
             </div>
           </div>
         </div>
-        <div className='sep'>&nbsp;</div>
+        <div className='sep no-select'>&nbsp;</div>
 
         <div className="board-section">
           <div className="part">
-            <Holder />
+            <Holder
+              highlighted={darkPlayer && canOffboard}
+              count={this.state.game.darkOff}
+              player='dark'
+            />
             <div className='cube'>dcube</div>
-            <Holder />
+            <Holder
+              highlighted={!darkPlayer && canOffboard}
+              count={this.state.game.lightOff}
+              player='light'
+            />
           </div>
         </div>
       </div>

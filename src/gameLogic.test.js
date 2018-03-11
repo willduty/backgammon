@@ -74,7 +74,7 @@ describe('turns and dice rolls', () => {
   });
 });
 
-describe('move calculation', () => {
+describe('move calculation and management', () => {
   let gl;
 
   beforeEach(() => {
@@ -242,6 +242,56 @@ describe('move calculation', () => {
   });
 });
 
+describe('offboarding and game conclusion', () => {
+  let gl;
+
+  beforeEach(() => {
+    gl = new GameLogic;
+    setDarkPlayerFirst(gl);
+    gl.start();
+    gl.decide();
+  });
+
+  test('canOffboard() returns false if current player does not have all chips in home board', () => {
+    gl.dark = { 17: 1, 23: 14 };
+    setPossibleMovesWithRoll(gl, [1, 2]);
+    expect(gl.currentPlayer).toEqual('dark');
+    expect(gl.canOffboard('dark')).toBeFalsy();
+  });
+
+  test('canOffboard() returns true if current player has all chips in home board', () => {
+    gl.dark = { 18: 5, 23: 10 };
+    setPossibleMovesWithRoll(gl, [1, 2]);
+    expect(gl.currentPlayer).toEqual('dark');
+    expect(gl.canOffboard('dark')).toBeTruthy();
+  });
+
+  test('doMove to an index beyond last board point moves chip to offboard holder', () => {
+    gl.dark = { 18: 5, 23: 10 };
+    setPossibleMovesWithRoll(gl, [6, 2]);
+    expect(gl.darkOff).toEqual(0);
+    gl.doMove(18, 'off');
+    expect(gl.darkOff).toEqual(1);
+  });
+
+  test('doMove() to an index beyond last board point moves chip to offboard holder', () => {
+    gl.dark = { 18: 5, 23: 10 };
+    setPossibleMovesWithRoll(gl, [6, 2]);
+    expect(gl.darkOff).toEqual(0);
+    gl.doMove(18, 'off');
+    expect(gl.darkOff).toEqual(1);
+    expect(gl.dark).toEqual({ 18: 4, 23: 10 });
+  });
+
+  test('currentPlayerHasWon() returns true after last chip has been borne off', () => {
+    gl.dark = { 18: 1 };
+    gl.darkOff = 14;
+    setPossibleMovesWithRoll(gl, [6, 2]);
+    expect(gl.currentPlayerHasWon()).toBeFalsy();
+    gl.doMove(18, 'off');
+    expect(gl.currentPlayerHasWon()).toBeTruthy();
+  });
+});
 
 function setPossibleMovesWithRoll(gl, roll) {
   let rollDiceMock = jest.fn();

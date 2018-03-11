@@ -14,7 +14,9 @@ export default class Game extends React.Component {
     this.updateGame = this.updateGame.bind(this);
     this.turnComplete = this.turnComplete.bind(this);
     this.doAutomatedMove = this.doAutomatedMove.bind(this);
+    this.showGameOptions = this.showGameOptions.bind(this);
 
+    // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
 
     this.state = {
@@ -29,7 +31,9 @@ export default class Game extends React.Component {
     let text;
     const game = this.state.game;
     const addressee = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
-    if (this.state.noMoves) {
+    if (this.state.winner) {
+      text = addressee + ' has won the game!';
+    } else if (this.state.noMoves) {
       text = addressee + ' has no moves..';
     } else if (this.state.rolling) {
       const decidingRoll = this.state.showDecision;
@@ -107,7 +111,12 @@ export default class Game extends React.Component {
     if(game.doMove(from, to)) {
       this.setState({game: game})
 
-      if(game.canMove()) {
+      if(game.currentPlayerHasWon()) {
+        this.setState({
+          winner: game.currentPlayer
+        });
+        setTimeout(this.showGameOptions, this.LONG_TIMEOUT)
+      } else if(game.canMove()) {
         if(game.currentPlayer === 'light') {
           setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT)
         }
@@ -135,6 +144,13 @@ export default class Game extends React.Component {
     });
 
     setTimeout(this.playerRoll, this.TIMEOUT);
+  }
+
+  showGameOptions() {
+    this.setState({
+      startButton: true,
+      winner: null,
+    });
   }
 
   updateStatus() {

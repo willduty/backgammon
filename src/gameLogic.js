@@ -17,10 +17,13 @@ export default class GameLogic {
       light: {5: 5, 7: 3, 12: 5, 23: 2},
       darkMoves: {}, // maybe should be an object with methods
       lightMoves: {},
+      darkOff: 0,
+      lightOff: 0,
       lastRoll: [],
       lastInitialRoll: [],
     };
 
+    this.gameOn = false;
     this.lastRoll = null;
     this.setGame(this.BLANK_GAME);
   }
@@ -28,7 +31,13 @@ export default class GameLogic {
   // Sets board with standard chips in place.
   // Does not set currentPlayer... call decide() to set who starts.
   start() {
+    this.gameOn = true;
     this.setGame(this.STANDARD_OPENING);
+  }
+
+  end() {
+    this.gameOn = false;
+    // TODO save history
   }
 
   // Sets who starts the game. ie, sets this.currentPlayer and this.opponent
@@ -61,7 +70,7 @@ export default class GameLogic {
 //    lastRoll = [2,2]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
-      lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]]
+      lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]];
     }
 
     this.lastInitialRoll = lastRoll.slice();
@@ -106,10 +115,8 @@ export default class GameLogic {
   }
 
   playerHasBarMove(player) {
-    const test =
-      this.currentPlayer === player &&
-      this.currentPlayerMoves(player === 'dark' ? '-1' : 24);
-    return test;
+    const ok = this.currentPlayerMoves(player === 'dark' ? '-1' : 24);
+    return (this.currentPlayer === player) && ok;
   }
 
   // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
@@ -186,9 +193,9 @@ export default class GameLogic {
           }
         }
 
-        const isOffboard = (moveTarget > 23 || moveTarget < 0) && !this.canOffboard();
-
-        if (!isOffboard && (!taken || (taken < 2))) {
+        if ((moveTarget > 23 || moveTarget < 0)) {
+          this.canOffboard() && allowedMoves.push('off');
+        } else if (!taken || (taken < 2)) {
           allowedMoves.push(possibleMoves[i]);
         }
       }
@@ -204,7 +211,12 @@ export default class GameLogic {
   }
 
   canOffboard() {
-    return false; // TODO implement
+    const currKeys = Object.keys(this.currentPlayerSpikes());
+    const currPlayer = this.currentPlayer;
+    const ready = !_.find(currKeys, function(key) {
+      return currPlayer === 'dark' ? key < 18 : key > 5;
+    });
+    return ready;
   }
 
   // TODO these should take an argument for index, else return all
@@ -216,11 +228,18 @@ export default class GameLogic {
     return this[this.currentPlayer];
   }
 
+  currentPlayerHasWon() {
+    const allChipsOff = this[this.currentPlayer + 'Off'] === 15,
+      noChipsOnBoard = !Object.keys(this.currentPlayerSpikes()).length;
+
+    return noChipsOnBoard && allChipsOff;
+  }
+
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
-
     const possibleMoves = this.currentPlayerMoves(from);
+
     const move = _.find(possibleMoves, function (item) {
       const target = Array.isArray(item) ? item[item.length - 1] : item;
       return target === to;
@@ -254,7 +273,12 @@ export default class GameLogic {
       }
 
       // increase decrease chip counts..
-      spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
+      if (move === 'off') {
+        this[this.currentPlayer + 'Off']++;
+      } else {
+        spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
+      }
+
       spikes[from]--;
       if(spikes[from] === 0 || !spikes[from]) {
         delete spikes[from]
@@ -310,7 +334,7 @@ export default class GameLogic {
     return !!this.automatedMove(from);
   }
 
-  // decides who gets first move
+  // decides who gets first turn
   rollDecidingDice() {
     return this.rollDice();
   }

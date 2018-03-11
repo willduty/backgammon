@@ -146,8 +146,10 @@ ol, ul {
   z-index: 10002;
 }
 
+
 .board {
-  height: 600px;
+    /*border: 1px solid black;*/
+    height: 600px;
 }
 
 .dice {
@@ -195,6 +197,16 @@ ol, ul {
   top: 50%;
 }
 
+.no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
 .sep {
   width: 13px;
   height: 600px;
@@ -228,6 +240,7 @@ ol, ul {
   padding: 0 0 0 0 ;
   border: 0 0 0 0;
   position: relative;
+    /*left: 60px;*/
 }
 
 .game {
@@ -260,13 +273,30 @@ ol, ul {
 
 .holder .chips {
   /*margin: 10px 5px 0 5px;*/
-    -webkit-box-shadow: inset 0 1em 2em -2em ;
+    -webkit-box-shadow: inset 0 1em 3em -2em ;
   height: 250px;
   width: 48px;
   background: #224022;
     margin: 0 auto;
-    /*position: relative;*/
-    /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
-    /*filter: drop-shadow(-2px 2px 1px #222);*/
 }
 
+.holder .chips.highlighted {
+    border: 1px solid green;
+    -webkit-filter: brightness(200%);
+    /*background: #eee;*/
+}
+
+.off-chip {
+    /*border: 1px solid black;*/
+    vertical-align: bottom;
+   align: right;
+  width: 45px;
+  height: 7px;
+  /*background: linear-gradient(to right, #000, orange, yellow, green, #050, black, gray);*/
+  background: linear-gradient(to right, #000, #030, #eee, #666, #532, #010, black, #555);
+    /*padding: 2px 2px 2px 2px ;*/
+  margin: 2px 0px 2px 0px;
+    border-radius: 2px;
+    /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
+    filter: drop-shadow(-1px 2px 1px #222);
+}
