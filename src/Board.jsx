@@ -67,7 +67,7 @@ export default class Board extends React.Component {
 
   stopDrag(e) {
     if (this.state.dragObj) {
-      const update = !this.state.currentDragTargetIndex ? null :
+      const update = (typeof this.state.currentDragTargetIndex === 'undefined') ? null :
         this.props.updateGame(this.state.dragObjParentIndex, this.state.currentDragTargetIndex);
 
       if (!update) {
