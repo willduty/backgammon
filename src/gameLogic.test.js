@@ -149,6 +149,19 @@ describe('move calculation and management', () => {
       expect(gl.lightMoves).toEqual( {5: [1, 4]});
     });
 
+    test('allows compound moves when player has only 1 chip on bar', () => {
+      gl.dark = { '-1': 1 };
+      gl.light = { };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {"-1": [1, 2, [1, 4]]});
+    });
+
+    test('does not allow compound moves when player has 2 or more chips on bar', () => {
+      gl.dark = { '-1': 2 };
+      gl.light = { };
+      setPossibleMovesWithRoll(gl, [2, 3]);
+      expect(gl.darkMoves).toEqual( {"-1": [1, 2]});
+    });
   });
 
   describe('currentPlayerMoves()', () => {

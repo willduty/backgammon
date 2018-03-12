@@ -183,15 +183,13 @@ export default class Game extends React.Component {
             clearDice={this.state.clearDice}
             />
         </div>
-        <div>
+        <div className="player-cards">
           <div>
-            <div>
-              <ol id="status">{
-                this.state.game.currentPlayer &&
-                (<span><b>Current Player:</b> {this.state.game.currentPlayer}</span>)
-              }
-              </ol>
-            </div>
+            <ol id="status">{
+              this.state.game.currentPlayer &&
+              (<span><b>Current Player:</b> {this.state.game.currentPlayer}</span>)
+            }
+            </ol>
           </div>
         </div>
       </div>

@@ -193,7 +193,9 @@ export default class GameLogic {
           }
         }
 
-        if ((moveTarget > 23 || moveTarget < 0)) {
+        if (barHash && (barHash[-1] > 1 || barHash[24] > 1) && compound) {
+          // TODO nothing
+        } else if ((moveTarget > 23 || moveTarget < 0)) {
           this.canOffboard() && allowedMoves.push('off');
         } else if (!taken || (taken < 2)) {
           allowedMoves.push(possibleMoves[i]);
