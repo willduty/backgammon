@@ -67,7 +67,7 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [2,2]; // TESTING
+//    lastRoll = [1,2]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]];
@@ -254,7 +254,7 @@ export default class GameLogic {
         }
       }
     } else if (typeof move !== 'undefined') {
-      this.lastRoll.splice(this.lastRoll.indexOf(to - from), 1);
+      this.lastRoll.splice(this.lastRoll.indexOf(Math.abs(to - from)), 1);
     };
 
     let spikes = this.currentPlayerSpikes();

@@ -114,7 +114,7 @@ export default class Board extends React.Component {
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
 
-      let x = e.pageX ;
+      let x = e.pageX - boardRect.x;
 
       if(this.state.dragObjParentIndex === -1) {
         x -= 300;
@@ -164,7 +164,12 @@ export default class Board extends React.Component {
     document.body.onmousemove = this.dragging;
 
     return (
-      <div className='board' >
+      <div
+        className='board'
+        onContextMenu={function(e) {
+          e.preventDefault();
+          }}
+      >
         <div className={this.props.showCover ? 'cover' : 'hide'} />
         <div className={this.props.showCover ? 'rolling' : 'hide'}>
           {this.props.startButton || this.props.coverText}

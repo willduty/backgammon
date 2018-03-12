@@ -8,8 +8,17 @@ ol, ul {
   padding-left: 30px;
 }
 
+.player-cards {
+    float: left;
+
+    background: gray;
+    height: 200px;
+    width: 100px;
+    z-index: 10000000;
+}
+
 .status {
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
 }
 
 .top-area {
@@ -243,7 +252,7 @@ ol, ul {
   padding: 0 0 0 0 ;
   border: 0 0 0 0;
   position: relative;
-    /*left: 60px;*/
+  left: 60px;
 }
 
 .game {
@@ -261,8 +270,8 @@ ol, ul {
 }
 
 .cube {
-    height: 50px;
-    background: #111;
+  height: 50px;
+  background: #111;
 }
 
 .holder {
@@ -294,8 +303,8 @@ ol, ul {
 }
 
 .holder .chips.drop-target {
-    border: 1px solid green;
-    -webkit-filter: brightness(300%);
+  border: 1px solid green;
+  -webkit-filter: brightness(300%);
 }
 
 .off-chip {
@@ -303,19 +312,16 @@ ol, ul {
   align: right;
   width: 43px;
   height: 5px;
-  /*background: linear-gradient(to right, #000, orange, yellow, green, #050, black, gray);*/
   background: linear-gradient(to right, black, #555, #233, black,  #010, #321, #555, #888, #eee, #aaa, #020, #000);
   margin: 2px 0px 2px 0px;
   border-radius: 2px;
-  /*-webkit-filter: drop-shadow(5px 5px 5px #222);*/
   filter: drop-shadow(-1px 2px 1px #222);
 }
 
 #dark-offboard .off-chip {
-
-    background: linear-gradient(to right, black, #555, #233, black,  #010, #321, #222, #333, #444, #eee, #444, #020, #000);
+  background: linear-gradient(to right, black, #555, #233, black,  #010, #321, #222, #333, #444, #eee, #444, #020, #000);
 }
 
 #light-offboard .off-chip {
-    background: linear-gradient(to right, #333, #999, #899, #aaa, #bbb, #aaa, #bbb, #fff, #ccc, #787, #666);
+  background: linear-gradient(to right, #333, #aaa, #9aa, #bbb, #ccc, #bbb, #ccc, #fff, #ddd, #898, #666);
 }
