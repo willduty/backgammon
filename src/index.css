@@ -8,88 +8,88 @@ body {
 
 
 .board-section {
-    /*border: 1px solid black;*/
-    float: left;
+  /*border: 1px solid black;*/
+  float: left;
 }
 
 .sep {
-    width: 13px;
-    height: 600px;
-    background: black;
-    float: left;
+  width: 13px;
+  height: 600px;
+  background: black;
+  float: left;
 }
 
 .status {
-    /*margin-bottom: 10px;*/
+  /*margin-bottom: 10px;*/
 }
 
 .top-area {
-    height: 20px;
+  height: 20px;
 }
 
 .board {
-    text-align: center;
-    width: 925px;
-    /*float: left;*/
-    /*border: 1px solid black;*/
-    padding: 0 0 0 0 ;
-    border: 0 0 0 0;
-    position: relative;
-    left: 10px;
-    height: 600px;
-    float: left;
+  text-align: center;
+  width: 925px;
+  /*float: left;*/
+  /*border: 1px solid black;*/
+  padding: 0 0 0 0 ;
+  border: 0 0 0 0;
+  position: relative;
+  left: 10px;
+  height: 600px;
+  float: left;
 }
 
 .board, .cover {
-    width: 725px;
+  width: 725px;
 }
 
 .player-cards {
-    background: #eee;
-    display: inline-block;
-    height: 600px;
-    width: 131px;
-    padding-left: 10px;
+  background: #eee;
+  display: inline-block;
+  height: 600px;
+  width: 131px;
+  padding-left: 10px;
 }
 
 .player-card {
-    border: 1px solid black;
-    height: 200px;
-    width: 130px;
-    margin-top: 10px;
+  border: 1px solid black;
+  height: 200px;
+  width: 130px;
+  margin-top: 10px;
 }
 
 .cover-button {
-    cursor: pointer;
-    border-radius: 5px;
-    padding: 10px 0 10px 0;
-    border: 1px solid white;
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 10px 0 10px 0;
+  border: 1px solid white;
 }
 
 .cover-text {
-    display: table-cell;
-    vertical-align: middle;
-    position: absolute;
-    top: 270px;
-    left: 200px;
-    height: 50px;
-    width: 260px;
-    color: white;
-    background: transparent;
-    font: 18px "Century Gothic", Futura, sans-serif;
-    z-index: 10002;
+  display: table-cell;
+  vertical-align: middle;
+  position: absolute;
+  top: 270px;
+  left: 200px;
+  height: 50px;
+  width: 260px;
+  color: white;
+  background: transparent;
+  font: 18px "Century Gothic", Futura, sans-serif;
+  z-index: 10002;
 }
 
 .cover {
-    display: table;
-    top: 0px;
-    left: 0px;
-    height: 600px;
-    background-color: #333;
-    opacity: .7;
-    z-index: 10001;
-    position: absolute;
-    color: white;
+  display: table;
+  top: 0px;
+  left: 0px;
+  height: 600px;
+  background-color: #333;
+  opacity: .7;
+  z-index: 10001;
+  position: absolute;
+  color: white;
 }
 
 
@@ -99,7 +99,7 @@ body {
 
 
 .cube, .holder {
-    width: 65px;
+  width: 65px;
 }
 
 .cube {
@@ -161,64 +161,64 @@ body {
 
 
 ol, ul {
-    padding-left: 30px;
+  padding-left: 30px;
 }
 
 
 
 .square {
-    /*border: 1px solid black;*/
-    float: left;
-    height: 300px;
-    padding: 0;
-    width: 51px;
-    background-repeat: no-repeat;
-    background-size: cover;
+  /*border: 1px solid black;*/
+  float: left;
+  height: 300px;
+  padding: 0;
+  width: 51px;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .dark {
-    background-image: url(./images/spike_yellow.png);
+  background-image: url(./images/spike_yellow.png);
 }
 
 .light {
-    background-image: url(./images/spike_red.png);
+  background-image: url(./images/spike_red.png);
 }
 
 .dark-bottom {
-    background: url(./images/spike_yellow_bottom.png) 0 -55px no-repeat;
-    background-size: 51px 355px;
+  background: url(./images/spike_yellow_bottom.png) 0 -55px no-repeat;
+  background-size: 51px 355px;
 }
 
 .light-bottom {
-    background: url(./images/spike_red_bottom.png) 0 -55px no-repeat;
-    background-size: 51px 355px;
+  background: url(./images/spike_red_bottom.png) 0 -55px no-repeat;
+  background-size: 51px 355px;
 }
 
 .light-bottom .chip, .dark-bottom .chip {
-    top: 550px;
+  top: 550px;
 }
 
 .chip {
-    /*border: 1px solid black;*/
-    height: 51px;
-    width: 51px;
-    background-repeat: no-repeat;
-    background-size: 51px 51px;
-    position: absolute;
-    -webkit-filter: drop-shadow(5px 5px 5px #222);
-    filter: drop-shadow(-2px 2px 1px #222);
+  /*border: 1px solid black;*/
+  height: 51px;
+  width: 51px;
+  background-repeat: no-repeat;
+  background-size: 51px 51px;
+  position: absolute;
+  -webkit-filter: drop-shadow(5px 5px 5px #222);
+  filter: drop-shadow(-2px 2px 1px #222);
 }
 
 .selectable {
-    /*-webkit-filter: brightness(600%) hue-rotate(230deg);*/
-    animation-name: showMovableChips;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
+  /*-webkit-filter: brightness(600%) hue-rotate(230deg);*/
+  animation-name: showMovableChips;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
 
 .selectable:hover {
-    cursor: grab;
-    -webkit-filter: brightness(300%);
+  cursor: grab;
+  -webkit-filter: brightness(300%);
 }
 
 @keyframes showMovableChips {
@@ -228,104 +228,104 @@ ol, ul {
 }
 
 .die1,.die2,.die3,.die4,.die5,.die6 {
-    float: left;
-    height: 35px;
-    width: 35px;
-    background-size: 35px 35px;
-    margin-right: 20px;
-    box-shadow: -3px 3px 8px #333;
+  float: left;
+  height: 35px;
+  width: 35px;
+  background-size: 35px 35px;
+  margin-right: 20px;
+  box-shadow: -3px 3px 8px #333;
 }
 
 .die1 {
-    background-image: url(./images/die1.png);
+  background-image: url(./images/die1.png);
 }
 .die2 {
-    background-image: url(./images/die2.png);
+  background-image: url(./images/die2.png);
 }
 .die3 {
-    background-image: url(./images/die3.png);
+  background-image: url(./images/die3.png);
 }
 .die4 {
-    background-image: url(./images/die4.png);
+  background-image: url(./images/die4.png);
 }
 .die5 {
-    background-image: url(./images/die5.png);
+  background-image: url(./images/die5.png);
 }
 .die6 {
-    background-image: url(./images/die6.png);
+  background-image: url(./images/die6.png);
 }
 
 
 .hide {
-    display: none;
+  display: none;
 }
 
 .dice {
-    top: 47%;
-    left: 10%;
-    z-index: 1000;
-    position: absolute;
+  top: 47%;
+  left: 10%;
+  z-index: 1000;
+  position: absolute;
 }
 
 .deciding-dice {
-    top: 47%;
-    left: 10%;
-    z-index: 50000;
-    position: absolute;
+  top: 47%;
+  left: 10%;
+  z-index: 50000;
+  position: absolute;
 }
 
 .chip_light {
-    background-image: url(./images/chip_light.png);
+  background-image: url(./images/chip_light.png);
 }
 
 .chip_dark {
-    background-image: url(./images/chip_dark.png);
+  background-image: url(./images/chip_dark.png);
 }
 
 .bar {
-    width: 35px;
-    position: relative;
-    height: 600px;
-    background: black;
-    float: left;
+  width: 35px;
+  position: relative;
+  height: 600px;
+  background: black;
+  float: left;
 }
 
 .bar-holder-light, .bar-holder-dark {
-    position: absolute;
-    color: white;
-    left: -8px;
-    z-index: 10000;
+  position: absolute;
+  color: white;
+  left: -8px;
+  z-index: 10000;
 }
 
 .bar-holder-light {
-    top: 35%;
+  top: 35%;
 }
 
 .bar-holder-dark {
-    top: 50%;
+  top: 50%;
 }
 
 .board-section, .sep, .bar, .holder, .bar-holder-light, .bar-holder-dark, .no-select  {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
 
 
 .darken {
-    -webkit-filter: brightness(50%)
+  -webkit-filter: brightness(50%)
 }
 
 .highlightSquare {
-    opacity: 0.7;
-    /*-webkit-filter: brightness(150%)*/
+  opacity: 0.7;
+  /*-webkit-filter: brightness(150%)*/
 }
 
 .dropTargetSquare {
-    opacity: 0.5;
-    /*-webkit-filter: brightness(200%)*/
+  opacity: 0.5;
+  /*-webkit-filter: brightness(200%)*/
 }
