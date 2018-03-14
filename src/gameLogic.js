@@ -68,13 +68,6 @@ export default class GameLogic {
     }
   }
 
-  // Switches the opponent to be the current player and vice versa.
-  nextTurn() {
-    const current = this.currentPlayer;
-    this.currentPlayer = this.opponent;
-    this.opponent = current;
-  }
-
   // Roll for current player's turn.
   // Sets lastRoll, lastInitialRoll, and the player's possible moves.
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
@@ -89,6 +82,14 @@ export default class GameLogic {
     this.lastInitialRoll = lastRoll.slice();
     this.lastRoll = lastRoll.slice();
     this.setPossibleMoves();
+  }
+
+
+  // Switches the opponent to be the current player and vice versa.
+  nextTurn() {
+    const current = this.currentPlayer;
+    this.currentPlayer = this.opponent;
+    this.opponent = current;
   }
 
   // Return moves hash or array depending on whether 'index' is provided.
@@ -162,7 +163,9 @@ export default class GameLogic {
 
       let possibleMoves;
 
-      if (first === sec) {
+      if (!first) {
+        possibleMoves = [];
+      } else if (first === sec) {
         possibleMoves = _.map(this.lastRoll, function(val, i) {
           const n = light ? -val : val;
           let move = curr + n;

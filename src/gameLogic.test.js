@@ -241,6 +241,17 @@ describe('move calculation and management', () => {
       expect(gl.playerHasBarMove('light')).toBeTruthy();
     });
 
+    test('playerHasBarMove() returns false if player has chips on bar but moves expended', () => {
+      gl.dark = { '-1': 3 };
+      gl.light = { 24: 1 };
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      expect(gl.currentPlayer).toEqual('dark')
+      expect(gl.playerHasBarMove('dark')).toBeTruthy();
+      gl.doMove(-1, 1);
+      gl.doMove(-1, 0);
+      expect(gl.playerHasBarMove('dark')).toBeFalsy();
+    });
+
     test('playerHasBarMove() returns false if player is blocked from bar moves', () => {
       gl.dark = { '-1': 1, 18: 2, 19: 2, 20: 2, 21: 2, 22: 2, 23: 2 };
       gl.light = { 0: 2, 1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 24: 1 };

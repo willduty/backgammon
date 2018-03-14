@@ -116,10 +116,10 @@ export default class Game extends React.Component {
         this.setState({
           winner: game.currentPlayer
         });
-        setTimeout(this.showGameOptions, this.LONG_TIMEOUT)
+        setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
       } else if(game.canMove()) {
         if(game.currentPlayer === 'light') {
-          setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT)
+          setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT);
         }
       } else {
         if (game.lastRoll && game.lastRoll.length) {
