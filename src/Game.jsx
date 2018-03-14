@@ -154,8 +154,8 @@ export default class Game extends React.Component {
   }
 
   updateStatus() {
-    const status = document.getElementById('status');
-    status.html = 'adfas';
+//    const status = document.getElementById('status');
+//    status.html = 'adfas';
   }
 
   render() {
@@ -164,7 +164,7 @@ export default class Game extends React.Component {
     return (
       <div className="game">
         <div className="top-area"></div>
-        <div className="game-board">
+        <div className="">
           <Board
             game={this.state.game}
             rolling={this.state.rolling}
@@ -182,15 +182,22 @@ export default class Game extends React.Component {
             }
             clearDice={this.state.clearDice}
             />
-        </div>
-        <div className="player-cards">
-          <div>
+          <div className="player-cards">
+
             <ol id="status">{
               this.state.game.currentPlayer &&
               (<span><b>Current Player:</b> {this.state.game.currentPlayer}</span>)
             }
             </ol>
+            <div className="player-card">
+              <span><b>Player:</b> {this.state.game.pips('dark')}</span>
+            </div>
+            <div className="player-card">
+              <span><b>Computer:</b> {this.state.game.pips('light')}</span>
+            </div>
+
           </div>
+
         </div>
       </div>
     );

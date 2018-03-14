@@ -306,6 +306,36 @@ describe('offboarding and game conclusion', () => {
   });
 });
 
+
+describe('pips', () => {
+  let gl;
+
+  beforeEach(() => {
+    gl = new GameLogic;
+    setDarkPlayerFirst(gl);
+    gl.start();
+    gl.decide();
+  });
+
+  test('pips are initially 167', () => {
+    expect(gl.pips('dark')).toEqual(167);
+    expect(gl.pips('light')).toEqual(167);
+  });
+
+  test('pips change accordingly with moves', () => {
+    setPossibleMovesWithRoll(gl, [2, 1]);
+    gl.doMove(0, 2);
+    expect(gl.pips('dark')).toEqual(165);
+    gl.nextTurn();
+    setPossibleMovesWithRoll(gl, [2, 1]);
+    gl.doMove(23, 20);
+    expect(gl.pips('light')).toEqual(164);
+  });
+
+});
+
+
+
 function setPossibleMovesWithRoll(gl, roll) {
   let rollDiceMock = jest.fn();
   rollDiceMock.mockReturnValue(roll);

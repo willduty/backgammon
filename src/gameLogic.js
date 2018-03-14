@@ -40,6 +40,19 @@ export default class GameLogic {
     // TODO save history
   }
 
+  int(n) {
+    return parseInt(n, 10);
+  }
+
+  pips(player) {
+    let count = 0;
+    const spikes = this[player];
+    for(var i in spikes) {
+      count += (this.int(spikes[i]) * Math.abs(((player == 'dark' ? 24 : -1) - this.int(i))));
+    }
+    return count;
+  }
+
   // Sets who starts the game. ie, sets this.currentPlayer and this.opponent
   // Does not start the turn, which happens on rollPlayerDice().
   decide() {

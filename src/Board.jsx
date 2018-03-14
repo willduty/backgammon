@@ -171,7 +171,7 @@ export default class Board extends React.Component {
           }}
       >
         <div className={this.props.showCover ? 'cover' : 'hide'} />
-        <div className={this.props.showCover ? 'rolling' : 'hide'}>
+        <div className={this.props.showCover ? 'cover-text' : 'hide'}>
           {this.props.startButton || this.props.coverText}
         </div>
 
