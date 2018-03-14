@@ -227,6 +227,7 @@ export default class Board extends React.Component {
             </div>
           </div>
         </div>
+
         <div className='sep no-select'>&nbsp;</div>
 
         <div className="board-section">
@@ -246,6 +247,8 @@ export default class Board extends React.Component {
             />
           </div>
         </div>
+
+        <div className='sep no-select'>&nbsp;</div>
       </div>
     );
   }

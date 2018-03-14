@@ -1,5 +1,6 @@
 import React from 'react';
 import Board from './Board';
+import PlayerCard from './PlayerCard';
 import GameLogic from './gameLogic.js';
 
 export default class Game extends React.Component {
@@ -182,20 +183,20 @@ export default class Game extends React.Component {
             }
             clearDice={this.state.clearDice}
             />
+
           <div className="player-cards">
-
-            <ol id="status">{
-              this.state.game.currentPlayer &&
-              (<span><b>Current Player:</b> {this.state.game.currentPlayer}</span>)
-            }
-            </ol>
-            <div className="player-card">
-              <span><b>Player:</b> {this.state.game.pips('dark')}</span>
-            </div>
-            <div className="player-card">
-              <span><b>Computer:</b> {this.state.game.pips('light')}</span>
-            </div>
-
+            <PlayerCard
+              playerName='Player'
+              pips={this.state.game.pips('dark')}
+              playerType='dark'
+              active={this.state.game.currentPlayer === 'dark'}
+            />
+            <PlayerCard
+              playerName='Computer'
+              pips={this.state.game.pips('light')}
+              playerType='light'
+              active={this.state.game.currentPlayer === 'light'}
+            />
           </div>
 
         </div>
