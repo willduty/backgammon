@@ -23,6 +23,9 @@ export default class GameLogic {
       lastInitialRoll: [],
     };
 
+    this.GAME_PROPS = Object.keys(this.STANDARD_OPENING);
+    this.history = [];
+
     this.gameOn = false;
     this.lastRoll = null;
     this.setGame(this.BLANK_GAME);
@@ -33,11 +36,33 @@ export default class GameLogic {
   start() {
     this.gameOn = true;
     this.setGame(this.STANDARD_OPENING);
+    this.snapHistory();
   }
 
   end() {
     this.gameOn = false;
-    // TODO save history
+  }
+
+  currentHistoryState() {
+    let hist = {};
+    const _this = this;
+    _.each(this.GAME_PROPS, function(prop) {
+      hist[prop] = JSON.parse(JSON.stringify(_this[prop]));
+    });
+    return hist;
+  }
+
+  snapHistory() {
+    this.history.push(this.currentHistoryState());
+  }
+
+  undo() {
+    this.history.pop();
+    const last = this.history[this.history.length - 1];
+    const _this = this;
+    _.each(last, function(value, key) {
+      _this[key] = JSON.parse(JSON.stringify(value));
+    });
   }
 
   int(n) {
@@ -222,6 +247,7 @@ export default class GameLogic {
         this[this.currentPlayer + 'Moves'][index] = allowedMoves;
       }
     }
+    this.snapHistory();
   }
 
   gameActive() {
@@ -304,6 +330,7 @@ export default class GameLogic {
       }
 
       this.setPossibleMoves();
+
       return true;
     } else {
       return false;

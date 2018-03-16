@@ -342,9 +342,32 @@ describe('pips', () => {
     gl.doMove(23, 20);
     expect(gl.pips('light')).toEqual(164);
   });
-
 });
 
+describe('history', () => {
+  let gl;
+
+  beforeEach(() => {
+    gl = new GameLogic;
+    setDarkPlayerFirst(gl);
+    gl.start();
+    gl.decide();
+  });
+
+  describe('undo()', () => {
+    test('history can be restored', () => {
+      setPossibleMovesWithRoll(gl, [2, 1]);
+      const snapshot1 = gl.currentHistoryState();
+      gl.doMove(0, 2);
+      const snapshot2 = gl.currentHistoryState();
+      gl.undo();
+      const snapshot3 = gl.currentHistoryState();
+      expect(snapshot1).toEqual(snapshot3);
+      expect(snapshot1).not.toEqual(snapshot2);
+    });
+  });
+  // TODO: need some more tests around history
+});
 
 
 function setPossibleMovesWithRoll(gl, roll) {

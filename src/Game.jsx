@@ -16,6 +16,7 @@ export default class Game extends React.Component {
     this.turnComplete = this.turnComplete.bind(this);
     this.doAutomatedMove = this.doAutomatedMove.bind(this);
     this.showGameOptions = this.showGameOptions.bind(this);
+    this.undoLastMove = this.undoLastMove.bind(this);
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -32,6 +33,7 @@ export default class Game extends React.Component {
     let text;
     const game = this.state.game;
     const addressee = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
+
     if (this.state.winner) {
       text = addressee + ' has won the game!';
     } else if (this.state.noMoves) {
@@ -41,8 +43,10 @@ export default class Game extends React.Component {
       text = (decidingRoll) ?
         (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
         addressee + 'Rolling...';
-      if (!game.currentPlayer) {
-        text = this.state.tie ? 'OOPS! Tie! Rolling again' : 'Opening roll...';
+      if (this.gameOn && !game.currentPlayer) {
+        text = this.state.tie ?
+          'OOPS! Tie! Rolling again' :
+          'Opening roll...';
       }
     }
     return text;
@@ -74,7 +78,6 @@ export default class Game extends React.Component {
 
   playerRoll() {
     this.state.game.rollPlayerDice();
-    this.updateStatus();
     var game = this.state.game;
 
     this.setState({
@@ -154,14 +157,29 @@ export default class Game extends React.Component {
     });
   }
 
-  updateStatus() {
-//    const status = document.getElementById('status');
-//    status.html = 'adfas';
+  undoLastMove() {
+    const game = this.state.game
+    game.undo();
+    this.setState({game: game});
   }
 
   render() {
     // TODO componentize start button or general button
+
     const coverText = this.coverText();
+
+    // Undo button only shown if player is partway through move.
+    let undoClass;
+    if(this.state.game.gameOn
+      && this.state.game.currentPlayer === 'dark'
+      && this.state.game.lastRoll.length > 0
+      && this.state.game.lastRoll.length !== this.state.game.lastInitialRoll.length
+      ) {
+      undoClass = 'undo';
+    } else {
+      undoClass = 'hide';
+    }
+
     return (
       <div className="game">
         <div className="top-area"></div>
@@ -182,7 +200,7 @@ export default class Game extends React.Component {
               </div>
             }
             clearDice={this.state.clearDice}
-            />
+          />
 
           <div className="player-cards">
             <PlayerCard
@@ -197,8 +215,13 @@ export default class Game extends React.Component {
               playerType='light'
               active={this.state.game.currentPlayer === 'light'}
             />
+            <button
+              className={undoClass}
+              onClick={() => this.undoLastMove()}
+            >
+              undo
+            </button>
           </div>
-
         </div>
       </div>
     );
