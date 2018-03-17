@@ -98,7 +98,7 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [1,2]; // TESTING
+//    lastRoll = [2, 3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]];
@@ -108,7 +108,6 @@ export default class GameLogic {
     this.lastRoll = lastRoll.slice();
     this.setPossibleMoves();
   }
-
 
   // Switches the opponent to be the current player and vice versa.
   nextTurn() {
@@ -171,14 +170,15 @@ export default class GameLogic {
     }
 
     // Possible moves are always either from board positions, or from the bar, but never both.
+    // movablePieceContainers is a hash of form {boardPosition => chipCount, ...}
     const movablePieceContainers = barHash || this.currentPlayerSpikes();
 
+    // Logic for which moves can be made from each occupied spike of position `index`.
     for(var index in movablePieceContainers) {
-      // Logic for which moves can be made from each occupied spike
-      const curr = parseInt(index, 10);
+      const curr = this.int(index);
       const light = (this.currentPlayer === 'light');
-      let   first = parseInt(this.lastRoll[0], 10),
-       sec = parseInt(this.lastRoll[1], 10);
+      let first = this.int(this.lastRoll[0]),
+        sec = this.int(this.lastRoll[1]);
 
       // opponent goes backwards
       if (light) {
@@ -186,32 +186,38 @@ export default class GameLogic {
         sec = - sec;
       }
 
+      // Find all possible moves, as if there was no opponent.
       let possibleMoves;
-
-      if (!first) {
-        possibleMoves = [];
-      } else if (first === sec) {
-        possibleMoves = _.map(this.lastRoll, function(val, i) {
-          const n = light ? -val : val;
-          let move = curr + n;
-
-          if (i > 0) {
-            move = [move];
-            for(var z = 1; z <= i; z++) {
-              move.push(curr + (n * (z + 1)));
+      if (first) {
+        if (first === sec) {
+          possibleMoves = _.map(this.lastRoll, function(val, i) {
+            const n = light ? -val : val;
+            let move = curr + n;
+            if (i > 0) {
+              move = [move];
+              for(var z = 1; z <= i; z++) {
+                move.push(curr + (n * (z + 1)));
+              }
             }
-          }
-          return move;
-        });
-      } else {
-        if(first && sec) {
-          possibleMoves = [curr + first, curr + sec, [curr + first, curr + first + sec]];
+            return move;
+          });
         } else {
-          possibleMoves = [curr + first];
+          if(sec) {
+            possibleMoves = [
+              curr + first,
+              curr + sec,
+              [curr + first, curr + first + sec],
+              [curr + sec, curr + sec + first]
+            ];
+          } else {
+            possibleMoves = [curr + first];
+          }
         }
+      } else {
+        possibleMoves = [];
       }
 
-      // exclude moves occupied by opponent (2 or more chips) and offboard moves, unless player can bear-off.
+      // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
       let allowedMoves = [];
 
       for(var i in possibleMoves) {
@@ -283,7 +289,6 @@ export default class GameLogic {
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
     const possibleMoves = this.currentPlayerMoves(from);
-
     const move = _.find(possibleMoves, function (item) {
       const target = Array.isArray(item) ? item[item.length - 1] : item;
       return target === to;
@@ -357,7 +362,7 @@ export default class GameLogic {
     let target = this.random(possibleMoves[whichKey].length);
     let to = possibleMoves[whichKey][target];
     to = Array.isArray(to) ? to[to.length - 1] : to;
-    return [parseInt(whichKey, 10), to];
+    return [this.int(whichKey), to];
   }
 
   // returns a randomly selected move of those available for the current player,

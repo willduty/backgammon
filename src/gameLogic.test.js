@@ -89,7 +89,7 @@ describe('move calculation and management', () => {
       gl.dark = { '0': 2 };
       gl.light = {};
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"0": [2, 3, [2, 5]]});
+      expect(gl.darkMoves).toEqual( {"0": [2, 3, [2, 5], [3, 5]]});
     });
 
     test('does not set up moves where opponent has 2 or more chips', () => {
@@ -106,35 +106,35 @@ describe('move calculation and management', () => {
       expect(gl.darkMoves).toEqual( {"0": [2, 3]});
     });
 
-    test('does not set up compound moves where opponent has 2 or more chips on intermediate target', () => {
+    test('does not set up compound moves where opponent has 2 or more chips on both intermediate targets', () => {
       gl.dark = { '0': 2 };
       gl.light = { 2: 2, 3: 2 };
       setPossibleMovesWithRoll(gl, [2, 3]);
       expect(gl.darkMoves).toEqual( {});
     });
 
-    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll', () => {
+    test('on double roll, does not set up compound moves where opponent has 2 or more chips on intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 4: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
       expect(gl.darkMoves).toEqual( {"0": [2]});
     });
 
-    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll later', () => {
+    test('on double roll, sets up compound moves only to where opponent has 2 or more chips on an intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 6: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
       expect(gl.darkMoves).toEqual( {"0": [2, [2, 4]]});
     });
 
-    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll later later', () => {
+    test('on double roll, sets up compound moves only to where opponent has 2 or more chips on an intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 8: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
       expect(gl.darkMoves).toEqual( {"0": [2, [2, 4], [2, 4, 6]]});
     });
 
-    test('does not set up compound moves where opponent has 2 or more chips on intermediate target, double roll, from bar', () => {
+    test('on double roll, does not set up compound moves where opponent has 2 or more chips on intermediate target, from bar', () => {
       gl.dark = { '-1': 1 };
       gl.light = { 5: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
@@ -153,7 +153,7 @@ describe('move calculation and management', () => {
       gl.dark = { '-1': 1 };
       gl.light = { };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"-1": [1, 2, [1, 4]]});
+      expect(gl.darkMoves).toEqual( {"-1": [1, 2, [1, 4], [2, 4]]});
     });
 
     test('does not allow compound moves when player has 2 or more chips on bar', () => {
@@ -169,14 +169,14 @@ describe('move calculation and management', () => {
       gl.dark = { '0': 1 };
       gl.light = {};
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.currentPlayerMoves()).toEqual( {"0": [2, 3, [2, 5]]});
+      expect(gl.currentPlayerMoves()).toEqual( {"0": [2, 3, [2, 5], [3, 5]]});
     });
 
     test('gets moves by index', () => {
       gl.dark = { '0': 1, 6: 1 };
       gl.light = {};
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.currentPlayerMoves(6)).toEqual([8, 9, [8, 11]]);
+      expect(gl.currentPlayerMoves(6)).toEqual([8, 9, [8, 11], [9, 11]]);
     });
   });
 
@@ -208,6 +208,20 @@ describe('move calculation and management', () => {
       setPossibleMovesWithRoll(gl, [2, 3]);
       expect(gl.canMove(0)).toBeFalsy();
     });
+
+    test.only('returns true when one but not the other compound path is both blocked', () => {
+      gl.dark = { '0': 1 };
+      gl.light = {  2: 2 };
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      expect(gl.canMove(0)).toBeTruthy();
+    });
+
+    test.only('returns false when both compound paths are blocked', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 1: 2, 2: 2 };
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      expect(gl.canMove(0)).toBeFalsy();
+    });
   });
 
   describe('blotting', () => {
@@ -216,8 +230,8 @@ describe('move calculation and management', () => {
       gl.light = { 1: 1 };
       setPossibleMovesWithRoll(gl, [1, 2]);
       gl.doMove(0, 1);
-      expect(gl.currentPlayerSpikes()).toEqual( {1: 1});
-      expect(gl.opponentSpikes()).toEqual( {24: 1});
+      expect(gl.currentPlayerSpikes()).toEqual({ 1: 1 });
+      expect(gl.opponentSpikes()).toEqual({ 24: 1 });
     });
 
     // TODO test light blotting dark also
@@ -372,7 +386,7 @@ describe('history', () => {
 
 function setPossibleMovesWithRoll(gl, roll) {
   let rollDiceMock = jest.fn();
-  rollDiceMock.mockReturnValue(roll);
+  rollDiceMock.mockReturnValue(roll.slice());
   gl.rollDice = rollDiceMock;
   gl.rollPlayerDice();
   gl.setPossibleMoves();
