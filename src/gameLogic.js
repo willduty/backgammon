@@ -217,6 +217,9 @@ export default class GameLogic {
         possibleMoves = [];
       }
 
+      // TODO:
+      // implement rule: Or if either number can be played but not both, the player must play the larger one.
+
       // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
       let allowedMoves = [];
 
@@ -256,6 +259,7 @@ export default class GameLogic {
     this.snapHistory();
   }
 
+  // TODO: Move all these public type methods to top of class
   gameActive() {
     return true; // TODO implement
   }
@@ -289,6 +293,9 @@ export default class GameLogic {
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   doMove(from, to) {
     const possibleMoves = this.currentPlayerMoves(from);
+
+    // TODO: this should return an array if 2 different compound moves are possible
+    // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
     const move = _.find(possibleMoves, function (item) {
       const target = Array.isArray(item) ? item[item.length - 1] : item;
       return target === to;
@@ -299,6 +306,7 @@ export default class GameLogic {
         this.lastRoll = [];
       } else {
         for(var i in move) {
+          // TODO: use slice here instead?
           this.lastRoll.pop();
         }
       }
@@ -310,15 +318,30 @@ export default class GameLogic {
 
     if (typeof move !== 'undefined') {
 
-      // TODO make decrement fn for the deletes below
-
-      // if blot occurred...
+      let blots = [];
       if (this.opponentSpikes()[to] === 1) {
-        this.opponentSpikes()[to]--;
-        this.opponentSpikes()[to] === 0 && (delete this.opponentSpikes()[to])
-        const opponentBarIndex = this.opponent === 'dark' ? '-1' : 24;
-        const curr = this.opponentSpikes()[opponentBarIndex];
-        this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
+        blots.push(to);
+      }
+      if (Array.isArray(move)) {
+        const _this = this;
+        _.each(move, function(i){
+          if(_this.opponentSpikes()[i] === 1) {
+            blots.push(i);
+          }
+        })
+      }
+
+      // if one or more blots occurred during move
+      if (blots.length) {
+        const _this = this;
+        _.each(blots, function(to) {
+          // TODO make decrement fn for this
+          _this.opponentSpikes()[to]--;
+          _this.opponentSpikes()[to] === 0 && (delete _this.opponentSpikes()[to])
+          const opponentBarIndex = _this.opponent === 'dark' ? '-1' : 24;
+          const curr = _this.opponentSpikes()[opponentBarIndex];
+          _this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
+        })
       }
 
       // increase decrease chip counts..

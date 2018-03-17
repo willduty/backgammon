@@ -209,14 +209,14 @@ describe('move calculation and management', () => {
       expect(gl.canMove(0)).toBeFalsy();
     });
 
-    test.only('returns true when one but not the other compound path is both blocked', () => {
+    test('returns true when one but not the other compound path is both blocked', () => {
       gl.dark = { '0': 1 };
       gl.light = {  2: 2 };
       setPossibleMovesWithRoll(gl, [1, 2]);
       expect(gl.canMove(0)).toBeTruthy();
     });
 
-    test.only('returns false when both compound paths are blocked', () => {
+    test('returns false when both compound paths are blocked', () => {
       gl.dark = { '0': 1 };
       gl.light = { 1: 2, 2: 2 };
       setPossibleMovesWithRoll(gl, [1, 2]);
@@ -231,7 +231,25 @@ describe('move calculation and management', () => {
       setPossibleMovesWithRoll(gl, [1, 2]);
       gl.doMove(0, 1);
       expect(gl.currentPlayerSpikes()).toEqual({ 1: 1 });
+      expect(gl.opponentSpikes()).toEqual({ 24: 1 }); // 24 is bar
+    });
+
+    test('knocks opponent onto bar with intermediate point of a compound move', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 1: 1 };
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      gl.doMove(0, 3);
+      expect(gl.currentPlayerSpikes()).toEqual({ 3: 1 });
       expect(gl.opponentSpikes()).toEqual({ 24: 1 });
+    });
+
+    test('double roll, knocks opponent onto bar with intermediate point of multiple compound move', () => {
+      gl.dark = { '0': 1 };
+      gl.light = { 1: 1, 2: 1 };
+      setPossibleMovesWithRoll(gl, [1, 1]);
+      gl.doMove(0, 4);
+      expect(gl.currentPlayerSpikes()).toEqual({ 4: 1 });
+      expect(gl.opponentSpikes()).toEqual({ 24: 2 });
     });
 
     // TODO test light blotting dark also
