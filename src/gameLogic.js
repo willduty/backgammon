@@ -296,35 +296,35 @@ export default class GameLogic {
 
     // TODO: this should return an array if 2 different compound moves are possible
     // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
-    const move = _.find(possibleMoves, function (item) {
+    const target = _.find(possibleMoves, function (item) {
       const target = Array.isArray(item) ? item[item.length - 1] : item;
       return target === to;
     });
 
-    if (Array.isArray(move)) {
+    if (Array.isArray(target)) {
       if (this.lastInitialRoll.length === 2) {
         this.lastRoll = [];
       } else {
-        for(var i in move) {
+        for(var i in target) {
           // TODO: use slice here instead?
           this.lastRoll.pop();
         }
       }
-    } else if (typeof move !== 'undefined') {
+    } else if (typeof target !== 'undefined') {
       this.lastRoll.splice(this.lastRoll.indexOf(Math.abs(to - from)), 1);
     };
 
     let spikes = this.currentPlayerSpikes();
 
-    if (typeof move !== 'undefined') {
+    if (typeof target !== 'undefined') {
 
       let blots = [];
       if (this.opponentSpikes()[to] === 1) {
         blots.push(to);
       }
-      if (Array.isArray(move)) {
+      if (Array.isArray(target)) {
         const _this = this;
-        _.each(move, function(i){
+        _.each(target, function(i){
           if(_this.opponentSpikes()[i] === 1) {
             blots.push(i);
           }
@@ -345,7 +345,7 @@ export default class GameLogic {
       }
 
       // increase decrease chip counts..
-      if (move === 'off') {
+      if (target === 'off') {
         this[this.currentPlayer + 'Off']++;
       } else {
         spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
@@ -359,7 +359,7 @@ export default class GameLogic {
 
       this.setPossibleMoves();
 
-      return true;
+      return [from, target];
     } else {
       return false;
     }
