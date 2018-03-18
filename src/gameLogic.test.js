@@ -252,6 +252,16 @@ describe('move calculation and management', () => {
       expect(gl.opponentSpikes()).toEqual({ 24: 2 });
     });
 
+
+    test('double roll, knocks opponent onto bar with final point of multiple compound move', () => {
+      gl.dark = { 8: 1 },
+      gl.light = { 18: 1 },
+      setPossibleMovesWithRoll(gl, [5, 5]);
+      gl.doMove(8, 18);
+      expect(gl.currentPlayerSpikes()).toEqual({ 18: 1 });
+      expect(gl.opponentSpikes()).toEqual({ 24: 1 });
+    });
+
     // TODO test light blotting dark also
   });
 

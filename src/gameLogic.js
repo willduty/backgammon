@@ -317,11 +317,7 @@ export default class GameLogic {
     let spikes = this.currentPlayerSpikes();
 
     if (typeof target !== 'undefined') {
-
       let blots = [];
-      if (this.opponentSpikes()[to] === 1) {
-        blots.push(to);
-      }
       if (Array.isArray(target)) {
         const _this = this;
         _.each(target, function(i){
@@ -329,6 +325,8 @@ export default class GameLogic {
             blots.push(i);
           }
         })
+      } else if (this.opponentSpikes()[to] === 1) {
+        blots.push(to);
       }
 
       // if one or more blots occurred during move
