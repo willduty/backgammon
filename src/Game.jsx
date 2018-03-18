@@ -17,6 +17,7 @@ export default class Game extends React.Component {
     this.doAutomatedMove = this.doAutomatedMove.bind(this);
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
+    this.animateMove = this.animateMove.bind(this);
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -99,38 +100,127 @@ export default class Game extends React.Component {
 
   doAutomatedMove() {
     const game = this.state.game;
-
     const m = game.automatedMove();
     if (m) {
       this.updateGame(m[0], m[1]);
-      // TODO: start "computer move" animation
-
     } else {
-      setTimeout( this.turnComplete, this.TIMEOUT);
+      setTimeout(this.turnComplete, this.SHORT_TIMEOUT);
+    }
+  }
+
+
+  // TODO move all this anim stuff to a util file AND make animation optional
+  findBoardContainer(index) {
+    let id;
+    if(index > -1 && index < 24) {
+      id = 'square_' + index;
+    } else if (index === -1) {
+      id = 'bar-holder-dark';
+    } else if (index === 24) {
+      id = 'bar-holder-light';
+    } else if (index === 'off') {
+      id = 'light-offboard';
+    }
+    return document.getElementById(id);
+  }
+
+  findAnimationChip(index) {
+    const startContainer = this.findBoardContainer(index);
+    const chips = startContainer.children;
+    const chip = chips[chips.length - 1];
+    return chip;
+  }
+
+  findAnimationTarget(targetIndex, move) {
+    const targetContainer = this.findBoardContainer(targetIndex);
+    const targetChips = targetContainer.children;
+    let targetRect, targetChip, y, x, end, yOffset = 0;
+    if(targetChips.length === 0) {
+      targetChip = targetContainer;
+      targetRect = targetChip.getBoundingClientRect();
+      yOffset = targetIndex < 12 ? 230 : 0;
+    } else {
+      targetChip = targetChips[targetChips.length - 1];
+      targetRect = targetChip.getBoundingClientRect();
+      yOffset = targetIndex < 12 ? -51 : 0;
+    }
+    end = [targetRect.x, targetRect.y + yOffset];
+
+    if (move[0] > 23 || move[0] < 0) {
+      const adj = targetChips ? (targetChips.length * 35) : 0;
+      end = [targetRect.x - 308, targetRect.y - 230 + adj];
+    }
+    return end;
+  }
+
+  animateMove(move, game, path, chip) {
+    const _this = this;
+
+    // TODO this needs to break into 2 moves
+    const targetIndex = Array.isArray(move[1]) ? move[1][move[1].length - 1] : move[1];
+
+    if(!path) {
+      // START POSITION
+      chip = this.findAnimationChip(move[0]);
+      const rect = chip.getBoundingClientRect();
+      let start = (move[0] > 23 || move[0] < 0) ? [0, 0] : [Math.round(rect.x), Math.round(rect.y - 20)];
+      path = [start.slice()];
+
+      // END POSITION
+      const end = this.findAnimationTarget(targetIndex, move);
+      const diffX = end[0] - start[0];
+      const diffY = end[1] - start[1];
+      const dist = Math.sqrt(diffX * diffX + diffY * diffY)
+
+      // calculate intermediate points
+      const frame_count = Math.ceil(dist / 20);
+      for (var i = 0; i < frame_count; i++) {
+        const last = path[path.length - 1].slice();
+        last[0] = start[0] + (diffX / frame_count * i);
+        last[1] = start[1] + (diffY / frame_count * i);
+        path.push(last);
+      }
+    }
+
+    if (path) {
+      if (path.length) {
+        const FRAME_RATE = 2;
+        chip.style.left = path[0][0] + 'px'
+        chip.style.top = path[0][1] + 'px'
+        path = path.slice(1);
+        setTimeout(function() {
+          _this.animateMove(move, game, path, chip);
+        }, FRAME_RATE);
+      } else {
+        _this.setState({game: game});
+        setTimeout(_this.doAutomatedMove, this.SHORT_TIMEOUT);
+      }
     }
   }
 
   updateGame(from, to) {
     let game = this.state.game;
-    if(game.doMove(from, to)) {
-      this.setState({game: game})
-
-      if(game.currentPlayerHasWon()) {
+    let move;
+    if(move = game.doMove(from, to)) {
+      if (game.currentPlayerHasWon()) {
         this.setState({
-          winner: game.currentPlayer
+          winner: game.currentPlayer,
+          game: game,
         });
         setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
+      } else if (game.currentPlayer === 'light' && move) {
+          this.animateMove(move, game);
       } else if(game.canMove()) {
-        if(game.currentPlayer === 'light') {
-          setTimeout( this.doAutomatedMove, this.SHORT_TIMEOUT);
-        }
+         this.setState({game: game});
       } else {
         if (game.lastRoll && game.lastRoll.length) {
-          this.setState({noMoves: true})
+          this.setState({
+            noMoves: true,
+            game: game,
+          })
         }
         setTimeout(this.turnComplete, this.TIMEOUT);
       }
-
     } else {
       this.setState({game: game})
       // TODO reset chip
