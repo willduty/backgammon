@@ -163,8 +163,11 @@ export default class Game extends React.Component {
       // START POSITION
       chip = this.findAnimationChip(move[0]);
       const rect = chip.getBoundingClientRect();
-      let start = (move[0] > 23 || move[0] < 0) ? [0, 0] : [Math.round(rect.x), Math.round(rect.y - 20)];
-      path = [start.slice()];
+      const moveStart = move[0]
+      let start = (moveStart > 23 || moveStart < 0) ?
+        [0, 0] :
+        [Math.round(rect.x - (moveStart > 18 ? 10 : 0) ), Math.round(rect.y - (moveStart > 11 ? 20 : 20))];
+      path = ['highlight', start.slice()];
 
       // END POSITION
       const end = this.findAnimationTarget(targetIndex, move);
@@ -173,7 +176,7 @@ export default class Game extends React.Component {
       const dist = Math.sqrt(diffX * diffX + diffY * diffY)
 
       // calculate intermediate points
-      const frame_count = Math.ceil(dist / 20);
+      const frame_count = 20;
       for (var i = 0; i < frame_count; i++) {
         const last = path[path.length - 1].slice();
         last[0] = start[0] + (diffX / frame_count * i);
@@ -184,9 +187,15 @@ export default class Game extends React.Component {
 
     if (path) {
       if (path.length) {
-        const FRAME_RATE = 2;
-        chip.style.left = path[0][0] + 'px'
-        chip.style.top = path[0][1] + 'px'
+        let FRAME_RATE;
+        if(path[0] === 'highlight') {
+          FRAME_RATE = 1200;
+          chip.className = chip.className + ' selectable-light'
+        } else {
+          FRAME_RATE = 10;
+          chip.style.left = path[0][0] + 'px'
+          chip.style.top = path[0][1] + 'px'
+        }
         path = path.slice(1);
         setTimeout(function() {
           _this.animateMove(move, game, path, chip);
