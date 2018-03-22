@@ -15,7 +15,6 @@ export default class GameLogic {
       opponent: null, // opposite of `currentPlayer`
       dark: {0: 2, 11: 5, 16: 3, 18: 5},
       light: {5: 5, 7: 3, 12: 5, 23: 2},
-      light: {5: 5, 7: 3},
       darkMoves: {}, // maybe should be an object with methods
       lightMoves: {},
       darkOff: 0,
@@ -84,7 +83,6 @@ export default class GameLogic {
   decide() {
     let roll = this.rollDecidingDice();
 //     roll = [3, 6]; // TESTING forces computer player first
-     roll = [3, 6]; // TESTING forces computer player first
 //     roll = [6, 3]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;

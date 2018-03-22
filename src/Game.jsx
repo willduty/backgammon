@@ -1,6 +1,5 @@
 import React from 'react';
 import Board from './Board';
-import PlayerCard from './PlayerCard';
 import GameLogic from './gameLogic.js';
 
 export default class Game extends React.Component {
@@ -144,17 +143,23 @@ export default class Game extends React.Component {
       targetRect = targetChip.getBoundingClientRect();
       yOffset = targetIndex < 12 ? -51 : 0;
     }
-    end = [targetRect.x, targetRect.y + yOffset];
+
+    const board = document.getElementById('board');
+    const boardXOffset = board.getBoundingClientRect().x;
+
+    end = [targetRect.x - boardXOffset, targetRect.y + yOffset];
 
     if (move[0] > 23 || move[0] < 0) {
       const adj = targetChips ? (targetChips.length * 35) : 0;
-      end = [targetRect.x - 308, targetRect.y - 230 + adj];
+      end = [targetRect.x - boardXOffset - 300, targetRect.y - 230 + adj];
     }
     return end;
   }
 
   animateMove(move, game, path, chip) {
     const _this = this;
+    const board = document.getElementById('board');
+    const boardXOffset = board.getBoundingClientRect().x;
 
     // TODO this needs to break into 2 moves
     const targetIndex = Array.isArray(move[1]) ? move[1][move[1].length - 1] : move[1];
@@ -166,7 +171,7 @@ export default class Game extends React.Component {
       const moveStart = move[0]
       let start = (moveStart > 23 || moveStart < 0) ?
         [0, 0] :
-        [Math.round(rect.x - (moveStart > 18 ? 10 : 0) ), Math.round(rect.y - (moveStart > 11 ? 20 : 20))];
+        [Math.round(rect.x - boardXOffset), Math.round(rect.y)];
       path = ['highlight', start.slice()];
 
       // END POSITION
@@ -189,10 +194,10 @@ export default class Game extends React.Component {
       if (path.length) {
         let FRAME_RATE;
         if(path[0] === 'highlight') {
-          FRAME_RATE = 1200;
+          FRAME_RATE = 800;
           chip.className = chip.className + ' selectable-light'
         } else {
-          FRAME_RATE = 10;
+          FRAME_RATE = 15;
           chip.style.left = path[0][0] + 'px'
           chip.style.top = path[0][1] + 'px'
         }
@@ -267,17 +272,6 @@ export default class Game extends React.Component {
 
     const coverText = this.coverText();
 
-    // Undo button only shown if player is partway through move.
-    let undoClass;
-    if(this.state.game.gameOn
-      && this.state.game.currentPlayer === 'dark'
-      && this.state.game.lastRoll.length > 0
-      && this.state.game.lastRoll.length !== this.state.game.lastInitialRoll.length
-      ) {
-      undoClass = 'undo';
-    } else {
-      undoClass = 'hide';
-    }
 
     return (
       <div className="game">
@@ -291,6 +285,7 @@ export default class Game extends React.Component {
             showDecision={this.state.showDecision}
             showCover={this.state.startButton || coverText}
             coverText={coverText}
+            undoLastMove={this.undoLastMove}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
@@ -301,26 +296,6 @@ export default class Game extends React.Component {
             clearDice={this.state.clearDice}
           />
 
-          <div className="player-cards">
-            <PlayerCard
-              playerName='Player'
-              pips={this.state.game.pips('dark')}
-              playerType='dark'
-              active={this.state.game.currentPlayer === 'dark'}
-            />
-            <PlayerCard
-              playerName='Computer'
-              pips={this.state.game.pips('light')}
-              playerType='light'
-              active={this.state.game.currentPlayer === 'light'}
-            />
-            <button
-              className={undoClass}
-              onClick={() => this.undoLastMove()}
-            >
-              undo
-            </button>
-          </div>
         </div>
       </div>
     );

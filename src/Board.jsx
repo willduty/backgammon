@@ -4,6 +4,7 @@ import Dice from './Dice'
 import Bar from './Bar'
 import Holder from './Holder'
 import _ from 'lodash';
+import PlayerCard from './PlayerCard';
 
 export default class Board extends React.Component {
   constructor(props) {
@@ -160,12 +161,26 @@ export default class Board extends React.Component {
       canOffboard = this.state.highlightTargets.indexOf('off') !== -1,
       holderHover = this.state.currentDragTargetIndex === 'off';
 
+    // Undo button only shown if player is partway through move.
+    let undoClass;
+    if(this.state.game.gameOn
+      && this.state.game.currentPlayer === 'dark'
+      && this.state.game.lastRoll.length > 0
+      && this.state.game.lastRoll.length !== this.state.game.lastInitialRoll.length
+      ) {
+      undoClass = 'undo';
+    } else {
+      undoClass = 'hide';
+    }
+
+
     document.body.onmouseup = this.stopDrag;
     document.body.onmousemove = this.dragging;
 
     return (
       <div
         className='board'
+        id='board'
         onContextMenu={function(e) {
           e.preventDefault();
           }}
@@ -249,6 +264,28 @@ export default class Board extends React.Component {
         </div>
 
         <div className='sep no-select'>&nbsp;</div>
+
+        <div className="player-cards">
+          <PlayerCard
+            playerName='Player'
+            pips={this.state.game.pips('dark')}
+            playerType='dark'
+            active={this.state.game.currentPlayer === 'dark'}
+          />
+          <PlayerCard
+            playerName='Computer'
+            pips={this.state.game.pips('light')}
+            playerType='light'
+            active={this.state.game.currentPlayer === 'light'}
+          />
+          <button
+            className={undoClass}
+            onClick={this.props.undoLastMove}
+          >
+            undo
+          </button>
+        </div>
+
       </div>
     );
   }

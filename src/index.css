@@ -6,7 +6,6 @@ body {
   margin: 0;;
 }
 
-
 .board-section {
   float: left;
 }
@@ -28,16 +27,16 @@ body {
 
 .board {
   text-align: center;
-  width: 925px;
+  width: 848px;
   padding: 0 0 0 0 ;
   border: 0 0 0 0;
   position: relative;
-  left: 100px;
+  left: 300px;
   height: 600px;
   float: left;
 }
 
-.board, .cover {
+.cover {
   width: 738px;
 }
 
@@ -46,7 +45,7 @@ body {
   display: inline-block;
   height: 600px;
   width: 110px;
-  padding-left: 10px;
+  /*padding-left: 10px;*/
 }
 
 .player-card {
@@ -127,7 +126,6 @@ body {
 
 /* BOARD COMPONENTS */
 
-
 .cube, .holder {
   width: 65px;
 }
@@ -189,12 +187,9 @@ body {
   background: linear-gradient(to right, #333, #aaa, #9aa, #bbb, #ccc, #bbb, #ccc, #fff, #ddd, #898, #666);
 }
 
-
 ol, ul {
   padding-left: 30px;
 }
-
-
 
 .square {
   /*border: 1px solid black;*/
@@ -300,7 +295,6 @@ ol, ul {
   background-image: url(./images/die6.png);
 }
 
-
 .hide {
   display: none;
 }
@@ -359,7 +353,6 @@ ol, ul {
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
-
 
 .darken {
   -webkit-filter: brightness(50%)
