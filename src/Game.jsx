@@ -1,6 +1,5 @@
 import React from 'react';
 import Board from './Board';
-import PlayerCard from './PlayerCard';
 import GameLogic from './gameLogic.js';
 
 export default class Game extends React.Component {
@@ -168,17 +167,6 @@ export default class Game extends React.Component {
 
     const coverText = this.coverText();
 
-    // Undo button only shown if player is partway through move.
-    let undoClass;
-    if(this.state.game.gameOn
-      && this.state.game.currentPlayer === 'dark'
-      && this.state.game.lastRoll.length > 0
-      && this.state.game.lastRoll.length !== this.state.game.lastInitialRoll.length
-      ) {
-      undoClass = 'undo';
-    } else {
-      undoClass = 'hide';
-    }
 
     return (
       <div className="game">
@@ -192,6 +180,7 @@ export default class Game extends React.Component {
             showDecision={this.state.showDecision}
             showCover={this.state.startButton || coverText}
             coverText={coverText}
+            undoLastMove={this.undoLastMove}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
@@ -202,26 +191,6 @@ export default class Game extends React.Component {
             clearDice={this.state.clearDice}
           />
 
-          <div className="player-cards">
-            <PlayerCard
-              playerName='Player'
-              pips={this.state.game.pips('dark')}
-              playerType='dark'
-              active={this.state.game.currentPlayer === 'dark'}
-            />
-            <PlayerCard
-              playerName='Computer'
-              pips={this.state.game.pips('light')}
-              playerType='light'
-              active={this.state.game.currentPlayer === 'light'}
-            />
-            <button
-              className={undoClass}
-              onClick={() => this.undoLastMove()}
-            >
-              undo
-            </button>
-          </div>
         </div>
       </div>
     );
