@@ -131,21 +131,23 @@ export default class Game extends React.Component {
   }
 
   findAnimationTarget(targetIndex, move) {
+  // TODO use a method and some destructuring for this mess
+    const board = document.getElementById('board');
+    const boardRect = board.getBoundingClientRect();
+    const boardXOffset = boardRect.x;
+    const boardYOffset = boardRect.y;
     const targetContainer = this.findBoardContainer(targetIndex);
     const targetChips = targetContainer.children;
     let targetRect, targetChip, y, x, end, yOffset = 0;
     if(targetChips.length === 0) {
       targetChip = targetContainer;
       targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? 230 : 0;
+      yOffset = targetIndex < 12 ? 230 : -boardYOffset;
     } else {
       targetChip = targetChips[targetChips.length - 1];
       targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? -51 : 0;
+      yOffset = targetIndex < 12 ? -51 : boardYOffset;
     }
-
-    const board = document.getElementById('board');
-    const boardXOffset = board.getBoundingClientRect().x;
 
     end = [targetRect.x - boardXOffset, targetRect.y + yOffset];
 
@@ -159,7 +161,9 @@ export default class Game extends React.Component {
   animateMove(move, game, path, chip) {
     const _this = this;
     const board = document.getElementById('board');
-    const boardXOffset = board.getBoundingClientRect().x;
+    const boardRect = board.getBoundingClientRect();
+    const boardXOffset = boardRect.x;
+    const boardYOffset = boardRect.y;
 
     // TODO this needs to break into 2 moves
     const targetIndex = Array.isArray(move[1]) ? move[1][move[1].length - 1] : move[1];
@@ -171,7 +175,7 @@ export default class Game extends React.Component {
       const moveStart = move[0]
       let start = (moveStart > 23 || moveStart < 0) ?
         [0, 0] :
-        [Math.round(rect.x - boardXOffset), Math.round(rect.y)];
+        [Math.round(rect.x - boardXOffset), Math.round(rect.y) - boardYOffset];
       path = ['highlight', start.slice()];
 
       // END POSITION
