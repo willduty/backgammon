@@ -1,6 +1,8 @@
 import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
+import _ from 'lodash';
+
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -108,8 +110,12 @@ export default class Game extends React.Component {
   }
 
 
-  // TODO move all this anim stuff to a util file AND make animation optional
-  findBoardContainer(index) {
+  // TODO move all this anim stuff to a util file
+  // TODO make animation optional
+
+  // returns dom element where chips can be placed, based on position index.
+  // this will be either a point, a spot on the center bar, or an offboard chip holder.
+  findContainer(index) {
     let id;
     if(index > -1 && index < 24) {
       id = 'square_' + index;
@@ -123,83 +129,105 @@ export default class Game extends React.Component {
     return document.getElementById(id);
   }
 
-  findAnimationChip(index) {
-    const startContainer = this.findBoardContainer(index);
-    const chips = startContainer.children;
-    const chip = chips[chips.length - 1];
-    return chip;
-  }
-
-  findAnimationTarget(targetIndex, move) {
-  // TODO use a method and some destructuring for this mess
-    const board = document.getElementById('board');
-    const boardRect = board.getBoundingClientRect();
+  // returns the position ([x, y]) of where a chip should be given targetIndex for a board element
+  // if isStart is true, accounts for the chip itself being present, else calculates it's hypothetical spot
+  // isBarChip is needed to account for different bar offsets than rest of board
+  findAnimationTarget(targetIndex, isStart, isBarChip) {
+    const boardRect = document.getElementById('board').getBoundingClientRect();
     const boardXOffset = boardRect.x;
     const boardYOffset = boardRect.y;
-    const targetContainer = this.findBoardContainer(targetIndex);
-    const targetChips = targetContainer.children;
-    let targetRect, targetChip, y, x, end, yOffset = 0;
-    if(targetChips.length === 0) {
+    const targetContainer = this.findContainer(targetIndex);
+    const currPlayerTargetChips = _.filter(targetContainer.children, function(chip) {
+      return chip.className.indexOf('light') !== -1;
+    });
+
+    let targetRect, targetChip, target, yOffset = 0, xOffset = 0;
+
+    // adjust depending on whether target is empty or has chips..
+    if(currPlayerTargetChips.length === 0 || (isStart && currPlayerTargetChips.length === 1)) {
       targetChip = targetContainer;
       targetRect = targetChip.getBoundingClientRect();
       yOffset = targetIndex < 12 ? 230 : -boardYOffset;
     } else {
-      targetChip = targetChips[targetChips.length - 1];
+      targetChip = currPlayerTargetChips[currPlayerTargetChips.length - (isStart ? 2 : 1)];
       targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? -51 : boardYOffset;
+      yOffset = targetIndex < 12 ? -61 : boardYOffset;
     }
 
-    end = [targetRect.x - boardXOffset, targetRect.y + yOffset];
-
-    if (move[0] > 23 || move[0] < 0) {
-      const adj = targetChips ? (targetChips.length * 35) : 0;
-      end = [targetRect.x - boardXOffset - 300, targetRect.y - 230 + adj];
+    // chips on the bar have different coordinates due to css nesting..
+    if (isBarChip) {
+      if (isStart) {
+        // TODO
+      } else {
+        xOffset = -298;
+        yOffset = (targetIndex < 12 ? 0 : -230) + (currPlayerTargetChips.length ? 40 : 0);
+      }
     }
-    return end;
+
+    if (targetIndex === 'off') {
+      const holderChipCount = targetContainer.children[0].children.length;
+      xOffset -= 3;
+      yOffset += 99 - holderChipCount * 7;
+    }
+
+    return [targetRect.x - boardXOffset + xOffset, targetRect.y + yOffset];
+  }
+
+  // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
+  buildPath(startIndex, targetIndex, isStart, isBarChip) {
+    // START POSITION
+    const testStart = this.findAnimationTarget(startIndex, isStart, isBarChip);
+    const start = (startIndex > 23 || startIndex < 0) ? [0, 0] : testStart.slice();
+
+    // END POSITION
+    const end = this.findAnimationTarget(targetIndex, false, isBarChip);
+    const diffX = end[0] - start[0];
+    const diffY = end[1] - start[1];
+
+    let path = [start.slice()];
+
+    // calculate intermediate points
+    const frame_count = 20;
+    for (var i = 0; i < frame_count; i++) {
+      const last = path[path.length - 1].slice();
+      last[0] = start[0] + (diffX / frame_count * i);
+      last[1] = start[1] + (diffY / frame_count * i);
+      path.push(last);
+    }
+    path.push(end.slice());
+    return path;
   }
 
   animateMove(move, game, path, chip) {
     const _this = this;
-    const board = document.getElementById('board');
-    const boardRect = board.getBoundingClientRect();
-    const boardXOffset = boardRect.x;
-    const boardYOffset = boardRect.y;
-
-    // TODO this needs to break into 2 moves
-    const targetIndex = Array.isArray(move[1]) ? move[1][move[1].length - 1] : move[1];
+    const startContainer = this.findContainer(move[0]);
+    const chips = startContainer.children;
+    chip = chips[chips.length - 1];
 
     if(!path) {
-      // START POSITION
-      chip = this.findAnimationChip(move[0]);
-      const rect = chip.getBoundingClientRect();
-      const moveStart = move[0]
-      let start = (moveStart > 23 || moveStart < 0) ?
-        [0, 0] :
-        [Math.round(rect.x - boardXOffset), Math.round(rect.y) - boardYOffset];
-      path = ['highlight', start.slice()];
-
-      // END POSITION
-      const end = this.findAnimationTarget(targetIndex, move);
-      const diffX = end[0] - start[0];
-      const diffY = end[1] - start[1];
-      const dist = Math.sqrt(diffX * diffX + diffY * diffY)
-
-      // calculate intermediate points
-      const frame_count = 20;
-      for (var i = 0; i < frame_count; i++) {
-        const last = path[path.length - 1].slice();
-        last[0] = start[0] + (diffX / frame_count * i);
-        last[1] = start[1] + (diffY / frame_count * i);
-        path.push(last);
+      let pathPoints = _.flatten([move[0], move[1]])
+      let subMoves = [];
+      for(var n = 0; n < pathPoints.length - 1; n++) {
+        subMoves.push([pathPoints[n], pathPoints[n + 1]]);
       }
+
+      path = ['highlight'];
+      const isBarChip = move[0] === 24 || move[0] === -1;
+
+      _.each(subMoves, function(fromTo) {
+        path  = _.concat(path, _this.buildPath(fromTo[0], fromTo[1], move[0] === fromTo[0], isBarChip));
+        path  = _.concat(path, ['pause']);
+      });
     }
 
     if (path) {
       if (path.length) {
         let FRAME_RATE;
         if(path[0] === 'highlight') {
-          FRAME_RATE = 800;
+          FRAME_RATE = 500;
           chip.className = chip.className + ' selectable-light'
+        } else if (path[0] === 'pause') {
+          FRAME_RATE = 300;
         } else {
           FRAME_RATE = 15;
           chip.style.left = path[0][0] + 'px'
@@ -211,15 +239,15 @@ export default class Game extends React.Component {
         }, FRAME_RATE);
       } else {
         _this.setState({game: game});
-        setTimeout(_this.doAutomatedMove, this.SHORT_TIMEOUT);
+        _this.doAutomatedMove()
       }
     }
   }
 
   updateGame(from, to) {
     let game = this.state.game;
-    let move;
-    if(move = game.doMove(from, to)) {
+    let move = game.doMove(from, to);
+    if(move) {
       if (game.currentPlayerHasWon()) {
         this.setState({
           winner: game.currentPlayer,
@@ -227,7 +255,7 @@ export default class Game extends React.Component {
         });
         setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
       } else if (game.currentPlayer === 'light' && move) {
-          this.animateMove(move, game);
+        this.animateMove(move, game);
       } else if(game.canMove()) {
          this.setState({game: game});
       } else {

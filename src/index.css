@@ -131,22 +131,22 @@ body {
 }
 
 .cube {
-  height: 50px;
+  height: 130px;
   background: #111;
 }
 
 .holder {
-  height: 275px;
+  height: 235px;
   background: #242;
 }
 
 .holder>div:first-child {
-  height: 12px;
+  height: 42px;
 }
 
 .holder .chips {
   -webkit-box-shadow: inset 0 1em 3em -2em ;
-  height: 250px;
+  height: 150px;
   width: 45px;
   background: #224022;
   margin: 0 auto;
