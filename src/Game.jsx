@@ -15,6 +15,7 @@ export default class Game extends React.Component {
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
     this.updateGame = this.updateGame.bind(this);
     this.turnComplete = this.turnComplete.bind(this);
+    this.completeGame = this.completeGame.bind(this);
     this.doAutomatedMove = this.doAutomatedMove.bind(this);
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
@@ -101,12 +102,24 @@ export default class Game extends React.Component {
 
   doAutomatedMove() {
     const game = this.state.game;
-    const m = game.automatedMove();
-    if (m) {
-      this.updateGame(m[0], m[1]);
+    if (game.currentPlayerHasWon()) {
+      this.completeGame();
     } else {
-      setTimeout(this.turnComplete, this.SHORT_TIMEOUT);
+      const m = game.automatedMove();
+      if (m) {
+        this.updateGame(m[0], m[1]);
+      } else {
+        setTimeout(this.turnComplete, this.SHORT_TIMEOUT);
+      }
     }
+  }
+
+  completeGame() {
+    this.setState({
+      winner: this.state.game.currentPlayer,
+      game: this.state.game,
+    });
+    setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
   }
 
 
@@ -248,12 +261,8 @@ export default class Game extends React.Component {
     let game = this.state.game;
     let move = game.doMove(from, to);
     if(move) {
-      if (game.currentPlayerHasWon()) {
-        this.setState({
-          winner: game.currentPlayer,
-          game: game,
-        });
-        setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
+      if (game.currentPlayer === 'dark' && game.currentPlayerHasWon()) {
+        this.completeGame();
       } else if (game.currentPlayer === 'light' && move) {
         this.animateMove(move, game);
       } else if(game.canMove()) {
