@@ -147,11 +147,11 @@ export default class Game extends React.Component {
     if(currPlayerTargetChips.length === 0 || (isStart && currPlayerTargetChips.length === 1)) {
       targetChip = targetContainer;
       targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? 230 : -boardYOffset;
+      yOffset = targetIndex < 12 ? (230 - boardYOffset + 20) : -boardYOffset;
     } else {
       targetChip = currPlayerTargetChips[currPlayerTargetChips.length - (isStart ? 2 : 1)];
       targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? -61 : boardYOffset;
+      yOffset = targetIndex < 12 ? -61 : (-boardYOffset + 40);
     }
 
     // chips on the bar have different coordinates due to css nesting..
@@ -160,7 +160,7 @@ export default class Game extends React.Component {
         // TODO
       } else {
         xOffset = -298;
-        yOffset = (targetIndex < 12 ? 0 : -230) + (currPlayerTargetChips.length ? 40 : 0);
+        yOffset = (targetIndex < 12 ? 0 : -230 - boardYOffset + 20) + (currPlayerTargetChips.length ? 40 : 0);
       }
     }
 
