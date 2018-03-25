@@ -225,7 +225,7 @@ export default class Game extends React.Component {
         let FRAME_RATE;
         if(path[0] === 'highlight') {
           FRAME_RATE = 500;
-          chip.className = chip.className + ' selectable-light'
+          chip.className =  'chip selectable-light'
         } else if (path[0] === 'pause') {
           FRAME_RATE = 300;
         } else {

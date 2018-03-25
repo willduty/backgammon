@@ -243,17 +243,17 @@ ol, ul {
 
 .selectable-light {
   /*-webkit-filter: brightness(600%) hue-rotate(230deg);*/
+  background-image: url(./images/chip_light_highlight.png);
   z-index: 100000;
   animation-name: animationChip;
-  animation-duration: 1s;
+  animation-duration: .5s;
   animation-iteration-count: infinite;
 }
 
 @keyframes animationChip {
-  0%   { -webkit-filter: brightness(100%) hue-rotate(230deg); }
-  30%   { -webkit-filter: brightness(130%) hue-rotate(230deg); }
-  70%  { -webkit-filter: brightness(50%) hue-rotate(30deg); }
-  100% { -webkit-filter: brightness(100%) hue-rotate(230deg); }
+  0%   { -webkit-filter: brightness(100%) hue-rotate(1deg); }
+  50%   { -webkit-filter: brightness(200%) hue-rotate(1deg); }
+  100% { -webkit-filter: brightness(100%) hue-rotate(1deg); }
 }
 
 .selectable:hover {
