@@ -291,6 +291,7 @@ export default class GameLogic {
 
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
+  // return a summary of the move and what points, if any, where a blot occurred.
   doMove(from, to) {
     const possibleMoves = this.currentPlayerMoves(from);
 
@@ -357,7 +358,7 @@ export default class GameLogic {
 
       this.setPossibleMoves();
 
-      return [from, target];
+      return {move: [from, target], blots: blots};
     } else {
       return false;
     }

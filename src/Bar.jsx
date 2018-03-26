@@ -6,7 +6,7 @@ export default class Bar extends React.Component {
     super(props);
     this.state = {};
 
-    this.CHIP_SPACING = 10;
+    this.CHIP_SPACING = 7;
   }
 
   makeChips(count, type) {
@@ -35,11 +35,11 @@ export default class Bar extends React.Component {
 
     return (
       <div className='bar' id='bar'>
+        <div/>
         <div
           className='bar-holder-light'
           id='bar-holder-light'>
          {lightChips}
-
         </div>
         <div
           className='bar-holder-dark'

@@ -114,12 +114,7 @@ export default class Board extends React.Component {
 
       let y = e.pageY;
       y += this.state.dragCursorYOffset;
-
       let x = e.pageX - boardRect.x;
-
-      if(this.state.dragObjParentIndex === -1) {
-        x -= 300;
-      }
       x += this.state.dragCursorXOffset;
 
       let dragObj = this.state.dragObj;

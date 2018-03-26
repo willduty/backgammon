@@ -324,17 +324,23 @@ ol, ul {
 
 .bar {
   width: 35px;
-  position: relative;
   height: 600px;
   background: black;
   float: left;
 }
 
+.bar div:first-child {
+  height: 200px;
+}
+
 .bar-holder-light, .bar-holder-dark {
-  position: absolute;
   color: white;
-  left: -8px;
+  height: 100px;
+  width: 50px;
   z-index: 10000;
+}
+
+.bar-holder-light .chip, .bar-holder-dark .chip {
 }
 
 .bar-holder-light {
