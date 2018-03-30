@@ -357,6 +357,25 @@ describe('offboarding and game conclusion', () => {
     gl.doMove(18, 'off');
     expect(gl.currentPlayerHasWon()).toBeTruthy();
   });
+
+  test('uses a die minimally required if not all dies are sufficient for move', () => {
+    gl.dark = { 20: 1, 22: 1 };
+    gl.darkOff = 13;
+    setPossibleMovesWithRoll(gl, [4, 2]);
+    expect(gl.currentPlayerHasWon()).toBeFalsy();
+    const move = gl.doMove(20, 'off');
+    expect(gl.lastRoll).toEqual([2]);
+  });
+
+  // TODO: is this rule-conformant?
+  test('uses the least expensive available die if more than one possible die', () => {
+    gl.dark = { 20: 1, 22: 1 };
+    gl.darkOff = 13;
+    setPossibleMovesWithRoll(gl, [4, 2]);
+    expect(gl.currentPlayerHasWon()).toBeFalsy();
+    const move = gl.doMove(22, 'off');
+    expect(gl.lastRoll).toEqual([4]);
+  });
 });
 
 

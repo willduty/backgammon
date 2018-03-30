@@ -312,7 +312,16 @@ export default class GameLogic {
         }
       }
     } else if (typeof target !== 'undefined') {
-      this.lastRoll.splice(this.lastRoll.indexOf(Math.abs(to - from)), 1);
+      let diff = Math.abs(to - from);
+      if (target === 'off') {
+        // find first die value large enough to get off board
+        const requiredDie = Math.abs((to === 'off' ? 24 : to) - from);
+        diff = _.find(_.sortBy(this.lastRoll), function(die) {
+          return requiredDie <= die;
+        });
+      }
+      const dieIndex = this.lastRoll.indexOf(diff);
+      this.lastRoll.splice(dieIndex, 1);
     };
 
     let spikes = this.currentPlayerSpikes();
