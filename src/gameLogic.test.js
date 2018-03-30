@@ -362,19 +362,58 @@ describe('offboarding and game conclusion', () => {
     gl.dark = { 20: 1, 22: 1 };
     gl.darkOff = 13;
     setPossibleMovesWithRoll(gl, [4, 2]);
-    expect(gl.currentPlayerHasWon()).toBeFalsy();
     const move = gl.doMove(20, 'off');
     expect(gl.lastRoll).toEqual([2]);
   });
 
   // TODO: is this rule-conformant?
-  test('uses the least expensive available die if more than one possible die', () => {
+  test('choose the least expensive available die if more than one possible die can offboard a chip', () => {
     gl.dark = { 20: 1, 22: 1 };
     gl.darkOff = 13;
     setPossibleMovesWithRoll(gl, [4, 2]);
-    expect(gl.currentPlayerHasWon()).toBeFalsy();
     const move = gl.doMove(22, 'off');
     expect(gl.lastRoll).toEqual([4]);
+  });
+
+  test('in double roll, uses all dies required for offboard, none left', () => {
+    gl.dark = { 20: 1 };
+    gl.darkOff = 14;
+    setPossibleMovesWithRoll(gl, [1, 1]);
+    const move = gl.doMove(20, 'off');
+    expect(gl.lastRoll).toEqual([]);
+    expect(gl.dark).toEqual({ });
+    expect(gl.darkOff).toEqual(15);
+  });
+
+  test('in double roll, uses all dies required for offboard, some left', () => {
+    gl.dark = { 21: 1 };
+    gl.darkOff = 14;
+    setPossibleMovesWithRoll(gl, [1, 1]);
+    const move = gl.doMove(21, 'off');
+    expect(gl.lastRoll).toEqual([1]);
+    expect(gl.dark).toEqual({ });
+    expect(gl.darkOff).toEqual(15);
+  });
+
+  test('in double roll, uses all dies required for offboard, some left', () => {
+    gl.dark = { 20: 1 };
+    gl.darkOff = 14;
+    setPossibleMovesWithRoll(gl, [4, 4]);
+    const move = gl.doMove(20, 'off');
+    expect(gl.lastRoll).toEqual([4, 4, 4]);
+  });
+
+  // TODO
+  test.skip('in double roll, uses all dies required for offboard, some left', () => {
+    gl.light = { 22: 1 };
+    gl.dark = { 21: 1 };
+    gl.darkOff = 14;
+    setPossibleMovesWithRoll(gl, [1, 1]);
+    const move = gl.doMove(21, 'off');
+    expect(gl.lastRoll).toEqual([1]);
+    expect(gl.dark).toEqual({ });
+    expect(gl.light).toEqual({ 24: 1 });
+    expect(gl.darkOff).toEqual(15);
   });
 });
 

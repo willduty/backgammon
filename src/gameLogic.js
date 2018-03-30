@@ -302,6 +302,7 @@ export default class GameLogic {
       return target === to;
     });
 
+    // Figure out which dice and knock down current roll (this.lastRoll)
     if (Array.isArray(target)) {
       if (this.lastInitialRoll.length === 2) {
         this.lastRoll = [];
@@ -314,16 +315,31 @@ export default class GameLogic {
     } else if (typeof target !== 'undefined') {
       let diff = Math.abs(to - from);
       if (target === 'off') {
+
         // find first die value large enough to get off board
         const requiredDie = Math.abs((to === 'off' ? 24 : to) - from);
         diff = _.find(_.sortBy(this.lastRoll), function(die) {
           return requiredDie <= die;
         });
+
+        // TODO setPossibleMoves() should figure out required compound moves for offboarding, not here
+        if (typeof diff === 'undefined') {
+          let compoundMove = 0, _this = this;
+          _.each(_.sortBy(this.lastRoll), function(item) {
+            compoundMove += item;
+            if (compoundMove < requiredDie) {
+              const dieIndex = _this.lastRoll.indexOf(item);
+              _this.lastRoll.splice(dieIndex, 1);
+            }
+          });
+        }
       }
+
       const dieIndex = this.lastRoll.indexOf(diff);
       this.lastRoll.splice(dieIndex, 1);
     };
 
+    // now adjust the spikes
     let spikes = this.currentPlayerSpikes();
 
     if (typeof target !== 'undefined') {
