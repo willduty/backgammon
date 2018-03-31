@@ -162,6 +162,21 @@ describe('move calculation and management', () => {
       setPossibleMovesWithRoll(gl, [2, 3]);
       expect(gl.darkMoves).toEqual( {"-1": [1, 2]});
     });
+
+    test('sets up move combinations for offboarding, two chips can offboard', () => {
+      gl.dark = { 20: 1, 22: 1 };
+      gl.darkOff = 13;
+      setPossibleMovesWithRoll(gl, [4, 2]);
+      expect(gl.currentPlayerMoves()).toEqual({'20': ['off', 22, [22, 'off']], '22': ['off']});
+    });
+
+    test('sets up move combinations for offboarding, only one chip can offboard', () => {
+      gl.dark = { 19: 1, 23: 1 };
+      gl.darkOff = 13;
+      gl.light = { 5: 15 }
+      setPossibleMovesWithRoll(gl, [3, 1]);
+      expect(gl.currentPlayerMoves()).toEqual({'19': [22, 20, [22, 23], [20, 23]], '23': ['off']});
+    });
   });
 
   describe('currentPlayerMoves()', () => {
@@ -251,7 +266,6 @@ describe('move calculation and management', () => {
       expect(gl.currentPlayerSpikes()).toEqual({ 4: 1 });
       expect(gl.opponentSpikes()).toEqual({ 24: 2 });
     });
-
 
     test('double roll, knocks opponent onto bar with final point of multiple compound move', () => {
       gl.dark = { 8: 1 },
@@ -403,8 +417,7 @@ describe('offboarding and game conclusion', () => {
     expect(gl.lastRoll).toEqual([4, 4, 4]);
   });
 
-  // TODO
-  test.skip('in double roll, uses all dies required for offboard, some left', () => {
+  test('in double roll, blots opponent', () => {
     gl.light = { 22: 1 };
     gl.dark = { 21: 1 };
     gl.darkOff = 14;

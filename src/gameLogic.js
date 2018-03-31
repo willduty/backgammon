@@ -213,6 +213,30 @@ export default class GameLogic {
             possibleMoves = [curr + first];
           }
         }
+
+        // adjust moves that go offboard..
+        // a move like [20, 22] remains unchanged
+        // a move like 26 becomes 'off'
+        // a move like [22, 24] becomes [22, 'off']
+        // a move like [22, 24, 26] becomes [22, 'off']
+        // a move like [24, 26] becomes 'off'
+        _.each(possibleMoves, function(move, i) {
+          if (Array.isArray(move)) {
+            // trim out excess
+            const firstOffboardIndex = _.findIndex(move, function(val){
+              return val > 23 || val < 0;
+            });
+            if (firstOffboardIndex !== -1) {
+              move = move.slice().splice(0, firstOffboardIndex + 1);
+              move[move.length - 1] = 'off';
+              possibleMoves[i] = move.length === 1 ? 'off' : move;
+            }
+          } else if (move > 23 || move < 0) {
+            possibleMoves[i] = 'off'
+          }
+        })
+
+        possibleMoves = _.uniq(possibleMoves);
       } else {
         possibleMoves = [];
       }
@@ -222,7 +246,6 @@ export default class GameLogic {
 
       // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
       let allowedMoves = [];
-
       for(var i in possibleMoves) {
         let moveTarget = possibleMoves[i];
         let compound;
@@ -244,9 +267,9 @@ export default class GameLogic {
         }
 
         if (barHash && (barHash[-1] > 1 || barHash[24] > 1) && compound) {
-          // TODO nothing
-        } else if ((moveTarget > 23 || moveTarget < 0)) {
-          this.canOffboard() && allowedMoves.push('off');
+          // do nothing
+        } else if ((moveTarget === 'off')) {
+          this.canOffboard() && allowedMoves.push(possibleMoves[i]);
         } else if (!taken || (taken < 2)) {
           allowedMoves.push(possibleMoves[i]);
         }
@@ -289,11 +312,13 @@ export default class GameLogic {
     return noChipsOnBoard && allChipsOff;
   }
 
+  // TODO: move this method next to setPossibleMoves
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   // return a summary of the move and what points, if any, where a blot occurred.
   doMove(from, to) {
-    const possibleMoves = this.currentPlayerMoves(from);
+    const possibleMoves = this.currentPlayerMoves(from),
+      _this = this;
 
     // TODO: this should return an array if 2 different compound moves are possible
     // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
@@ -304,35 +329,42 @@ export default class GameLogic {
 
     // Figure out which dice and knock down current roll (this.lastRoll)
     if (Array.isArray(target)) {
-      if (this.lastInitialRoll.length === 2) {
-        this.lastRoll = [];
+      const finalTarget = target[target.length - 1];
+      if (finalTarget === 'off') {
+
+        let subMoves = [[from, target[0]]];
+        for(var n = 0; n < target.length - 1; n++) {
+          const last = target[n + 1],
+            to = last === 'off' ? (this.currentPlayer === 'dark' ? 24 : -1) : last;
+          const item = to - target[n]
+          subMoves.push([target[n], to]);
+        }
+
+        _.each(subMoves, function(move) {
+          const item = move[1] - move[0];
+          const dieIndex = _this.lastRoll.indexOf(item);
+          _this.lastRoll.splice(dieIndex, 1);
+        });
+
       } else {
-        for(var i in target) {
-          // TODO: use slice here instead?
-          this.lastRoll.pop();
+
+        if (this.lastInitialRoll.length === 2) {
+          this.lastRoll = [];
+        } else {
+          for(var i in target) {
+            // TODO: use slice here instead?
+            this.lastRoll.pop();
+          }
         }
       }
     } else if (typeof target !== 'undefined') {
       let diff = Math.abs(to - from);
       if (target === 'off') {
-
         // find first die value large enough to get off board
         const requiredDie = Math.abs((to === 'off' ? 24 : to) - from);
         diff = _.find(_.sortBy(this.lastRoll), function(die) {
           return requiredDie <= die;
         });
-
-        // TODO setPossibleMoves() should figure out required compound moves for offboarding, not here
-        if (typeof diff === 'undefined') {
-          let compoundMove = 0, _this = this;
-          _.each(_.sortBy(this.lastRoll), function(item) {
-            compoundMove += item;
-            if (compoundMove < requiredDie) {
-              const dieIndex = _this.lastRoll.indexOf(item);
-              _this.lastRoll.splice(dieIndex, 1);
-            }
-          });
-        }
       }
 
       const dieIndex = this.lastRoll.indexOf(diff);
@@ -369,7 +401,7 @@ export default class GameLogic {
       }
 
       // increase decrease chip counts..
-      if (target === 'off') {
+      if (target === 'off' || to === 'off') {
         this[this.currentPlayer + 'Off']++;
       } else {
         spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
