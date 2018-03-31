@@ -105,11 +105,14 @@ export default class Game extends React.Component {
     if (game.currentPlayerHasWon()) {
       this.completeGame();
     } else {
-      const m = game.automatedMove();
-      if (m) {
-        this.updateGame(m[0], m[1]);
+      const move = game.automatedMove();
+      if (move) {
+        this.updateGame(move[0], move[1]);
       } else {
-        setTimeout(this.turnComplete, this.SHORT_TIMEOUT);
+        if (game.lastRoll && game.lastRoll.length) {
+          this.setState({noMoves: true})
+        }
+        setTimeout(this.turnComplete, this.TIMEOUT);
       }
     }
   }
