@@ -317,13 +317,16 @@ export default class Game extends React.Component {
       } else if(game.canMove()) {
          this.setState({game: game});
       } else {
-        if (game.lastRoll && game.lastRoll.length) {
-          this.setState({
-            noMoves: true,
-            game: game,
-          })
-        }
-        setTimeout(this.turnComplete, this.TIMEOUT);
+        const _this = this;
+        setTimeout(function() {
+          if (game.lastRoll && game.lastRoll.length) {
+            _this.setState({
+              noMoves: true,
+              game: game,
+            })
+          }
+          setTimeout(_this.turnComplete, _this.TIMEOUT);
+        }, this.SHORT_TIMEOUT);
       }
     } else {
       this.setState({game: game})
