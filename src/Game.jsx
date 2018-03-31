@@ -186,7 +186,7 @@ export default class Game extends React.Component {
     if (targetIndex === 'off') {
       const holderChipCount = targetContainer.children[0].children.length;
       xOffset -= 3;
-      yOffset += 99 - holderChipCount * 7;
+      yOffset += 57 - holderChipCount * 7;
     }
 
     return [targetChip.getBoundingClientRect().x - boardRect.x + xOffset, targetChip.getBoundingClientRect().y - boardRect.y + yOffset]

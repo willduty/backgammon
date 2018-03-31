@@ -142,12 +142,12 @@ body {
 }
 
 .holder>div:first-child {
-  height: 42px;
+  height: 60px;
 }
 
 .holder .chips {
   -webkit-box-shadow: inset 0 1em 3em -2em ;
-  height: 150px;
+  height: 108px;
   width: 45px;
   background: #224022;
   margin: 0 auto;
