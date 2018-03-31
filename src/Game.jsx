@@ -20,6 +20,7 @@ export default class Game extends React.Component {
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
     this.animateMove = this.animateMove.bind(this);
+    this.handleUnload = this.handleUnload.bind(this);
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -59,12 +60,20 @@ export default class Game extends React.Component {
     var game = this.state.game;
     game.start();
 
+    window.addEventListener('beforeunload', this.handleUnload);
+
     this.setState({
       game: game,
       startButton: false,
       rolling: true,
     });
     setTimeout(this.doDecidingRoll, this.TIMEOUT);
+  }
+
+  handleUnload(e) {
+    const msg = 'Game is in progress.. Leave page?';
+    (e || window.event).returnValue = msg;
+    return msg;
   }
 
   // decide who gets opening move
@@ -122,6 +131,9 @@ export default class Game extends React.Component {
       winner: this.state.game.currentPlayer,
       game: this.state.game,
     });
+
+    window.removeEventListener('beforeunload', this.handleUnload);
+
     setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
   }
 
@@ -367,7 +379,6 @@ export default class Game extends React.Component {
     // TODO componentize start button or general button
 
     const coverText = this.coverText();
-
 
     return (
       <div className="game">
