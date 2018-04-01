@@ -22,7 +22,19 @@ describe('game setup', () => {
     });
   });
 
-  test('currentPlayer is not null after decide', () => {
+  test('currentPlayer is null after decide() if roll is a tie', () => {
+    let rollDiceMock = jest.fn();
+    rollDiceMock.mockReturnValue([5, 5]);
+    gl.rollDice = rollDiceMock;
+    gl.start();
+    gl.decide();
+    expect(gl.currentPlayer).toBe(null);
+  });
+
+  test('currentPlayer is set after decide() if roll is not a tie', () => {
+    let rollDiceMock = jest.fn();
+    rollDiceMock.mockReturnValue([1, 2]);
+    gl.rollDice = rollDiceMock;
     gl.start();
     gl.decide();
     expect(gl.currentPlayer).not.toBe(null);
