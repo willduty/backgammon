@@ -158,8 +158,7 @@ export default class Game extends React.Component {
 
   // returns the position ([x, y]) of where a chip should be given targetIndex for a board element
   // if isStart is true, accounts for the chip itself being present, else calculates hypothetical position
-  // isBarChip is needed to account for different bar offsets than rest of board // TODO get rid of this?
-  findAnimationTarget(targetIndex, isStart, isBarChip) {
+  findAnimationTarget(targetIndex, isStart) {
     const boardRect = document.getElementById('board').getBoundingClientRect();
     const targetContainer = this.findContainer(targetIndex);
     const currPlayerTargetChips = _.filter(targetContainer.children, function(chip) {
@@ -209,10 +208,10 @@ export default class Game extends React.Component {
   // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
   buildPath(startIndex, targetIndex, isStart, isBarChip) {
     // START POSITION
-    const start = this.findAnimationTarget(startIndex, isStart, isBarChip).slice();
+    const start = this.findAnimationTarget(startIndex, isStart).slice();
 
     // END POSITION
-    const end = this.findAnimationTarget(targetIndex, false, isBarChip);
+    const end = this.findAnimationTarget(targetIndex, false);
     const diffX = end[0] - start[0];
     const diffY = end[1] - start[1];
     let path = [start.slice()];
