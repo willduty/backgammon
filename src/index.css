@@ -263,9 +263,9 @@ ol, ul {
 }
 
 @keyframes showMovableChips {
-  0%   { -webkit-filter: brightness(400%) hue-rotate(30deg); }
-  50%  { -webkit-filter: brightness(600%) hue-rotate(230deg); }
-  100% { -webkit-filter: brightness(400%) hue-rotate(30deg); }
+  0%   { -webkit-filter: brightness(600%) hue-rotate(200deg); }
+  50%  { -webkit-filter: brightness(800%) hue-rotate(230deg); }
+  100% { -webkit-filter: brightness(600%) hue-rotate(200deg); }
 }
 
 .die1,.die2,.die3,.die4,.die5,.die6 {
@@ -352,13 +352,12 @@ ol, ul {
 }
 
 .board-section, .sep, .bar, .holder, .bar-holder-light, .bar-holder-dark, .no-select  {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .darken {
