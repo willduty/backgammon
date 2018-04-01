@@ -3,7 +3,6 @@ import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
 
-
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -221,7 +220,7 @@ export default class Game extends React.Component {
     // calculate intermediate points
     const frame_count = 20;
     for (var i = 0; i < frame_count; i++) {
-      const last = path[path.length - 1].slice();
+      const last = _.last(path).slice();
       last[0] = start[0] + (diffX / frame_count * i);
       last[1] = start[1] + (diffY / frame_count * i);
       path.push(last);
@@ -236,7 +235,7 @@ export default class Game extends React.Component {
     const _this = this;
     const startContainer = this.findContainer(move[0]);
     const chips = startContainer.children;
-    chip = chips[chips.length - 1];
+    chip = _.last(chips);
 
     // TODO move to function buildAllPaths
     if(!path) {

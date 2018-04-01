@@ -133,32 +133,37 @@ export default class Board extends React.Component {
   }
 
   renderSquare(i) {
+    const game = this.state.game;
     return (<Square
       index={i}
-      chips={{dark: (this.state.game.dark[i] || 0), light: (this.state.game.light[i] || 0)}}
-      player={this.state.game.currentPlayer}
+      chips={
+        {
+          dark: (game.chipsAt('dark', i)),
+          light: (game.chipsAt('light', i))
+        }
+      }
+      player={game.currentPlayer}
       onMouseEnter={this.showMoves}
       onMouseLeave={this.hideMoves}
       onMouseDown={this.startDrag}
       onMouseUp={this.stopDrag}
       highlight={this.state.highlightTargets.indexOf(i) !== -1}
-      hasMoves={this.state.game.canMove(i)}
+      hasMoves={game.canMove(i)}
       currentDragTargetIndex={this.state.currentDragTargetIndex}
       rolling={this.state.rolling}
     />);
   }
 
   render() {
+    const game = this.state.game;
     const barChipActive = !this.props.coverText &&
-      this.state.game.playerHasBarMove('dark');
-
-    const darkPlayer = this.state.game.currentPlayer === 'dark',
+      game.playerHasBarMove('dark');
+    const darkPlayer = game.currentPlayer === 'dark',
       canOffboard = this.state.highlightTargets.indexOf('off') !== -1,
       holderHover = this.state.currentDragTargetIndex === 'off';
 
     // Undo button only shown if player is partway through move.
     let undoClass;
-    const game = this.state.game;
     if(game.gameActive()
       && !this.turnComplete
       && game.currentPlayer === 'dark'
@@ -188,7 +193,7 @@ export default class Board extends React.Component {
         </div>
 
         <Dice
-          game={this.state.game}
+          game={game}
           showDecision={this.props.showDecision}
           clearDice={this.props.clearDice}
         />
@@ -213,7 +218,7 @@ export default class Board extends React.Component {
             </div>
           </div>
           <Bar
-            bar={this.state.game.bar()}
+            bar={game.bar()}
             active={barChipActive}
             onMouseEnter={this.showMoves}
             onMouseLeave={this.hideMoves}
@@ -247,14 +252,14 @@ export default class Board extends React.Component {
             <Holder
               highlighted={darkPlayer && canOffboard}
               isDropTarget={darkPlayer && holderHover && canOffboard}
-              count={this.state.game.darkOff}
+              count={game.darkOff}
               player='dark'
             />
             <div className='cube'>dcube</div>
             <Holder
               highlighted={!darkPlayer && canOffboard}
               isDropTarget={!darkPlayer && holderHover}
-              count={this.state.game.lightOff}
+              count={game.lightOff}
               player='light'
             />
           </div>
@@ -265,15 +270,15 @@ export default class Board extends React.Component {
         <div className="player-cards">
           <PlayerCard
             playerName='Player'
-            pips={this.state.game.pips('dark')}
+            pips={game.pips('dark')}
             playerType='dark'
-            active={this.state.game.currentPlayer === 'dark'}
+            active={game.currentPlayer === 'dark'}
           />
           <PlayerCard
             playerName='Computer'
-            pips={this.state.game.pips('light')}
+            pips={game.pips('light')}
             playerType='light'
-            active={this.state.game.currentPlayer === 'light'}
+            active={game.currentPlayer === 'light'}
           />
           <button
             className={undoClass}

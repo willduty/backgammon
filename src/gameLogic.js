@@ -13,14 +13,14 @@ export default class GameLogic {
     this.STANDARD_OPENING = {
       currentPlayer: null, // either 'dark' or 'light'
       opponent: null, // opposite of `currentPlayer`
-      dark: {0: 2, 11: 5, 16: 3, 18: 5},
-      light: {5: 5, 7: 3, 12: 5, 23: 2},
-      darkMoves: {}, // maybe should be an object with methods
-      lightMoves: {},
-      darkOff: 0,
+      dark: {0: 2, 11: 5, 16: 3, 18: 5}, // chip counts for dark player's points. if nothing on point, key is removed.
+      light: {5: 5, 7: 3, 12: 5, 23: 2}, // same as above for light player
+      darkMoves: {}, // key indices for active board points. 0 thru 23 are board point. key '-1' is dark bar.
+      lightMoves: {}, // same for light player. 24 is light bar.
+      darkOff: 0, // count of offboarded chips
       lightOff: 0,
-      lastRoll: [],
-      lastInitialRoll: [],
+      lastRoll: [], // current state of dice in a turn: changes as the player uses up dice, or undoes moves.
+      lastInitialRoll: [], // original state of dice in a turn. does not change until new turn.
     };
 
     this.GAME_PROPS = Object.keys(this.STANDARD_OPENING);
@@ -39,15 +39,17 @@ export default class GameLogic {
     this.snapHistory();
   }
 
+  // undo game to previous history state. (before latest move)
   undo() {
     this.history.pop();
-    const last = this.history[this.history.length - 1];
+    const last = _.last(this.history);
     const _this = this;
     _.each(last, function(value, key) {
       _this[key] = JSON.parse(JSON.stringify(value));
     });
   }
 
+  // pip count
   pips(player) {
     let count = 0;
     const spikes = this[player];
@@ -57,17 +59,17 @@ export default class GameLogic {
     return count;
   }
 
-  // Sets who starts the game. ie, sets this.currentPlayer and this.opponent
-  // Does not start the turn, which happens on rollPlayerDice().
+  // Rolls dice to start the first turn.
+  //  - if dice are different, sets who starts the game. ie, sets this.currentPlayer and this.opponent
+  //  - returns roll value so gui can display.
+  //  - does NOT start the turn, which happens on rollPlayerDice().
   decide() {
     let roll = this.rollDecidingDice();
-    if (roll[0] === roll[1]) {
-      return roll;
-    } else {
+    if (roll[0] !== roll[1]) {
       this.currentPlayer = (roll[0] > roll[1]) ? 'dark' : 'light';
       this.opponent = (this.currentPlayer === 'dark') ? 'light' : 'dark';
-      return roll;
     }
+    return roll;
   }
 
   // Roll for current player's turn.
@@ -86,12 +88,12 @@ export default class GameLogic {
   }
 
   // Switches the opponent to be the current player and vice versa.
+  // must be called externally when the gui is ready to proceed
   nextTurn() {
     const current = this.currentPlayer;
     this.currentPlayer = this.opponent;
     this.opponent = current;
   }
-
 
   // returns a randomly selected move of those available for the current player,
   // or undefined if current player has no moves.
@@ -104,10 +106,18 @@ export default class GameLogic {
     }
   }
 
+  // returns true if the current player has any possible moves.
   // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
   //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove
   canMove(from) {
     return !!this.automatedMove(from);
+  }
+
+  // returns count of chips for a given player at a point on the board.
+  // player: 'dark' or 'light', index: point index
+  chipsAt(player, index) {
+    const curr = this[player];
+    return curr[index] || 0;
   }
 
   // Return moves hash or array depending on whether 'index' is provided.
@@ -127,7 +137,7 @@ export default class GameLogic {
     let targets = [];
     if(Array.isArray(moves)) {
       targets = moves.map(function(item) {
-        return Array.isArray(item) ? item[item.length - 1] : item;
+        return Array.isArray(item) ? _.last(item) : item;
       });
     }
     return targets;
@@ -189,13 +199,13 @@ export default class GameLogic {
     // TODO: this should return an array if 2 different compound moves are possible
     // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
     const target = _.find(possibleMoves, function (item) {
-      const target = Array.isArray(item) ? item[item.length - 1] : item;
+      const target = Array.isArray(item) ? _.last(item) : item;
       return target === to;
     });
 
     // Figure out which dice and knock down current roll (this.lastRoll)
     if (Array.isArray(target)) {
-      const finalTarget = target[target.length - 1];
+      const finalTarget = _.last(target);
       if (finalTarget === 'off') {
 
         let subMoves = [[from, target[0]]];
@@ -389,17 +399,17 @@ export default class GameLogic {
 
         if (Array.isArray(moveTarget)) {
           compound = true;
-          moveTarget = moveTarget[moveTarget.length - 1];
+          moveTarget = _.last(moveTarget);
         }
 
         let taken = this.opponentSpikes()[moveTarget] || 0;
         if (compound) {
           const opponentSpikes = this.opponentSpikes();
           const point = _.find(possibleMoves[i], function(point) {
-            return opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point] > 1;
+            return opponentSpikes[Array.isArray(point) ? _.last(point) : point] > 1;
           });
           if (point) {
-            taken = opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point]
+            taken = opponentSpikes[Array.isArray(point) ? _.last(point) : point]
           }
         }
 
@@ -428,20 +438,17 @@ export default class GameLogic {
       return;
     }
 
-    const whichKey = (typeof arguments[0] !== 'undefined' ) ? index : movablePieceKeys[this.random(movablePieceKeys.length)];
+    const whichKey = (typeof arguments[0] !== 'undefined' ) ? index : _.sample(movablePieceKeys);
     if (!possibleMoves[whichKey]) {
       return;
     }
-    let target = this.random(possibleMoves[whichKey].length);
-    let to = possibleMoves[whichKey][target];
-    to = Array.isArray(to) ? to[to.length - 1] : to;
+    const move = _.sample(possibleMoves[whichKey]),
+      to = Array.isArray(move) ? _.last(move) : move;
     return [this.int(whichKey), to];
   }
 
-
-  // decides who gets first turn
   rollDecidingDice() {
-    return this.rollDice();
+    return this.rollDice().slice();
   }
 
   currentHistoryState() {
@@ -461,13 +468,8 @@ export default class GameLogic {
     return parseInt(n, 10);
   }
 
-  random(val) {
-    return Math.floor(Math.random() * val);
-  }
-
-  // utility method
   rollDice() {
-    return [this.random(6) + 1, this.random(6) + 1];
+    return [Math.ceil(Math.random() * 6), Math.ceil(Math.random() * 6)];
   }
 
   setGame(setting) {
