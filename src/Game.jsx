@@ -47,7 +47,7 @@ export default class Game extends React.Component {
       text = (decidingRoll) ?
         (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
         addressee + 'Rolling...';
-      if (this.gameOn && !game.currentPlayer) {
+      if (game.gameActive() && !game.currentPlayer) {
         text = this.state.tie ?
           'OOPS! Tie! Rolling again' :
           'Opening roll...';

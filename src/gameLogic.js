@@ -39,23 +39,6 @@ export default class GameLogic {
     this.snapHistory();
   }
 
-  end() {
-    this.gameOn = false;
-  }
-
-  currentHistoryState() {
-    let hist = {};
-    const _this = this;
-    _.each(this.GAME_PROPS, function(prop) {
-      hist[prop] = JSON.parse(JSON.stringify(_this[prop]));
-    });
-    return hist;
-  }
-
-  snapHistory() {
-    this.history.push(this.currentHistoryState());
-  }
-
   undo() {
     this.history.pop();
     const last = this.history[this.history.length - 1];
@@ -63,10 +46,6 @@ export default class GameLogic {
     _.each(last, function(value, key) {
       _this[key] = JSON.parse(JSON.stringify(value));
     });
-  }
-
-  int(n) {
-    return parseInt(n, 10);
   }
 
   pips(player) {
@@ -82,8 +61,6 @@ export default class GameLogic {
   // Does not start the turn, which happens on rollPlayerDice().
   decide() {
     let roll = this.rollDecidingDice();
-//     roll = [3, 6]; // TESTING forces computer player first
-//     roll = [6, 3]; // TESTING forces dark player first
     if (roll[0] === roll[1]) {
       return roll;
     } else {
@@ -98,7 +75,6 @@ export default class GameLogic {
   // Once this is called, the player can begin moving pieces, or automated moves can be performed.
   rollPlayerDice() {
     let lastRoll = this.rollDice();
-//    lastRoll = [2, 3]; // TESTING
 
     if (lastRoll[0] === lastRoll[1]) {
       lastRoll = [lastRoll[0], lastRoll[0], lastRoll[0], lastRoll[0]];
@@ -114,6 +90,24 @@ export default class GameLogic {
     const current = this.currentPlayer;
     this.currentPlayer = this.opponent;
     this.opponent = current;
+  }
+
+
+  // returns a randomly selected move of those available for the current player,
+  // or undefined if current player has no moves.
+  automatedMove(from) {
+    if (this.lastRoll && this.lastRoll.length) {
+      const move = this.selectRandomMove(from);
+      if (move) {
+        return move;
+      }
+    }
+  }
+
+  // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
+  //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove
+  canMove(from) {
+    return !!this.automatedMove(from);
   }
 
   // Return moves hash or array depending on whether 'index' is provided.
@@ -157,134 +151,8 @@ export default class GameLogic {
     return (this.currentPlayer === player) && ok;
   }
 
-  // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
-  setPossibleMoves() {
-    this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
-
-    let barHash;
-    const val = this.bar()[this.currentPlayer];
-    if (val > 0) {
-      const idx = [this.currentPlayer === 'dark' ? '-1' : 24];
-      barHash = {};
-      barHash[idx] = this.currentPlayerSpikes()[idx];
-    }
-
-    // Possible moves are always either from board positions, or from the bar, but never both.
-    // movablePieceContainers is a hash of form {boardPosition => chipCount, ...}
-    const movablePieceContainers = barHash || this.currentPlayerSpikes();
-
-    // Logic for which moves can be made from each occupied spike of position `index`.
-    for(var index in movablePieceContainers) {
-      const curr = this.int(index);
-      const light = (this.currentPlayer === 'light');
-      let first = this.int(this.lastRoll[0]),
-        sec = this.int(this.lastRoll[1]);
-
-      // opponent goes backwards
-      if (light) {
-        first = -first;
-        sec = - sec;
-      }
-
-      // Find all possible moves, as if there was no opponent.
-      let possibleMoves;
-      if (first) {
-        if (first === sec) {
-          possibleMoves = _.map(this.lastRoll, function(val, i) {
-            const n = light ? -val : val;
-            let move = curr + n;
-            if (i > 0) {
-              move = [move];
-              for(var z = 1; z <= i; z++) {
-                move.push(curr + (n * (z + 1)));
-              }
-            }
-            return move;
-          });
-        } else {
-          if(sec) {
-            possibleMoves = [
-              curr + first,
-              curr + sec,
-              [curr + first, curr + first + sec],
-              [curr + sec, curr + sec + first]
-            ];
-          } else {
-            possibleMoves = [curr + first];
-          }
-        }
-
-        // adjust moves that go offboard..
-        // a move like [20, 22] remains unchanged
-        // a move like 26 becomes 'off'
-        // a move like [22, 24] becomes [22, 'off']
-        // a move like [22, 24, 26] becomes [22, 'off']
-        // a move like [24, 26] becomes 'off'
-        _.each(possibleMoves, function(move, i) {
-          if (Array.isArray(move)) {
-            // trim out excess
-            const firstOffboardIndex = _.findIndex(move, function(val){
-              return val > 23 || val < 0;
-            });
-            if (firstOffboardIndex !== -1) {
-              move = move.slice().splice(0, firstOffboardIndex + 1);
-              move[move.length - 1] = 'off';
-              possibleMoves[i] = move.length === 1 ? 'off' : move;
-            }
-          } else if (move > 23 || move < 0) {
-            possibleMoves[i] = 'off'
-          }
-        })
-
-        possibleMoves = _.uniq(possibleMoves);
-      } else {
-        possibleMoves = [];
-      }
-
-      // TODO:
-      // implement rule: Or if either number can be played but not both, the player must play the larger one.
-
-      // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
-      let allowedMoves = [];
-      for(var i in possibleMoves) {
-        let moveTarget = possibleMoves[i];
-        let compound;
-
-        if (Array.isArray(moveTarget)) {
-          compound = true;
-          moveTarget = moveTarget[moveTarget.length - 1];
-        }
-
-        let taken = this.opponentSpikes()[moveTarget] || 0;
-        if (compound) {
-          const opponentSpikes = this.opponentSpikes();
-          const point = _.find(possibleMoves[i], function(point) {
-            return opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point] > 1;
-          });
-          if (point) {
-            taken = opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point]
-          }
-        }
-
-        if (barHash && (barHash[-1] > 1 || barHash[24] > 1) && compound) {
-          // do nothing
-        } else if ((moveTarget === 'off')) {
-          this.canOffboard() && allowedMoves.push(possibleMoves[i]);
-        } else if (!taken || (taken < 2)) {
-          allowedMoves.push(possibleMoves[i]);
-        }
-      }
-
-      if (allowedMoves.length) {
-        this[this.currentPlayer + 'Moves'][index] = allowedMoves;
-      }
-    }
-    this.snapHistory();
-  }
-
-  // TODO: Move all these public type methods to top of class
   gameActive() {
-    return true; // TODO implement
+    return this.gameOn;
   }
 
   canOffboard() {
@@ -308,11 +176,9 @@ export default class GameLogic {
   currentPlayerHasWon() {
     const allChipsOff = this[this.currentPlayer + 'Off'] === 15,
       noChipsOnBoard = !Object.keys(this.currentPlayerSpikes()).length;
-
     return noChipsOnBoard && allChipsOff;
   }
 
-  // TODO: move this method next to setPossibleMoves
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   // return a summary of the move and what points, if any, where a blot occurred.
@@ -391,9 +257,7 @@ export default class GameLogic {
       if (blots.length) {
         const _this = this;
         _.each(blots, function(to) {
-          // TODO make decrement fn for this
-          _this.opponentSpikes()[to]--;
-          _this.opponentSpikes()[to] === 0 && (delete _this.opponentSpikes()[to])
+          _this.decrementOpponentAt(to);
           const opponentBarIndex = _this.opponent === 'dark' ? '-1' : 24;
           const curr = _this.opponentSpikes()[opponentBarIndex];
           _this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
@@ -407,22 +271,152 @@ export default class GameLogic {
         spikes[to] = spikes[to] ? (spikes[to] + 1) : 1;
       }
 
-      spikes[from]--;
-      if(spikes[from] === 0 || !spikes[from]) {
-        delete spikes[from]
-        delete spikes[from.toString()];
-      }
+      this.decrementCurrentPlayerAt(from);
 
       this.setPossibleMoves();
-
+      if (this.currentPlayerHasWon()) {
+        this.endGame();
+      }
       return {move: [from, target], blots: blots};
     } else {
       return false;
     }
   }
 
-  random(val) {
-    return Math.floor(Math.random() * val);
+  // private
+
+  decrementCurrentPlayerAt(index) {
+    this.currentPlayerSpikes()[index]--;
+    this.currentPlayerSpikes()[index] === 0 && (delete this.currentPlayerSpikes()[index]);
+  }
+
+  decrementOpponentAt(index) {
+    this.opponentSpikes()[index]--;
+    this.opponentSpikes()[index] === 0 && (delete this.opponentSpikes()[index]);
+  }
+
+  // Sets the possible moves for currentPlayer based on the current value of this.lastRoll
+  setPossibleMoves() {
+    this[this.currentPlayer + 'Moves'] = {}; // clear existing moves
+
+    let barHash;
+    const val = this.bar()[this.currentPlayer];
+    if (val > 0) {
+      const idx = [this.currentPlayer === 'dark' ? '-1' : 24];
+      barHash = {};
+      barHash[idx] = this.currentPlayerSpikes()[idx];
+    }
+
+    // Possible moves are always either from board positions, or from the bar, but never both.
+    // movablePieceContainers is a hash of form {boardPosition => chipCount, ...}
+    const movablePieceContainers = barHash || this.currentPlayerSpikes();
+
+    // Logic for which moves can be made from each occupied spike of position `index`.
+    for(var index in movablePieceContainers) {
+      const curr = this.int(index);
+      const light = (this.currentPlayer === 'light');
+      let first = this.int(this.lastRoll[0]),
+        sec = this.int(this.lastRoll[1]);
+
+      // opponent goes backwards
+      if (light) {
+        first = -first;
+        sec = - sec;
+      }
+
+      // Find all possible moves, as if there was no opponent.
+      let possibleMoves;
+      if (first) {
+        if (first === sec) {
+          possibleMoves = _.map(this.lastRoll, function(val, i) {
+            const n = light ? -val : val;
+            let move = curr + n;
+            if (i > 0) {
+              move = [move];
+              for(var z = 1; z <= i; z++) {
+                move.push(curr + (n * (z + 1)));
+              }
+            }
+            return move;
+          });
+        } else {
+          if(sec) {
+            possibleMoves = [
+              curr + first,
+              curr + sec,
+              [curr + first, curr + first + sec],
+              [curr + sec, curr + sec + first]
+            ];
+          } else {
+            possibleMoves = [curr + first];
+          }
+        }
+
+        // trim moves that go offboard..
+        // a move like [20, 22] remains unchanged
+        // a move like 26 becomes 'off'
+        // a move like [22, 24] becomes [22, 'off']
+        // a move like [22, 24, 26] becomes [22, 24, 'off']
+        _.each(possibleMoves, function(move, i) {
+          if (Array.isArray(move)) {
+            // trim out excess
+            const firstOffboardIndex = _.findIndex(move, function(val){
+              return val > 23 || val < 0;
+            });
+            if (firstOffboardIndex !== -1) {
+              move = move.slice().splice(0, firstOffboardIndex + 1);
+              move[move.length - 1] = 'off';
+              possibleMoves[i] = move.length === 1 ? 'off' : move;
+            }
+          } else if (move > 23 || move < 0) {
+            possibleMoves[i] = 'off'
+          }
+        })
+
+        possibleMoves = _.uniq(possibleMoves);
+      } else {
+        possibleMoves = [];
+      }
+
+      // TODO:
+      // implement rule: Or if either number can be played but not both, the player must play the larger one.
+
+      // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
+      let allowedMoves = [];
+      for(var i in possibleMoves) {
+        let moveTarget = possibleMoves[i];
+        let compound;
+
+        if (Array.isArray(moveTarget)) {
+          compound = true;
+          moveTarget = moveTarget[moveTarget.length - 1];
+        }
+
+        let taken = this.opponentSpikes()[moveTarget] || 0;
+        if (compound) {
+          const opponentSpikes = this.opponentSpikes();
+          const point = _.find(possibleMoves[i], function(point) {
+            return opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point] > 1;
+          });
+          if (point) {
+            taken = opponentSpikes[Array.isArray(point) ? point[point.length - 1] : point]
+          }
+        }
+
+        if (barHash && (barHash[-1] > 1 || barHash[24] > 1) && compound) {
+          // do nothing
+        } else if ((moveTarget === 'off')) {
+          this.canOffboard() && allowedMoves.push(possibleMoves[i]);
+        } else if (!taken || (taken < 2)) {
+          allowedMoves.push(possibleMoves[i]);
+        }
+      }
+
+      if (allowedMoves.length) {
+        this[this.currentPlayer + 'Moves'][index] = allowedMoves;
+      }
+    }
+    this.snapHistory();
   }
 
   selectRandomMove(index) {
@@ -444,28 +438,31 @@ export default class GameLogic {
     return [this.int(whichKey), to];
   }
 
-  // returns a randomly selected move of those available for the current player,
-  // or undefined if current player has no moves.
-  automatedMove(from) {
-    if (this.lastRoll && this.lastRoll.length) {
-      const move = this.selectRandomMove(from);
-      if (move) {
-        return move;
-      }
-    }
-  }
-
-  // TODO move all these public type methods towards the top of file
-
-  // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
-  //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove
-  canMove(from) {
-    return !!this.automatedMove(from);
-  }
 
   // decides who gets first turn
   rollDecidingDice() {
     return this.rollDice();
+  }
+
+  currentHistoryState() {
+    let hist = {};
+    const _this = this;
+    _.each(this.GAME_PROPS, function(prop) {
+      hist[prop] = JSON.parse(JSON.stringify(_this[prop]));
+    });
+    return hist;
+  }
+
+  snapHistory() {
+    this.history.push(this.currentHistoryState());
+  }
+
+  int(n) {
+    return parseInt(n, 10);
+  }
+
+  random(val) {
+    return Math.floor(Math.random() * val);
   }
 
   // utility method
@@ -478,5 +475,9 @@ export default class GameLogic {
     for(var property in obj) {
       this[property] = obj[property]
     }
+  }
+
+  endGame() {
+    this.gameOn = false;
   }
 }

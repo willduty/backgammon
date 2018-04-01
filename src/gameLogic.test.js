@@ -483,6 +483,37 @@ describe('history', () => {
 });
 
 
+describe('game activity', () => {
+  let gl;
+
+  beforeEach(() => {
+    gl = new GameLogic;
+  });
+
+  describe('gameActive()', () => {
+    test('returns false before game has been started', () => {
+      expect(gl.gameActive()).toEqual(false);
+    });
+
+    test('returns true after game has started but not ended', () => {
+      gl.start();
+      expect(gl.gameActive()).toEqual(true);
+    });
+
+    test('returns false after game has ended', () => {
+      gl.start();
+      setDarkPlayerFirst(gl);
+      gl.decide();
+      gl.dark = { 18: 1 };
+      gl.darkOff = 14;
+      setPossibleMovesWithRoll(gl, [6, 2]);
+      gl.doMove(18, 'off');
+      expect(gl.gameActive()).toEqual(false);
+    });
+  });
+});
+
+
 function setPossibleMovesWithRoll(gl, roll) {
   let rollDiceMock = jest.fn();
   rollDiceMock.mockReturnValue(roll.slice());

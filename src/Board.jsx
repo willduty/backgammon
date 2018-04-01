@@ -158,11 +158,12 @@ export default class Board extends React.Component {
 
     // Undo button only shown if player is partway through move.
     let undoClass;
-    if(this.state.game.gameOn
+    const game = this.state.game;
+    if(game.gameActive()
       && !this.turnComplete
-      && this.state.game.currentPlayer === 'dark'
-      && this.state.game.lastRoll.length > 0
-      && this.state.game.lastRoll.length !== this.state.game.lastInitialRoll.length
+      && game.currentPlayer === 'dark'
+      && game.lastRoll.length > 0
+      && game.lastRoll.length !== game.lastInitialRoll.length
       ) {
       undoClass = 'undo';
     } else {
