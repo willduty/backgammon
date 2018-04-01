@@ -17,10 +17,6 @@ body {
   float: left;
 }
 
-.status {
-  /*margin-bottom: 10px;*/
-}
-
 .top-area {
   height: 20px;
 }
@@ -46,7 +42,6 @@ body {
   display: inline-block;
   height: 600px;
   width: 110px;
-  /*padding-left: 10px;*/
 }
 
 .player-card {
@@ -193,7 +188,6 @@ ol, ul {
 }
 
 .square {
-  /*border: 1px solid black;*/
   float: left;
   height: 300px;
   padding: 0;
@@ -236,14 +230,12 @@ ol, ul {
 }
 
 .selectable {
-  /*-webkit-filter: brightness(600%) hue-rotate(230deg);*/
   animation-name: showMovableChips;
   animation-duration: 1s;
   animation-iteration-count: infinite;
 }
 
 .selectable-light {
-  /*-webkit-filter: brightness(600%) hue-rotate(230deg);*/
   background-image: url(./images/chip_light_highlight.png);
   z-index: 100000;
   animation-name: animationChip;

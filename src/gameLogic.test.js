@@ -39,17 +39,6 @@ describe('game setup', () => {
     gl.decide();
     expect(gl.currentPlayer).not.toBe(null);
   });
-
-  test('currentPlayer switched to opponent on nextTurn', () => {
-    gl.start();
-    gl.decide();
-    const before = gl.currentPlayer;
-    const expected = (before === 'dark' ? 'light' : 'dark');
-
-    gl.nextTurn();
-    expect(gl.currentPlayer).toEqual(expected);
-    expect(gl.opponent).toEqual(before);
-  });
 });
 
 describe('turns and dice rolls', () => {
@@ -82,6 +71,19 @@ describe('turns and dice rolls', () => {
       expect(gl.lastRoll).toEqual([5]);
       gl.doMove(11, 16);
       expect(gl.lastRoll).toEqual([]);
+    });
+  });
+
+  describe('nextTurn()', () => {
+    test('currentPlayer switched to opponent on nextTurn', () => {
+      gl.start();
+      gl.decide();
+      const before = gl.currentPlayer;
+      const expected = (before === 'dark' ? 'light' : 'dark');
+
+      gl.nextTurn();
+      expect(gl.currentPlayer).toEqual(expected);
+      expect(gl.opponent).toEqual(before);
     });
   });
 });
