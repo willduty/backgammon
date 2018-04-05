@@ -47,23 +47,23 @@ export default class Board extends React.Component {
 
   startDrag(event, chipIndex) {
     const game = this.state.game;
-    const dragObjParent = game.isBarIndex(chipIndex)  ?
+    const dragObjParent = game.isBarIndex(chipIndex) ?
       document.getElementById('bar-holder-' + game.currentPlayer) :
       document.getElementById('square_' + chipIndex);
 
-    const chip = _.find(dragObjParent.children, function(e) {
-      return e.className.indexOf('selectable') !== -1;
+    const dachips = _.map(dragObjParent.firstChild.children, function(e) {return e.firstChild})
+    const chip = _.find(dachips, function(e) {
+      return e && e.className.indexOf('selectable') !== -1;
     });
 
-    const dragObjOriginalY = chip.style.top || 0;
+    const boardRect = document.getElementById('draggableArea').getBoundingClientRect();
+
     this.setState({
-      dragObjOriginalX: chip.style.left,
-      dragObjOriginalY: dragObjOriginalY,
       dragObj: chip,
-      dragCursorXOffset: dragObjParent.getBoundingClientRect().x - parseInt(event.pageX, 10),
-      dragCursorYOffset: parseInt(dragObjOriginalY, 10) - parseInt(event.pageY, 10),
+      dragCursorXOffset: event.pageX - chip.getBoundingClientRect().x,
+      dragCursorYOffset: event.pageY - chip.getBoundingClientRect().y,
       dragObjParentIndex: chipIndex,
-    })
+    });
   }
 
   stopDrag(e) {
@@ -73,9 +73,12 @@ export default class Board extends React.Component {
 
       if (!update) {
         const dragObj = this.state.dragObj;
-        dragObj.style.top = this.state.dragObjOriginalY;
-        dragObj.style.left = this.state.dragObjOriginalX;
-        dragObj.style.zIndex = null;
+        const parent = dragObj.parentElement;
+        if (parent) {
+          dragObj.style.top = parent.style.top;
+          dragObj.style.left = parent.style.left;
+          dragObj.style.zIndex = null;
+        }
       }
 
       this.setState({
@@ -112,10 +115,8 @@ export default class Board extends React.Component {
         currentSq = 'off';
       }
 
-      let y = e.pageY;
-      y += this.state.dragCursorYOffset;
-      let x = e.pageX - boardRect.x;
-      x += this.state.dragCursorXOffset;
+      let x = e.pageX - boardRect.x - this.state.dragCursorXOffset;
+      let y = e.pageY - boardRect.y - this.state.dragCursorYOffset;
 
       let dragObj = this.state.dragObj;
       dragObj.style.zIndex = 100000;

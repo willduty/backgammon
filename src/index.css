@@ -164,6 +164,16 @@ body {
   -webkit-filter: brightness(300%);
 }
 
+.holder .box  {
+  height: 5px;
+  /*border: 1px solid red;*/
+}
+
+.holder .box > div {
+  margin-left: 3px;
+  /*border: 1px solid orange;*/
+}
+
 .off-chip {
   vertical-align: bottom;
   align: right;
@@ -183,10 +193,6 @@ body {
   background: linear-gradient(to right, #333, #aaa, #9aa, #bbb, #ccc, #bbb, #ccc, #fff, #ddd, #898, #666);
 }
 
-ol, ul {
-  padding-left: 30px;
-}
-
 .square {
   float: left;
   height: 300px;
@@ -194,7 +200,127 @@ ol, ul {
   width: 51px;
   background-repeat: no-repeat;
   background-size: cover;
+  display: table;
 }
+
+.bottomer {
+  vertical-align: bottom;
+  height: 20px;
+  width: 51px;
+  display: table-cell;
+}
+
+.box {
+  /*border: 1px solid green;*/
+  width: 49px;
+}
+
+.box1 {
+  height: 40px;
+}
+.box8 {
+  height: 35px;
+}
+.box9 {
+  height: 30px;
+}
+.box10 {
+  height: 26px;
+}
+.box11 {
+  height: 23px;
+}
+.box12 {
+  height: 21px;
+}
+.box13 {
+  height: 20px;
+}
+.box14 {
+  height: 18px;
+}
+.box15 {
+  height: 16px;
+}
+.box16 {
+  height: 15px;
+}
+.box-off {
+  height: 7px;
+}
+
+
+.board-section > div:nth-child(2) .square .box:nth-child(2) > div {
+  z-index: 1016;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(3) > div {
+  z-index: 1015;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(4) > div {
+  z-index: 1014;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(5) > div {
+  z-index: 1013;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(6) > div {
+  z-index: 1012;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(7) > div {
+  z-index: 1011;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(8) > div {
+  z-index: 1010;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(9) > div {
+  z-index: 1009;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(10) > div {
+  z-index: 1008;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(11) > div {
+  z-index: 1007;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(12) > div {
+  z-index: 1006;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(13) > div {
+  z-index: 1005;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(14) > div {
+  z-index: 1004;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(15) > div {
+  z-index: 1003;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(16) > div{
+  z-index: 1002;
+}
+.board-section > div:nth-child(2) .square .box:nth-child(17) > div{
+  z-index: 1001;
+}
+
+
+.bar-holder-light, .bar-holder-dark {
+  width: 41px;
+  z-index: 10000;
+}
+
+.bar-holder-dark .box  {
+  /*border: 1px solid red;*/
+  float: right;
+}
+
+.bar-holder-light .box  {
+  /*border: 1px solid orange;*/
+  float: right;
+}
+
+.bar-holder-dark .box, .bar-holder-light .box  {
+  height: 10px;
+  z-index: 1000000;
+}
+
+
 
 .dark {
   background-image: url(./images/spike_yellow.png);
@@ -214,8 +340,14 @@ ol, ul {
   background-size: 51px 355px;
 }
 
+
+.light-bottom .box:last-child, .dark-bottom .box:last-child {
+  height: 50px;
+  /*top: 550px;*/
+}
+
 .light-bottom .chip, .dark-bottom .chip {
-  top: 550px;
+  /*top: 550px;*/
 }
 
 .chip {
@@ -321,27 +453,11 @@ ol, ul {
   float: left;
 }
 
-.bar div:first-child {
-  height: 200px;
+.bar > div:first-child {
+  height: 180px;
 }
 
-.bar-holder-light, .bar-holder-dark {
-  color: white;
-  height: 100px;
-  width: 50px;
-  z-index: 10000;
-}
 
-.bar-holder-light .chip, .bar-holder-dark .chip {
-}
-
-.bar-holder-light {
-  top: 35%;
-}
-
-.bar-holder-dark {
-  top: 50%;
-}
 
 .board-section, .sep, .bar, .holder, .bar-holder-light, .bar-holder-dark, .no-select  {
   -webkit-touch-callout: none;

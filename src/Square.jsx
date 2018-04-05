@@ -4,8 +4,6 @@ import Chip from './Chip';
 export default class Square extends React.Component {
   constructor(props) {
     super(props);
-    this.CHIP_SPACING = 40;
-    this.MAX_UNSPACED = 250;
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -23,14 +21,11 @@ export default class Square extends React.Component {
 
       const active =
         (this.props.player === 'dark') && (i === count - 1) && (type === 'chip_dark') && (this.props.hasMoves);
-      const spacing = (count > 6 ? this.MAX_UNSPACED / count : this.CHIP_SPACING);
 
       items.push(
         <Chip
-          key={i}
           parentIndex = {this.props.index}
           active = {active}
-          offset = {i * spacing}
           type = {type}
           onMouseEnter={this.props.onMouseEnter}
           onMouseLeave={this.props.onMouseLeave}
@@ -61,12 +56,37 @@ export default class Square extends React.Component {
     let chips = this.makeChips(this.props.chips.dark, 'chip_dark');
     chips = chips.concat(this.makeChips(this.props.chips.light, 'chip_light'));
 
+    let count, className;
+    if (chips.length < 7) {
+      count = 7;
+      className = 'box box1';
+    } else {
+      count = chips.length + 1;
+      className = 'box box' + (chips.length + 1);
+    }
+
+    const divs = []
+    for (var i = 0; i < count; i++) {
+      const box =
+        <div
+          id={'box_' + this.props.index + '_' + i}
+          className={className}
+          key={i}>
+          {chips[i]}
+        </div>
+      this.props.index > 11 ? divs.push(box) : divs.unshift(box)
+    }
+
+    const aligner = this.props.index < 12 ? 'bottomer' : '';
+
     return (
       <div
           className={classNames.join(' ')}
           id={'square_' + this.props.index}
         >
-        {chips}
+        <div className={aligner}>
+          {divs}
+        </div>
       </div>
     );
   }
