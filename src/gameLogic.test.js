@@ -103,56 +103,56 @@ describe('move calculation and management', () => {
       gl.dark = { '0': 2 };
       gl.light = {};
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"0": [2, 3, [2, 5], [3, 5]]});
+      expect(gl.darkMoves).toEqual({'0': [2, 3, [2, 5], [3, 5]]});
     });
 
     test('does not set up moves where opponent has 2 or more chips', () => {
       gl.dark = { '0': 2 };
       gl.light = { 3: 2 };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"0": [2, [2, 5]]});
+      expect(gl.darkMoves).toEqual({'0': [2, [2, 5]]});
     });
 
     test('does not set up compound moves where opponent has 2 or more chips on compound target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 5: 2 };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"0": [2, 3]});
+      expect(gl.darkMoves).toEqual({'0': [2, 3]});
     });
 
     test('does not set up compound moves where opponent has 2 or more chips on both intermediate targets', () => {
       gl.dark = { '0': 2 };
       gl.light = { 2: 2, 3: 2 };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {});
+      expect(gl.darkMoves).toEqual({});
     });
 
     test('on double roll, does not set up compound moves where opponent has 2 or more chips on intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 4: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
-      expect(gl.darkMoves).toEqual( {"0": [2]});
+      expect(gl.darkMoves).toEqual({'0': [2]});
     });
 
     test('on double roll, sets up compound moves only to where opponent has 2 or more chips on an intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 6: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
-      expect(gl.darkMoves).toEqual( {"0": [2, [2, 4]]});
+      expect(gl.darkMoves).toEqual({'0': [2, [2, 4]]});
     });
 
     test('on double roll, sets up compound moves only to where opponent has 2 or more chips on an intermediate target', () => {
       gl.dark = { '0': 2 };
       gl.light = { 8: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
-      expect(gl.darkMoves).toEqual( {"0": [2, [2, 4], [2, 4, 6]]});
+      expect(gl.darkMoves).toEqual({'0': [2, [2, 4], [2, 4, 6]]});
     });
 
     test('on double roll, does not set up compound moves where opponent has 2 or more chips on intermediate target, from bar', () => {
       gl.dark = { '-1': 1 };
       gl.light = { 5: 2 };
       setPossibleMovesWithRoll(gl, [2, 2]);
-      expect(gl.darkMoves).toEqual( {"-1": [1, [1, 3]]});
+      expect(gl.darkMoves).toEqual({'-1': [1, [1, 3]]});
     });
 
     test('does not set up compound moves where opponent has 2 or more chips on compound target, light player', () => {
@@ -160,21 +160,21 @@ describe('move calculation and management', () => {
       gl.light = {5: 5};
       gl.nextTurn();
       setPossibleMovesWithRoll(gl, [4, 1]);
-      expect(gl.lightMoves).toEqual( {5: [1, 4]});
+      expect(gl.lightMoves).toEqual({5: [1, 4]});
     });
 
     test('allows compound moves when player has only 1 chip on bar', () => {
       gl.dark = { '-1': 1 };
       gl.light = { };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"-1": [1, 2, [1, 4], [2, 4]]});
+      expect(gl.darkMoves).toEqual({'-1': [1, 2, [1, 4], [2, 4]]});
     });
 
     test('does not allow compound moves when player has 2 or more chips on bar', () => {
       gl.dark = { '-1': 2 };
       gl.light = { };
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.darkMoves).toEqual( {"-1": [1, 2]});
+      expect(gl.darkMoves).toEqual({'-1': [1, 2]});
     });
 
     test('sets up move combinations for offboarding, two chips can offboard', () => {
@@ -191,6 +191,39 @@ describe('move calculation and management', () => {
       setPossibleMovesWithRoll(gl, [3, 1]);
       expect(gl.currentPlayerMoves()).toEqual({'19': [22, 20, [22, 23], [20, 23]], '23': ['off']});
     });
+
+    test('in double roll, player blocked from compound offboard move', () => {
+      gl.dark = { 22: 1 };
+      gl.light = { 23: 2 };
+      gl.darkOff = 14;
+      setPossibleMovesWithRoll(gl, [1, 1]);
+      expect(gl.canMove()).toBeFalsy();
+    });
+
+    test('player blocked from compound offboard move', () => {
+      gl.dark = { 21: 1 };
+      gl.light = { 22: 2, 23: 2 };
+      gl.darkOff = 14;
+      setPossibleMovesWithRoll(gl, [1, 2]);
+      expect(gl.canMove()).toBeFalsy();
+    });
+
+    test('light player blocked from compound offboard move', () => {
+      gl.dark = {0: 2, 1: 2, 2: 2, 3: 2, 4: 2 };
+      gl.light = {5: 1};
+      gl.nextTurn();
+      expect(gl.currentPlayer).toBe('light');
+      setPossibleMovesWithRoll(gl, [5, 1]);
+      expect(gl.canMove()).toBeFalsy();
+    });
+
+    test('in double roll, light player blocked from compound offboard move', () => {
+      gl.dark = {0: 2, 1: 2, 2: 2, 3: 2, 4: 2 };
+      gl.light = {5: 1};
+      gl.nextTurn();
+      setPossibleMovesWithRoll(gl, [2, 2]);
+      expect(gl.canMove()).toBeFalsy();
+    });
   });
 
   describe('currentPlayerMoves()', () => {
@@ -198,7 +231,7 @@ describe('move calculation and management', () => {
       gl.dark = { '0': 1 };
       gl.light = {};
       setPossibleMovesWithRoll(gl, [2, 3]);
-      expect(gl.currentPlayerMoves()).toEqual( {"0": [2, 3, [2, 5], [3, 5]]});
+      expect(gl.currentPlayerMoves()).toEqual({'0': [2, 3, [2, 5], [3, 5]]});
     });
 
     test('gets moves by index', () => {
@@ -405,6 +438,7 @@ describe('offboarding and game conclusion', () => {
 
   test('in double roll, uses all dies required for offboard, none left', () => {
     gl.dark = { 20: 1 };
+    gl.light = { };
     gl.darkOff = 14;
     setPossibleMovesWithRoll(gl, [1, 1]);
     const move = gl.doMove(20, 'off');
@@ -415,6 +449,7 @@ describe('offboarding and game conclusion', () => {
 
   test('in double roll, uses all dies required for offboard, some left', () => {
     gl.dark = { 21: 1 };
+    gl.light = { };
     gl.darkOff = 14;
     setPossibleMovesWithRoll(gl, [1, 1]);
     const move = gl.doMove(21, 'off');

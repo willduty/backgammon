@@ -394,30 +394,33 @@ export default class GameLogic {
       // Now, exclude targets occupied by opponent (2 or more chips) and all offboard moves unless player can bear-off.
       let allowedMoves = [];
       for(var i in possibleMoves) {
-        let moveTarget = possibleMoves[i];
-        let compound;
+        let compound, taken, moveTarget = possibleMoves[i];
 
         if (Array.isArray(moveTarget)) {
           compound = true;
           moveTarget = _.last(moveTarget);
         }
 
-        let taken = this.opponentSpikes()[moveTarget] || 0;
         if (compound) {
           const opponentSpikes = this.opponentSpikes();
           const point = _.find(possibleMoves[i], function(point) {
             return opponentSpikes[Array.isArray(point) ? _.last(point) : point] > 1;
           });
-          if (point) {
+          if (typeof point !== 'undefined') {
             taken = opponentSpikes[Array.isArray(point) ? _.last(point) : point]
           }
+        } else {
+          taken = this.opponentSpikes()[moveTarget] || 0
         }
+        taken = taken > 1;
 
         if (barHash && (barHash[-1] > 1 || barHash[24] > 1) && compound) {
           // do nothing
-        } else if ((moveTarget === 'off')) {
-          this.canOffboard() && allowedMoves.push(possibleMoves[i]);
-        } else if (!taken || (taken < 2)) {
+        } else if (moveTarget === 'off') {
+          if(this.canOffboard() && !taken) {
+            allowedMoves.push(possibleMoves[i]);
+          }
+        } else if (!taken) {
           allowedMoves.push(possibleMoves[i]);
         }
       }
