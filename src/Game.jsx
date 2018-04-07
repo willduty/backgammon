@@ -113,6 +113,7 @@ export default class Game extends React.Component {
     if (game.currentPlayerHasWon()) {
       this.completeGame();
     } else {
+
       const move = game.automatedMove();
       if (move) {
         this.updateGame(move[0], move[1]);
@@ -156,59 +157,46 @@ export default class Game extends React.Component {
     return document.getElementById(id);
   }
 
+  findAnimationChipBox(targetIndex, isStart) {
+    const targetContainer = this.findContainer(targetIndex);
+    let boxIds = [];
+    const off = (targetIndex === 'off') ? (this.state.game.currentPlayer + '_') : '';
+    for(let i = 0; i < targetContainer.firstChild.children.length; i++) {
+      boxIds.push('box_' + targetIndex + '_' + (off) + i);
+    }
+
+    const _this = this;
+    let lastBoxIndex = _.findLastIndex(boxIds, function(boxId) {
+      const chips = document.getElementById(boxId).children;
+      if (targetIndex === 'off') {
+        return chips.length;
+      } else {
+        return chips.length && (chips[0].className.indexOf(_this.state.game.currentPlayer) !== -1);
+      }
+    });
+
+    (!isStart && lastBoxIndex > -1) && lastBoxIndex++;
+    (lastBoxIndex === -1) && (lastBoxIndex = 0);
+
+    const lastBox = 'box_' + targetIndex + '_' + off + lastBoxIndex;
+
+    return document.getElementById(lastBox);
+  }
+
   // returns the position ([x, y]) of where a chip should be given targetIndex for a board element
   // if isStart is true, accounts for the chip itself being present, else calculates hypothetical position
   findAnimationTarget(targetIndex, isStart) {
     const boardRect = document.getElementById('board').getBoundingClientRect();
-    const targetContainer = this.findContainer(targetIndex);
-    const currPlayerTargetChips = _.filter(targetContainer.children, function(chip) {
-      return chip.className.indexOf('light') !== -1;
-    });
-
-    let targetRect, targetChip, target, yOffset = 0, xOffset = 0;
-
-    // adjust depending on whether target is empty or has chips..
-    if(currPlayerTargetChips.length === 0 || (isStart && currPlayerTargetChips.length === 1)) {
-    // TODO, insert a temp chip? or get an array of 'zero' chips on start
-      targetChip = targetContainer;
-      targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? 250 : 0;
-    } else {
-      targetChip = currPlayerTargetChips[currPlayerTargetChips.length - (isStart ? 2 : 1)];
-      targetRect = targetChip.getBoundingClientRect();
-      yOffset = targetIndex < 12 ? -40 : 40;
-    }
-
-    if(targetChip.className === 'bar-holder-dark') {
-      const offset = document.getElementById('bar-holder-dark').children.length * 7;
-      xOffset = -8;
-      yOffset = offset + 50;
-    }
-
-    if(targetChip.className === 'bar-holder-light') {
-      xOffset = -8;
-      yOffset = 0;
-    }
-
-    if(targetChip.parentElement.className === 'bar-holder-light') {
-      const offset = (document.getElementById('bar-holder-light').children.length - 1) * 7;
-      xOffset = 0;
-      yOffset = 7;
-    }
-
-    if (targetIndex === 'off') {
-      const holderChipCount = targetContainer.children[0].children.length;
-      xOffset -= 3;
-      yOffset += 57 - holderChipCount * 7;
-    }
-
-    return [targetChip.getBoundingClientRect().x - boardRect.x + xOffset, targetChip.getBoundingClientRect().y - boardRect.y + yOffset]
+    const chipBox = this.findAnimationChipBox(targetIndex, isStart);
+    return [chipBox.getBoundingClientRect().x - boardRect.x,
+     chipBox.getBoundingClientRect().y - boardRect.y - (targetIndex === 'off' ? 43 : 0)];
   }
 
   // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
   buildPath(startIndex, targetIndex, isStart, isBarChip) {
+
     // START POSITION
-    const start = this.findAnimationTarget(startIndex, isStart).slice();
+    const start = this.findAnimationTarget(startIndex, isStart);
 
     // END POSITION
     const end = this.findAnimationTarget(targetIndex, false);
@@ -232,23 +220,23 @@ export default class Game extends React.Component {
   animateMove(moveSummary, game, path, chip) {
     const move = moveSummary.move;
     const _this = this;
-    const startContainer = this.findContainer(move[0]);
-    const chips = startContainer.children;
-    chip = _.last(chips);
+    const startIndex = move[0];
 
     // TODO move to function buildAllPaths
     if(!path) {
-      let pathPoints = _.flatten([move[0], move[1]])
+      chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
+      let pathPoints = _.flatten([move[0], move[1]]);
       let subMoves = [];
       for(var n = 0; n < pathPoints.length - 1; n++) {
         subMoves.push([pathPoints[n], pathPoints[n + 1]]);
       }
 
       path = ['highlight'];
-      const isBarChip = move[0] === 24 || move[0] === -1;
+      const isBarChip = startIndex === 24 || startIndex === -1;
 
       _.each(subMoves, function(fromTo) {
-        let pathpoints = _this.buildPath(fromTo[0], fromTo[1], move[0] === fromTo[0], isBarChip);
+        let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0], isBarChip);
+
         pathpoints = pathpoints.map(function(arr) {
           return {position: arr.slice(), chip: chip};
         }).slice();
@@ -256,24 +244,20 @@ export default class Game extends React.Component {
         path  = _.concat(path, pathpoints);
         path  = _.concat(path, ['pause']);
 
-        _this.lastBlot = null;
         _this.lastBlotIndex = null;
 
         let blottedChip;
         // if a blot occurs, animate blotted chip to bar
         if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
           pathpoints = _this.buildPath(fromTo[1], -1, true, true);
-          const blotContainer = _this.findContainer(fromTo[1]);
+          const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
 
           // TODO: bad, render should take care of chip position...
-          if (!_this.lastBlot) {
-            _this.lastBlot = pathpoints[0].slice();
+          if (!_this.lastBlotIndex) {
             _this.lastBlotIndex = fromTo[1];
           }
 
-          blottedChip = _.find(blotContainer.children, function(elem) {
-            return elem.className.indexOf('dark') !== -1;
-          });
+          blottedChip = blotContainer.firstChild;
 
           pathpoints = pathpoints.map(function(arr) {
             return {position: arr.slice(), chip: blottedChip};
@@ -298,6 +282,7 @@ export default class Game extends React.Component {
           FRAME_RATE = 15;
           frameInfo.chip.style.left = frameInfo.position[0] + 'px';
           frameInfo.chip.style.top = frameInfo.position[1] + 'px';
+          frameInfo.chip.style.zIndex = 1000000;
         }
 
         path = path.slice(1);
@@ -305,13 +290,15 @@ export default class Game extends React.Component {
           _this.animateMove(moveSummary, game, path, frameInfo.chip);
         }, FRAME_RATE);
       } else {
+
         _this.setState({game: this.state.game});
 
-        // TODO whatta mess
-        if(_this.lastBlot) {
-           document.getElementById('square_'+_this.lastBlotIndex).children[0].style.left = _this.lastBlot[0] + 'px';
-           document.getElementById('square_'+_this.lastBlotIndex).children[0].style.top = _this.lastBlot[1] + 'px';
-           _this.lastBlot = null;
+        if(_this.lastBlotIndex || _this.lastBlotIndex === 0) {
+            const box = document.getElementById('box_' + _this.lastBlotIndex + '_0');
+            const chip = box.firstChild;
+            chip.style.left = box.style.left;
+            chip.style.top = box.style.top;
+            chip.style.zIndex = box.style.zIndex;
            _this.lastBlotIndex = null;
          }
         _this.doAutomatedMove();

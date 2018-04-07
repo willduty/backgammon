@@ -21,6 +21,18 @@ export default class Holder extends React.Component {
       chips.push(<div className='off-chip' key={i}></div>)
     }
 
+    const divs = []
+    for (var i = 0; i < 15; i++) {
+      const box =
+        <div
+          id={'box_off_' + this.props.player + '_' + i}
+          className={'box box-off'}
+          key={i}>
+          {chips[i]}
+        </div>
+      this.props.index > 11 ? divs.push(box) : divs.unshift(box)
+    }
+
     return (
       <div className='holder'>
         <div ></div>
@@ -29,7 +41,7 @@ export default class Holder extends React.Component {
           id={this.props.player + '-offboard'}
         >
           <div className='chips-bottom-align'>
-            {chips}
+            {divs}
           </div>
         </div>
       </div>
