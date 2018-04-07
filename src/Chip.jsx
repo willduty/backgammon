@@ -16,6 +16,7 @@ export default class Chip extends React.Component{
       props['onMouseEnter'] = (() => this.props.onMouseEnter(this.props.parentIndex))
       props['onMouseLeave'] = (() => this.props.onMouseLeave(this.props.parentIndex))
       props['onMouseDown'] = ((e) => this.props.onMouseDown(e, this.props.parentIndex))
+      props['onDoubleClick'] = ((e) => this.props.onDoubleClick(e, this.props.parentIndex))
     }
 
     return (

@@ -14,6 +14,7 @@ export default class Board extends React.Component {
     this.startDrag = this.startDrag.bind(this);
     this.stopDrag = this.stopDrag.bind(this);
     this.dragging = this.dragging.bind(this);
+    this.doFirstAvailableMove = this.doFirstAvailableMove.bind(this);
     this.SQUARE_WIDTH = 51;
 
     this.state = {
@@ -133,6 +134,21 @@ export default class Board extends React.Component {
     }
   }
 
+  doFirstAvailableMove(event, index) {
+    const game = this.state.game;
+    const moves = game.currentPlayerMoves(index);
+    if (moves.length === 1 && !Array.isArray(moves[0])) {
+      game.doMove(index, moves[0]);
+      if (!game.canMove()) {
+        this.props.turnComplete();
+      } else {
+        this.setState({
+          game: game
+        });
+      }
+    }
+  }
+
   renderSquare(i) {
     const game = this.state.game;
     return (<Square
@@ -148,6 +164,7 @@ export default class Board extends React.Component {
       onMouseLeave={this.hideMoves}
       onMouseDown={this.startDrag}
       onMouseUp={this.stopDrag}
+      onDoubleClick={this.doFirstAvailableMove}
       highlight={this.state.highlightTargets.indexOf(i) !== -1}
       hasMoves={game.canMove(i)}
       currentDragTargetIndex={this.state.currentDragTargetIndex}
@@ -166,7 +183,6 @@ export default class Board extends React.Component {
     // Undo button only shown if player is partway through move.
     let undoClass;
     if(game.gameActive()
-      && !this.turnComplete
       && game.currentPlayer === 'dark'
       && game.lastRoll.length > 0
       && game.lastRoll.length !== game.lastInitialRoll.length

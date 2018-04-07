@@ -388,6 +388,7 @@ export default class Game extends React.Component {
             showCover={this.state.startButton || coverText}
             coverText={coverText}
             undoLastMove={this.undoLastMove}
+            turnComplete={this.turnComplete}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
