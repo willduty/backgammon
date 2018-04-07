@@ -11,6 +11,7 @@ export default class Game extends React.Component {
     this.LONG_TIMEOUT = 2000;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
+    this.hideDice = this.hideDice.bind(this);
     this.doDecidingRoll = this.doDecidingRoll.bind(this);
     this.updateGame = this.updateGame.bind(this);
     this.turnComplete = this.turnComplete.bind(this);
@@ -48,7 +49,7 @@ export default class Game extends React.Component {
         addressee + 'Rolling...';
       if (game.gameActive() && !game.currentPlayer) {
         text = this.state.tie ?
-          'OOPS! Tie! Rolling again' :
+          (this.state.showDecision ? 'OOPS! Tie!' : ' Rolling again') :
           'Opening roll...';
       }
     }
@@ -75,16 +76,25 @@ export default class Game extends React.Component {
     return msg;
   }
 
+  hideDice() {
+    this.setState({
+      showDecision: false,
+    });
+    setTimeout(this.doDecidingRoll, this.TIMEOUT);
+  }
+
   // decide who gets opening move
   doDecidingRoll() {
-    this.setState({showDecision: null})
+    this.setState({
+      showDecision: false
+    });
     const roll = this.state.game.decide();
     const tie = roll[0] === roll[1];
     this.setState({
       tie: tie,
       showDecision: roll
     })
-    setTimeout( tie ? this.doDecidingRoll : this.playerRoll, this.LONG_TIMEOUT);
+    setTimeout( tie ? this.hideDice : this.playerRoll, this.LONG_TIMEOUT);
   }
 
   playerRoll() {
