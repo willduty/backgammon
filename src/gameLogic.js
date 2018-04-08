@@ -143,6 +143,10 @@ export default class GameLogic {
     return targets;
   }
 
+  currentPlayerAutomated() {
+    return this.currentPlayer === 'light'
+  }
+
   isBarIndex(index) {
     return index === -1 || index === 24;
   }
