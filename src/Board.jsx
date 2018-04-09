@@ -19,7 +19,6 @@ export default class Board extends React.Component {
     this.state = {
       game: this.props.game,
       highlightTargets: [],
-      board: document.getElementById('draggableArea'),
       currentDragTargetIndex: null,
     }
   };
@@ -51,12 +50,14 @@ export default class Board extends React.Component {
       document.getElementById('bar-holder-' + game.currentPlayer) :
       document.getElementById('square_' + chipIndex);
 
-    const dachips = _.map(dragObjParent.firstChild.children, function(e) {return e.firstChild})
-    const chip = _.find(dachips, function(e) {
+    const chips = _.map(dragObjParent.firstChild.children, function(e) {
+      return e.firstChild
+    });
+    const chip = _.find(chips, function(e) {
       return e && e.className.indexOf('selectable') !== -1;
     });
 
-    const boardRect = document.getElementById('draggableArea').getBoundingClientRect();
+    this.boardRect = document.getElementById('draggableArea').getBoundingClientRect();
 
     this.setState({
       dragObj: chip,
@@ -91,46 +92,37 @@ export default class Board extends React.Component {
   }
 
   dragging(e) {
-    if(this.state.dragObj) {
-      const boardRect = this.state.boardRect || document.getElementById('draggableArea').getBoundingClientRect();
-      const leftBoard = this.state.leftBoard || document.getElementById('left-board').getBoundingClientRect();
-      const rightBoard = this.state.rightBoard || document.getElementById('right-board').getBoundingClientRect();
-      const currOffboard = this.state.currOffboard || document.getElementById(this.state.game.currentPlayer + '-offboard').getBoundingClientRect();
-      const mouseY = Math.floor((e.pageY - boardRect.y) / 300);
+    if (!this.state.dragObj) return;
 
-      let currentSq;
-      if(rightBoard.x < e.pageX && rightBoard.x + rightBoard.width > e.pageX) {
-        if (mouseY < 1) {
-          currentSq = Math.floor((e.pageX - rightBoard.left) / this.SQUARE_WIDTH) + 18;
-        } else {
-          currentSq = Math.floor((rightBoard.right - e.pageX) / this.SQUARE_WIDTH);
-        }
-      } else if (leftBoard.x < e.pageX && leftBoard.x + leftBoard.width > e.pageX) {
-        if (mouseY < 1) {
-          currentSq = Math.floor((e.pageX - leftBoard.left) / this.SQUARE_WIDTH) + 12;
-        } else {
-          currentSq = Math.floor((leftBoard.right - e.pageX) / this.SQUARE_WIDTH) + 6;
-        }
-      } else if (currOffboard.x < e.pageX && currOffboard.x + currOffboard.width > e.pageX) {
-        currentSq = 'off';
-      }
+    const leftBoard = this.leftBoard || document.getElementById('left-board').getBoundingClientRect(),
+      rightBoard = this.rightBoard || document.getElementById('right-board').getBoundingClientRect(),
+      currOffboard = this.currOffboard ||
+        document.getElementById(this.state.game.currentPlayer + '-offboard').getBoundingClientRect(),
+      mouseY = Math.floor((e.pageY - this.boardRect.y) / 300);
 
-      let x = e.pageX - boardRect.x - this.state.dragCursorXOffset;
-      let y = e.pageY - boardRect.y - this.state.dragCursorYOffset;
-
-      let dragObj = this.state.dragObj;
-      dragObj.style.zIndex = 100000;
-      dragObj.style.top = y + 'px';
-      dragObj.style.left = x + 'px';
-
-      this.setState({
-        dragObj: dragObj,
-        boardRect: boardRect,
-        leftBoard: leftBoard,
-        rightBoard: rightBoard,
-        currentDragTargetIndex: currentSq,
-      });
+    let currentSq, upper = (mouseY < 1);
+    if(rightBoard.x < e.pageX && rightBoard.x + rightBoard.width > e.pageX) {
+      const pos = upper ? (e.pageX - rightBoard.left) : (rightBoard.right - e.pageX);
+      currentSq = Math.floor(pos / this.SQUARE_WIDTH) + (upper ? 18 : 0);
+    } else if (leftBoard.x < e.pageX && leftBoard.x + leftBoard.width > e.pageX) {
+      const pos = upper ? (e.pageX - leftBoard.left) : (leftBoard.right - e.pageX);
+      currentSq = Math.floor(pos / this.SQUARE_WIDTH) + (upper ? 12 : 6);
+    } else if (currOffboard.x < e.pageX && currOffboard.x + currOffboard.width > e.pageX) {
+      currentSq = 'off';
     }
+
+    let x = e.pageX - this.boardRect.x - this.state.dragCursorXOffset;
+    let y = e.pageY - this.boardRect.y - this.state.dragCursorYOffset;
+
+    let dragObj = this.state.dragObj;
+    dragObj.style.zIndex = 100000;
+    dragObj.style.left = x + 'px';
+    dragObj.style.top = y + 'px';
+
+    this.setState({
+      dragObj: dragObj,
+      currentDragTargetIndex: currentSq,
+    });
   }
 
   renderSquare(i) {
