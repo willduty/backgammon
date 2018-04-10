@@ -148,17 +148,18 @@ export default class Game extends React.Component {
     }
   }
 
+  // move clicked chip to first available point.
+  // TODO: highlight possible moves to select from
   animatePlayerClick(event, index) {
     const game = this.state.game;
     const moves = game.currentPlayerMoves(index);
-    if (moves.length === 1 && !Array.isArray(moves[0])) {
-      let move = game.doMove(index, moves[0]);
-      if(move) {
-        if (game.currentPlayerHasWon()) {
-          this.completeGame();
-        } else if (move) {
-          this.animateMove(move, game);
-        }
+    let move = moves.sort()[0];
+    move = game.doMove(index, moves[0]);
+    if(move) {
+      if (game.currentPlayerHasWon()) {
+        this.completeGame();
+      } else if (move) {
+        this.animateMove(move, game);
       }
     }
   }
