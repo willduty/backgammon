@@ -3,4 +3,4 @@ Backgammon
 
 Implementation of standard Backgammon in React js.
 
-![gifmovie](back3.gif)
+![gifmovie](public/back3.gif)
