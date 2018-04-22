@@ -372,12 +372,21 @@ export default class Game extends React.Component {
 
   render() {
     // TODO componentize start button or general button
-
+    // TODO figure out better way to preload dice imgs
     const coverText = this.coverText();
 
     return (
       <div className="game">
-        <div className="top-area"></div>
+        <div className="top-area">
+          <div className='images' style={{display: 'none'}}>
+            <img src={require('./images/die1.png')} />
+            <img src={require('./images/die2.png')} />
+            <img src={require('./images/die3.png')} />
+            <img src={require('./images/die4.png')} />
+            <img src={require('./images/die5.png')} />
+            <img src={require('./images/die6.png')} />
+          </div>
+        </div>
         <div className="">
           <Board
             game={this.state.game}
@@ -397,7 +406,6 @@ export default class Game extends React.Component {
             }
             clearDice={this.state.clearDice}
           />
-
         </div>
       </div>
     );
