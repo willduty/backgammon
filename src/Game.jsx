@@ -346,6 +346,7 @@ export default class Game extends React.Component {
         if (game.lastRoll.length) {
           if(!game.canMove()) {
             this.setState({noMoves: true})
+            setTimeout(this.turnComplete, this.TIMEOUT);
           }
         } else {
           setTimeout(this.turnComplete, this.TIMEOUT);
