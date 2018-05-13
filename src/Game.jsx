@@ -2,6 +2,7 @@ import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
+import Cookies from 'universal-cookie';
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -21,6 +22,8 @@ export default class Game extends React.Component {
     this.undoLastMove = this.undoLastMove.bind(this);
     this.animateMove = this.animateMove.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
+    this.DEFAULT_TALLY = {light: 0, dark: 0, target: 15}
+    this.tally = this.DEFAULT_TALLY;
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -29,6 +32,7 @@ export default class Game extends React.Component {
       game: gameLogic,
       tie: false,
       startButton: true,
+      resumeButton: !!this.savedActiveGame(),
       rolling: false,
     }
   }
@@ -56,18 +60,29 @@ export default class Game extends React.Component {
     return text;
   }
 
-  startNew() {
-    var game = this.state.game;
+  startNew(resume) {
+    const game = this.state.game, _this = this;
+    let lastGame;
     game.start();
 
-    window.addEventListener('beforeunload', this.handleUnload);
+    if (resume && (lastGame = this.savedActiveGame())) {
+      game.setGame(lastGame);
+      this.tally = this.savedTally();
+    } else {
+      this.tally = this.DEFAULT_TALLY;
+    }
 
     this.setState({
       game: game,
       startButton: false,
-      rolling: true,
+      rolling: lastGame ? false : true,
     });
-    setTimeout(this.doDecidingRoll, this.TIMEOUT);
+
+    setTimeout(lastGame ? (function() {
+      lastGame.currentPlayer === 'light' && _this.doAutomatedMove();
+    }) : this.doDecidingRoll, this.TIMEOUT);
+
+    window.addEventListener('beforeunload', this.handleUnload);
   }
 
   handleUnload(e) {
@@ -108,6 +123,8 @@ export default class Game extends React.Component {
       rolling: false,
     });
 
+    this.saveGame();
+
     if(!game.canMove()) {
       if (game.lastRoll && game.lastRoll.length) {
         this.setState({noMoves: true})
@@ -141,6 +158,9 @@ export default class Game extends React.Component {
       winner: this.state.game.currentPlayer,
       game: this.state.game,
     });
+
+    this.tally[this.state.game.currentPlayer] ++;
+    this.saveGame();
 
     window.removeEventListener('beforeunload', this.handleUnload);
 
@@ -316,6 +336,37 @@ export default class Game extends React.Component {
     }
   }
 
+  saveGame() {
+    const cookies = new Cookies();
+    cookies.set('backgammon', {
+      current: this.state.game.currentHistoryState(),
+      tally: this.tally,
+    }, { path: '/' });
+  }
+
+  savedActiveGame() {
+    const cookie = this.savedState();
+    if (cookie) {
+      const lastGame = cookie.current;
+      if (lastGame && !lastGame.winner) {
+        return lastGame;
+      }
+    }
+  }
+
+  savedTally() {
+    const cookie = this.savedState();
+    if (cookie) {
+       return cookie.tally;
+    }
+  }
+
+  savedState() {
+    const cookies = new Cookies();
+    var cookie = cookies.get('backgammon');
+    return cookie;
+  }
+
   updateGame(from, to) {
     let game = this.state.game;
     let move = game.doMove(from, to);
@@ -375,6 +426,7 @@ export default class Game extends React.Component {
     // TODO figure out better way to preload dice imgs
     const coverText = this.coverText();
 
+
     return (
       <div className="game">
         <div className="top-area">
@@ -397,13 +449,22 @@ export default class Game extends React.Component {
             showCover={this.state.startButton || coverText}
             coverText={coverText}
             undoLastMove={this.undoLastMove}
+            tally={this.tally}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
                 onClick={() => this.startNew()}>
-                Start Game..
+               {this.state.resumeButton ? 'Start New Game' : 'Start Game..' }
               </div>
             }
+            resumeButton={this.state.resumeButton &&
+              <div
+                className='cover-button'
+                onClick={() => this.startNew(true)}>
+                Resume Game..
+              </div>
+            }
+
             clearDice={this.state.clearDice}
           />
         </div>

@@ -168,7 +168,6 @@ export default class Board extends React.Component {
       undoClass = 'hide';
     }
 
-
     document.body.onmouseup = this.stopDrag;
     document.body.onmousemove = this.dragging;
 
@@ -182,7 +181,9 @@ export default class Board extends React.Component {
       >
         <div className={this.props.showCover ? 'cover' : 'hide'} />
         <div className={this.props.showCover ? 'cover-text' : 'hide'}>
-          {this.props.startButton || this.props.coverText}
+          {this.props.startButton ?
+            [this.props.resumeButton, this.props.startButton]
+            : this.props.coverText}
         </div>
 
         <Dice
@@ -266,12 +267,14 @@ export default class Board extends React.Component {
             pips={game.pips('dark')}
             playerType='dark'
             active={game.currentPlayer === 'dark'}
+            score={this.props.tally.dark + ' / ' + this.props.tally.target}
           />
           <PlayerCard
             playerName='Computer'
             pips={game.pips('light')}
             playerType='light'
             active={game.currentPlayer === 'light'}
+            score={this.props.tally.light + ' / ' + this.props.tally.target}
           />
           <button
             className={undoClass}

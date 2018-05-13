@@ -21,6 +21,7 @@ export default class GameLogic {
       lightOff: 0,
       lastRoll: [], // current state of dice in a turn: changes as the player uses up dice, or undoes moves.
       lastInitialRoll: [], // original state of dice in a turn. does not change until new turn.
+      winner: null,
     };
 
     this.GAME_PROPS = Object.keys(this.STANDARD_OPENING);
@@ -184,9 +185,8 @@ export default class GameLogic {
   }
 
   currentPlayerHasWon() {
-    const allChipsOff = this[this.currentPlayer + 'Off'] === 15,
-      noChipsOnBoard = !Object.keys(this.currentPlayerSpikes()).length;
-    return noChipsOnBoard && allChipsOff;
+    const noChipsOnBoard = !Object.keys(this.currentPlayerSpikes()).length;
+    return noChipsOnBoard;
   }
 
   // Move a current player's chip from -> to and change this.lastRoll to exclude used dice.
@@ -484,5 +484,6 @@ export default class GameLogic {
 
   endGame() {
     this.gameOn = false;
+    this.winner = this.currentPlayer.toString();
   }
 }
