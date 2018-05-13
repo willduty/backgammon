@@ -182,7 +182,7 @@ export default class Board extends React.Component {
         <div className={this.props.showCover ? 'cover' : 'hide'} />
         <div className={this.props.showCover ? 'cover-text' : 'hide'}>
           {this.props.startButton ?
-            [this.props.resumeButton, this.props.startButton]
+            [this.props.nextGameButton, this.props.resumeButton, this.props.startButton]
             : this.props.coverText}
         </div>
 

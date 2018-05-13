@@ -33,6 +33,7 @@ export default class Game extends React.Component {
       tie: false,
       startButton: true,
       resumeButton: !!this.savedActiveGame(),
+      nextGameButton: !this.savedActiveGame() && true,
       rolling: false,
     }
   }
@@ -40,17 +41,17 @@ export default class Game extends React.Component {
   coverText() {
     let text;
     const game = this.state.game;
-    const addressee = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
+    const player = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
 
     if (this.state.winner) {
-      text = addressee + ' has won the game!';
+      text = player + ' has won the game!';
     } else if (this.state.noMoves) {
-      text = addressee + ' has no moves..';
+      text = player + ' has no moves..';
     } else if (this.state.rolling) {
       const decidingRoll = this.state.showDecision;
       text = (decidingRoll) ?
-        (decidingRoll[0] + ', ' + decidingRoll[1] + addressee + 'starts...') :
-        addressee + 'Rolling...';
+        (decidingRoll[0] + ', ' + decidingRoll[1] + player + 'starts...') :
+        player + 'Rolling...';
       if (game.gameActive() && !game.currentPlayer) {
         text = this.state.tie ?
           (this.state.showDecision ? 'OOPS! Tie!' : ' Rolling again') :
@@ -63,14 +64,18 @@ export default class Game extends React.Component {
   startNew(resume) {
     const game = this.state.game, _this = this;
     let lastGame;
+
     game.start();
 
     if (resume && (lastGame = this.savedActiveGame())) {
       game.setGame(lastGame);
-      this.tally = this.savedTally();
-    } else {
-      this.tally = this.DEFAULT_TALLY;
     }
+
+    if (!resume) {
+      this.clearGame();
+    }
+
+    this.tally = this.savedTally();
 
     this.setState({
       game: game,
@@ -154,6 +159,7 @@ export default class Game extends React.Component {
   }
 
   completeGame() {
+    console.log('completeGame...')
     this.setState({
       winner: this.state.game.currentPlayer,
       game: this.state.game,
@@ -336,6 +342,14 @@ export default class Game extends React.Component {
     }
   }
 
+  clearGame() {
+    const cookies = new Cookies();
+    cookies.set('backgammon', {
+      current: null,
+      tally: this.DEFAULT_TALLY,
+    }, { path: '/' });
+  }
+
   saveGame() {
     const cookies = new Cookies();
     cookies.set('backgammon', {
@@ -348,6 +362,7 @@ export default class Game extends React.Component {
     const cookie = this.savedState();
     if (cookie) {
       const lastGame = cookie.current;
+      console.log('savedActiveGame, lastGame-->', lastGame)
       if (lastGame && !lastGame.winner) {
         return lastGame;
       }
@@ -357,7 +372,9 @@ export default class Game extends React.Component {
   savedTally() {
     const cookie = this.savedState();
     if (cookie) {
-       return cookie.tally;
+      return cookie.tally;
+    } else {
+      return this.DEFAULT_TALLY;
     }
   }
 
@@ -464,7 +481,13 @@ export default class Game extends React.Component {
                 Resume Game..
               </div>
             }
-
+            nextGameButton={this.state.nextGameButton &&
+              <div
+                className='cover-button'
+                onClick={() => this.startNew(true)}>
+                Next Game..
+              </div>
+            }
             clearDice={this.state.clearDice}
           />
         </div>
