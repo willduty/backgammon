@@ -1,42 +1,39 @@
 import _ from 'lodash';
 
+export const STANDARD_OPENING = {
+  currentPlayer: null, // either 'dark' or 'light'
+  opponent: null, // opposite of `currentPlayer`
+  dark: {0: 2, 11: 5, 16: 3, 18: 5}, // chip counts for dark player's points. if nothing on point, key is removed.
+  light: {5: 5, 7: 3, 12: 5, 23: 2}, // same as above for light player
+  darkMoves: {}, // key indices for active board points. 0 thru 23 are board points. key '-1' is dark bar.
+  lightMoves: {}, // same for light player. 24 is light bar.
+  darkOff: 0, // count of offboarded chips
+  lightOff: 0,
+  lastRoll: [], // current state of dice in a turn: changes as the player uses up dice, or undoes moves.
+  lastInitialRoll: [], // original state of dice in a turn. does not change until new turn.
+  winner: null,
+};
+
+export const BLANK_GAME = {
+  currentPlayer: null,
+  dark: {},
+  light: {},
+};
+
 export default class GameLogic {
-
   constructor() {
-    this.BLANK_GAME = {
-      currentPlayer: null,
-      dark: {},
-      light: {},
-    };
-
-    // standard initial game
-    this.STANDARD_OPENING = {
-      currentPlayer: null, // either 'dark' or 'light'
-      opponent: null, // opposite of `currentPlayer`
-      dark: {0: 2, 11: 5, 16: 3, 18: 5}, // chip counts for dark player's points. if nothing on point, key is removed.
-      light: {5: 5, 7: 3, 12: 5, 23: 2}, // same as above for light player
-      darkMoves: {}, // key indices for active board points. 0 thru 23 are board points. key '-1' is dark bar.
-      lightMoves: {}, // same for light player. 24 is light bar.
-      darkOff: 0, // count of offboarded chips
-      lightOff: 0,
-      lastRoll: [], // current state of dice in a turn: changes as the player uses up dice, or undoes moves.
-      lastInitialRoll: [], // original state of dice in a turn. does not change until new turn.
-      winner: null,
-    };
-
-    this.GAME_PROPS = Object.keys(this.STANDARD_OPENING);
+    this.GAME_PROPS = Object.keys(STANDARD_OPENING);
     this.history = [];
-
     this.gameOn = false;
     this.lastRoll = null;
-    this.setGame(this.BLANK_GAME);
+    this.setGame(BLANK_GAME);
   }
 
   // Sets board with standard chips in place.
   // Does not set currentPlayer... call decide() to set who starts.
   start() {
     this.gameOn = true;
-    this.setGame(this.STANDARD_OPENING);
+    this.setGame(STANDARD_OPENING);
     this.snapHistory();
   }
 
@@ -486,4 +483,4 @@ export default class GameLogic {
     this.gameOn = false;
     this.winner = this.currentPlayer.toString();
   }
-}
+};
