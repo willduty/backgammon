@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
-import Cookies from 'universal-cookie';
+import { clearGame, saveGame, savedActiveGame, savedTally, savedState } from './helpers/gamesHelper.js'
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -22,8 +22,6 @@ export default class Game extends React.Component {
     this.undoLastMove = this.undoLastMove.bind(this);
     this.animateMove = this.animateMove.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
-    this.DEFAULT_TALLY = {light: 0, dark: 0, target: 15}
-    this.tally = this.DEFAULT_TALLY;
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -32,8 +30,8 @@ export default class Game extends React.Component {
       game: gameLogic,
       tie: false,
       startButton: true,
-      resumeButton: !!this.savedActiveGame(),
-      nextGameButton: !this.savedActiveGame() && true,
+      resumeButton: !!savedActiveGame(),
+      nextGameButton: !savedActiveGame() && true,
       rolling: false,
     }
   }
@@ -67,15 +65,15 @@ export default class Game extends React.Component {
 
     game.start();
 
-    if (resume && (lastGame = this.savedActiveGame())) {
+    if (resume && (lastGame = savedActiveGame())) {
       game.setGame(lastGame);
     }
 
     if (!resume) {
-      this.clearGame();
+      clearGame();
     }
 
-    this.tally = this.savedTally();
+    this.tally = savedTally();
 
     this.setState({
       game: game,
@@ -128,7 +126,7 @@ export default class Game extends React.Component {
       rolling: false,
     });
 
-    this.saveGame();
+    saveGame(game.currentHistoryState());
 
     if(!game.canMove()) {
       if (game.lastRoll && game.lastRoll.length) {
@@ -159,20 +157,28 @@ export default class Game extends React.Component {
   }
 
   completeGame() {
-    console.log('completeGame...')
     this.setState({
       winner: this.state.game.currentPlayer,
       game: this.state.game,
     });
 
     this.tally[this.state.game.currentPlayer] ++;
-    this.saveGame();
+    saveGame(this.state.game.currentHistoryState());
+
+    const tally = this.tally,
+      target = tally.target,
+      darkWon = tally.dark >= target,
+      lightWon = tally.light >= target;
+
+    if (darkWon || lightWon) {
+      alert(darkWon ? 'Player Wins!' : 'Computer Wins!');
+      this.tally = this.DEFAULT_TALLY;
+      saveGame(this.state.game.currentHistoryState());
+    }
 
     window.removeEventListener('beforeunload', this.handleUnload);
-
     setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
   }
-
 
   // TODO move all this anim stuff to a util file
   // TODO make animation optional
@@ -342,47 +348,7 @@ export default class Game extends React.Component {
     }
   }
 
-  clearGame() {
-    const cookies = new Cookies();
-    cookies.set('backgammon', {
-      current: null,
-      tally: this.DEFAULT_TALLY,
-    }, { path: '/' });
-  }
 
-  saveGame() {
-    const cookies = new Cookies();
-    cookies.set('backgammon', {
-      current: this.state.game.currentHistoryState(),
-      tally: this.tally,
-    }, { path: '/' });
-  }
-
-  savedActiveGame() {
-    const cookie = this.savedState();
-    if (cookie) {
-      const lastGame = cookie.current;
-      console.log('savedActiveGame, lastGame-->', lastGame)
-      if (lastGame && !lastGame.winner) {
-        return lastGame;
-      }
-    }
-  }
-
-  savedTally() {
-    const cookie = this.savedState();
-    if (cookie) {
-      return cookie.tally;
-    } else {
-      return this.DEFAULT_TALLY;
-    }
-  }
-
-  savedState() {
-    const cookies = new Cookies();
-    var cookie = cookies.get('backgammon');
-    return cookie;
-  }
 
   updateGame(from, to) {
     let game = this.state.game;
@@ -466,7 +432,7 @@ export default class Game extends React.Component {
             showCover={this.state.startButton || coverText}
             coverText={coverText}
             undoLastMove={this.undoLastMove}
-            tally={this.tally}
+            tally={savedTally()}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
