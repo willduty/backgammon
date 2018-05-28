@@ -22,6 +22,7 @@ export default class Bar extends React.Component {
           onMouseEnter={this.props.onMouseEnter}
           onMouseLeave={this.props.onMouseLeave}
           onMouseDown={this.props.onMouseDown}
+          onDoubleClick={this.props.onDoubleClick}
         />
       )
     }

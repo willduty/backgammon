@@ -18,10 +18,13 @@ export default class Game extends React.Component {
     this.turnComplete = this.turnComplete.bind(this);
     this.completeGame = this.completeGame.bind(this);
     this.doAutomatedMove = this.doAutomatedMove.bind(this);
+    this.animatePlayerClick = this.animatePlayerClick.bind(this);
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
     this.animateMove = this.animateMove.bind(this);
+    this.afterAnimation = this.afterAnimation.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
+    this.animationInProgress = false;
 
     // TODO should probably do this in startNew()
     let gameLogic = new GameLogic();
@@ -138,6 +141,15 @@ export default class Game extends React.Component {
     }
   }
 
+  afterAnimation() {
+    const _this = this;
+    return new Promise(function(resolve, reject) {
+      if(!_this.animationInProgress) {
+        resolve();
+      }
+    });
+  }
+
   doAutomatedMove() {
     const game = this.state.game;
     if (game.currentPlayerHasWon()) {
@@ -152,6 +164,22 @@ export default class Game extends React.Component {
           this.setState({noMoves: true})
         }
         setTimeout(this.turnComplete, this.TIMEOUT);
+      }
+    }
+  }
+
+  // move clicked chip to first available point.
+  // TODO: highlight possible moves to select from
+  animatePlayerClick(event, index) {
+    const game = this.state.game;
+    const moves = game.currentPlayerMoves(index);
+    let move = moves.sort()[0];
+    move = game.doMove(index, moves[0]);
+    if(move) {
+      if (game.currentPlayerHasWon()) {
+        this.completeGame();
+      } else if (move) {
+        this.animateMove(move, game);
       }
     }
   }
@@ -236,12 +264,8 @@ export default class Game extends React.Component {
   }
 
   // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
-  buildPath(startIndex, targetIndex, isStart, isBarChip) {
-
-    // START POSITION
+  buildPath(startIndex, targetIndex, isStart) {
     const start = this.findAnimationTarget(startIndex, isStart);
-
-    // END POSITION
     const end = this.findAnimationTarget(targetIndex, false);
     const diffX = end[0] - start[0];
     const diffY = end[1] - start[1];
@@ -260,91 +284,109 @@ export default class Game extends React.Component {
     return path;
   }
 
+  // Returns an array of animation steps for an entire move, including blots moving to bar.
+  // Each array item is either an animation step (hash of position and chip)
+  // or a directive string like 'highlight' or 'pause'.
+  buildPaths(chip, startIndex, moveSummary) {
+    const move = moveSummary.move
+    let pathPoints = _.flatten([move[0], move[1]]);
+    let subMoves = [];
+    const _this = this;
+    for(var n = 0; n < pathPoints.length - 1; n++) {
+      subMoves.push([pathPoints[n], pathPoints[n + 1]]);
+    }
+
+    let path = ['highlight'];
+    const isBarChip = startIndex === 24 || startIndex === -1;
+
+    _.each(subMoves, function(fromTo) {
+      let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
+
+      pathpoints = pathpoints.map(function(arr) {
+        return {position: arr.slice(), chip: chip};
+      }).slice();
+
+      path  = _.concat(path, pathpoints);
+      path  = _.concat(path, ['pause']);
+
+      _this.lastBlotIndex = null;
+
+      let blottedChip;
+      // if a blot occurs, animate blotted chip to bar
+      if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
+        const barIndex = _this.state.game.currentPlayer === 'dark' ? 24 : -1;
+        pathpoints = _this.buildPath(fromTo[1], barIndex , true);
+        const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
+
+        // TODO: bad, render should take care of chip position...
+        if (!_this.lastBlotIndex) {
+          _this.lastBlotIndex = fromTo[1];
+        }
+
+        blottedChip = blotContainer.firstChild;
+
+        pathpoints = pathpoints.map(function(arr) {
+          return {position: arr.slice(), chip: blottedChip};
+        });
+
+        path  = _.concat(path, pathpoints);
+        path  = _.concat(path, ['pause']);
+      }
+    });
+    return path;
+  }
+
   animateMove(moveSummary, game, path, chip) {
     const move = moveSummary.move;
     const _this = this;
     const startIndex = move[0];
+    chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
+    path = path || this.buildPaths(chip, startIndex, moveSummary);
 
-    // TODO move to function buildAllPaths
-    if(!path) {
-      chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
-      let pathPoints = _.flatten([move[0], move[1]]);
-      let subMoves = [];
-      for(var n = 0; n < pathPoints.length - 1; n++) {
-        subMoves.push([pathPoints[n], pathPoints[n + 1]]);
+    this.animationInProgress = true;
+    if (path.length) {
+      let FRAME_RATE, frameInfo = path[0];
+      if(frameInfo === 'highlight') {
+        FRAME_RATE = 100;
+        chip.className = 'chip selectable-light';
+      } else if (frameInfo === 'pause') {
+        FRAME_RATE = 200;
+      } else {
+        FRAME_RATE = 15;
+        frameInfo.chip.style.left = frameInfo.position[0] + 'px';
+        frameInfo.chip.style.top = frameInfo.position[1] + 'px';
+        frameInfo.chip.style.zIndex = 1000000;
       }
 
-      path = ['highlight'];
-      const isBarChip = startIndex === 24 || startIndex === -1;
+      path = path.slice(1);
+      setTimeout(function() {
+        _this.animateMove(moveSummary, game, path, frameInfo.chip);
+      }, FRAME_RATE);
+    } else {
+      this.setState({game: this.state.game});
 
-      _.each(subMoves, function(fromTo) {
-        let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0], isBarChip);
+      if(this.lastBlotIndex || this.lastBlotIndex === 0) {
+        const box = document.getElementById('box_' + this.lastBlotIndex + '_0');
+        const chip = box.firstChild;
+        chip.style.left = box.style.left;
+        chip.style.top = box.style.top;
+        chip.style.zIndex = box.style.zIndex;
+        this.lastBlotIndex = null;
+      }
 
-        pathpoints = pathpoints.map(function(arr) {
-          return {position: arr.slice(), chip: chip};
-        }).slice();
+      this.animationInProgress = false;
 
-        path  = _.concat(path, pathpoints);
-        path  = _.concat(path, ['pause']);
-
-        _this.lastBlotIndex = null;
-
-        let blottedChip;
-        // if a blot occurs, animate blotted chip to bar
-        if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
-          pathpoints = _this.buildPath(fromTo[1], -1, true, true);
-          const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
-
-          // TODO: bad, render should take care of chip position...
-          if (!_this.lastBlotIndex) {
-            _this.lastBlotIndex = fromTo[1];
-          }
-
-          blottedChip = blotContainer.firstChild;
-
-          pathpoints = pathpoints.map(function(arr) {
-            return {position: arr.slice(), chip: blottedChip};
-          });
-
-          path  = _.concat(path, pathpoints);
-          path  = _.concat(path, ['pause']);
-        }
-      });
-    }
-
-    if (path) {
-      if (path.length) {
-        let FRAME_RATE, frameInfo = path[0];
-
-        if(frameInfo === 'highlight') {
-          FRAME_RATE = 100;
-          chip.className = 'chip selectable-light';
-        } else if (frameInfo === 'pause') {
-          FRAME_RATE = 200;
-        } else {
-          FRAME_RATE = 15;
-          frameInfo.chip.style.left = frameInfo.position[0] + 'px';
-          frameInfo.chip.style.top = frameInfo.position[1] + 'px';
-          frameInfo.chip.style.zIndex = 1000000;
-        }
-
-        path = path.slice(1);
-        setTimeout(function() {
-          _this.animateMove(moveSummary, game, path, frameInfo.chip);
-        }, FRAME_RATE);
+      if (game.currentPlayerAutomated()) {
+        this.doAutomatedMove();
       } else {
-
-        _this.setState({game: this.state.game});
-
-        if(_this.lastBlotIndex || _this.lastBlotIndex === 0) {
-            const box = document.getElementById('box_' + _this.lastBlotIndex + '_0');
-            const chip = box.firstChild;
-            chip.style.left = box.style.left;
-            chip.style.top = box.style.top;
-            chip.style.zIndex = box.style.zIndex;
-           _this.lastBlotIndex = null;
-         }
-        _this.doAutomatedMove();
+        if (game.lastRoll.length) {
+          if(!game.canMove()) {
+            this.setState({noMoves: true})
+            setTimeout(this.turnComplete, this.TIMEOUT);
+          }
+        } else {
+          setTimeout(this.turnComplete, this.TIMEOUT);
+        }
       }
     }
   }
@@ -434,6 +476,9 @@ export default class Game extends React.Component {
             coverText={coverText}
             undoLastMove={this.undoLastMove}
             tally={savedTally()}
+            turnComplete={this.turnComplete}
+            animatePlayerClick={this.animatePlayerClick}
+            afterAnimation={this.afterAnimation}
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
