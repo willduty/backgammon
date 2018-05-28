@@ -163,7 +163,7 @@ export default class Game extends React.Component {
     });
 
     this.tally[this.state.game.currentPlayer] ++;
-    saveGame(this.state.game.currentHistoryState());
+    saveGame(this.state.game.currentHistoryState(), this.tally);
 
     const tally = this.tally,
       target = tally.target,
@@ -171,7 +171,8 @@ export default class Game extends React.Component {
       lightWon = tally.light >= target;
 
     if (darkWon || lightWon) {
-      alert(darkWon ? 'Player Wins!' : 'Computer Wins!');
+      // TODO implement series winner screen
+      alert(darkWon ? 'Player Wins Series!' : 'Computer Wins Series!');
       this.tally = this.DEFAULT_TALLY;
       saveGame(this.state.game.currentHistoryState());
     }
@@ -440,7 +441,7 @@ export default class Game extends React.Component {
                {this.state.resumeButton ? 'Start New Game' : 'Start Game..' }
               </div>
             }
-            resumeButton={this.state.resumeButton &&
+            resumeButton={!this.state.nextGameButton && this.state.resumeButton &&
               <div
                 className='cover-button'
                 onClick={() => this.startNew(true)}>

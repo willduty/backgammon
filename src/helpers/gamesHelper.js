@@ -6,7 +6,7 @@ export const clearGame = () => {
   const cookies = new Cookies();
   cookies.set('backgammon', {
     current: null,
-    tally: this.DEFAULT_TALLY,
+    tally: DEFAULT_TALLY,
   }, { path: '/' });
 }
 
@@ -33,7 +33,7 @@ export const savedTally = () => {
   if (cookie) {
     return cookie.tally || DEFAULT_TALLY;
   } else {
-    return this.DEFAULT_TALLY;
+    return DEFAULT_TALLY;
   }
 }
 
