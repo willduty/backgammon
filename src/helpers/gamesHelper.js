@@ -35,10 +35,20 @@ export const savedTally = () => {
   } else {
     return DEFAULT_TALLY;
   }
+};
+
+export const seriesComplete = () => {
+  const target = savedTally().target;
+  return (savedTally().light >= target) || (savedTally().dark >= target)
 }
+
+export const seriesInProgress = () => {
+  const target = savedTally().target;
+  return savedTally().light > 0 || savedTally().dark > 0 || seriesComplete();
+};
 
 export const savedState = () => {
   const cookies = new Cookies();
   var cookie = cookies.get('backgammon');
   return cookie;
-}
+};

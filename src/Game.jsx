@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
-import { clearGame, saveGame, savedActiveGame, savedTally, savedState } from './helpers/gamesHelper.js'
+import { clearGame, saveGame, savedActiveGame, savedTally, savedState, seriesInProgress } from './helpers/gamesHelper.js'
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -34,7 +34,7 @@ export default class Game extends React.Component {
       tie: false,
       startButton: true,
       resumeButton: !!savedActiveGame(),
-      nextGameButton: !savedActiveGame() && true,
+      nextGameButton: !savedActiveGame() && seriesInProgress(),
       rolling: false,
     }
   }
@@ -185,10 +185,6 @@ export default class Game extends React.Component {
   }
 
   completeGame() {
-    this.setState({
-      winner: this.state.game.currentPlayer,
-      game: this.state.game,
-    });
 
     this.tally[this.state.game.currentPlayer] ++;
     saveGame(this.state.game.currentHistoryState(), this.tally);
@@ -204,6 +200,12 @@ export default class Game extends React.Component {
       this.tally = this.DEFAULT_TALLY;
       saveGame(this.state.game.currentHistoryState());
     }
+
+    this.setState({
+      winner: this.state.game.currentPlayer,
+      game: this.state.game,
+      nextGameButton: !savedActiveGame() && seriesInProgress(),
+    });
 
     window.removeEventListener('beforeunload', this.handleUnload);
     setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
@@ -448,10 +450,9 @@ export default class Game extends React.Component {
   }
 
   render() {
-    // TODO componentize start button or general button
+    // TODO componentize buttons
     // TODO figure out better way to preload dice imgs
     const coverText = this.coverText();
-
 
     return (
       <div className="game">
@@ -479,6 +480,7 @@ export default class Game extends React.Component {
             turnComplete={this.turnComplete}
             animatePlayerClick={this.animatePlayerClick}
             afterAnimation={this.afterAnimation}
+
             startButton={this.state.startButton &&
               <div
                 className='cover-button'
@@ -500,6 +502,7 @@ export default class Game extends React.Component {
                 Next Game..
               </div>
             }
+
             clearDice={this.state.clearDice}
           />
         </div>
