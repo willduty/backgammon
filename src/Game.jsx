@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
-import { clearGame, saveGame, savedActiveGame, savedTally, savedState, seriesInProgress } from './helpers/gamesHelper.js'
+import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './helpers/gamesHelper.js'
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -393,8 +393,6 @@ export default class Game extends React.Component {
     }
   }
 
-
-
   updateGame(from, to) {
     let game = this.state.game;
     let move = game.doMove(from, to);
@@ -450,7 +448,6 @@ export default class Game extends React.Component {
   }
 
   render() {
-    // TODO componentize buttons
     // TODO figure out better way to preload dice imgs
     const coverText = this.coverText();
 
@@ -480,30 +477,11 @@ export default class Game extends React.Component {
             turnComplete={this.turnComplete}
             animatePlayerClick={this.animatePlayerClick}
             afterAnimation={this.afterAnimation}
-
-            startButton={this.state.startButton &&
-              <div
-                className='cover-button'
-                onClick={() => this.startNew()}>
-               {this.state.resumeButton ? 'Start New Game' : 'Start Game..' }
-              </div>
-            }
-            resumeButton={!this.state.nextGameButton && this.state.resumeButton &&
-              <div
-                className='cover-button'
-                onClick={() => this.startNew(true)}>
-                Resume Game..
-              </div>
-            }
-            nextGameButton={this.state.nextGameButton &&
-              <div
-                className='cover-button'
-                onClick={() => this.startNew(true)}>
-                Next Game..
-              </div>
-            }
-
             clearDice={this.state.clearDice}
+            handleStartGame={this.startNew}
+            startButton={this.state.startButton}
+            nextGameButton={this.state.nextGameButton}
+            resumeButton={this.state.resumeButton}
           />
         </div>
       </div>

@@ -177,19 +177,43 @@ export default class Board extends React.Component {
     document.body.onmouseup = this.stopDrag;
     document.body.onmousemove = this.dragging;
 
+    // TODO componentize buttons
+
     return (
       <div
         className='board'
         id='board'
         onContextMenu={function(e) {
           e.preventDefault();
-          }}
+        }}
       >
-        <div className={this.props.showCover ? 'cover' : 'hide'} />
-        <div className={this.props.showCover ? 'cover-text' : 'hide'}>
-          {this.props.startButton ?
-            [this.props.nextGameButton, this.props.resumeButton, this.props.startButton]
-            : this.props.coverText}
+      <div className={this.props.showCover ? 'cover' : 'hide'} />
+      <div className={this.props.showCover ? 'cover-text' : 'hide'}>
+        {this.props.startButton ?
+          [
+            (!this.props.nextGameButton && this.props.resumeButton &&
+            <div
+              className='cover-button'
+              onClick={() => this.props.handleStartGame(true)}>
+              Resume Game..
+            </div>
+            ),
+            (this.props.nextGameButton &&
+            <div
+              className='cover-button'
+              onClick={() => this.props.handleStartGame(true)}>
+              Next Game..
+            </div>
+            ),
+            (this.props.startButton &&
+            <div
+              className='cover-button'
+              onClick={() => this.props.handleStartGame()}>
+              {(this.props.resumeButton || this.props.nextGameButton) ? 'Start New Series' : 'Start Game..' }
+            </div>
+            ),
+          ]
+          : this.props.coverText}
         </div>
 
         <Dice
