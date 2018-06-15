@@ -43,7 +43,6 @@ export const seriesComplete = () => {
 }
 
 export const seriesInProgress = () => {
-  const target = savedTally().target;
   return savedTally().light > 0 || savedTally().dark > 0 || seriesComplete();
 };
 

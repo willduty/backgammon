@@ -2,9 +2,6 @@ import React from 'react';
 import Chip from './Chip';
 
 export default class Square extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   shouldComponentUpdate(nextProps, nextState) {
     const chipsUpdated = this.props.chips.dark !== nextProps.chips.dark ||

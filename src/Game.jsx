@@ -299,7 +299,6 @@ export default class Game extends React.Component {
     }
 
     let path = ['highlight'];
-    const isBarChip = startIndex === 24 || startIndex === -1;
 
     _.each(subMoves, function(fromTo) {
       let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
@@ -455,12 +454,12 @@ export default class Game extends React.Component {
       <div className="game">
         <div className="top-area">
           <div className='images' style={{display: 'none'}}>
-            <img src={require('./images/die1.png')} />
-            <img src={require('./images/die2.png')} />
-            <img src={require('./images/die3.png')} />
-            <img src={require('./images/die4.png')} />
-            <img src={require('./images/die5.png')} />
-            <img src={require('./images/die6.png')} />
+            <img src={require('./images/die1.png')} alt='' />
+            <img src={require('./images/die2.png')} alt='' />
+            <img src={require('./images/die3.png')} alt='' />
+            <img src={require('./images/die4.png')} alt='' />
+            <img src={require('./images/die5.png')} alt='' />
+            <img src={require('./images/die6.png')} alt='' />
           </div>
         </div>
         <div className="">

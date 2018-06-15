@@ -194,21 +194,24 @@ export default class Board extends React.Component {
             (!this.props.nextGameButton && this.props.resumeButton &&
             <div
               className='cover-button'
-              onClick={() => this.props.handleStartGame(true)}>
+              onClick={() => this.props.handleStartGame(true)}
+              key='resume-button'>
               Resume Game..
             </div>
             ),
             (this.props.nextGameButton &&
             <div
               className='cover-button'
-              onClick={() => this.props.handleStartGame(true)}>
+              onClick={() => this.props.handleStartGame(true)}
+              key='next-game-button'>
               Next Game..
             </div>
             ),
             (this.props.startButton &&
             <div
               className='cover-button'
-              onClick={() => this.props.handleStartGame()}>
+              onClick={() => this.props.handleStartGame()}
+              key='start-game-button'>
               {(this.props.resumeButton || this.props.nextGameButton) ? 'Start New Series' : 'Start Game..' }
             </div>
             ),

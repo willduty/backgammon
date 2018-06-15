@@ -2,10 +2,6 @@ import React from 'react';
 
 export default class Holder extends React.Component {
 
-  constructor(props) {
-    super(props) 
-  }
-
   render() {
     let className = ['chips'];
     if (this.props.isDropTarget) {
@@ -16,13 +12,13 @@ export default class Holder extends React.Component {
     className = className.join(' ');
 
     // side holder chips
-    let chips = [];
-    for (var i = 0; i < this.props.count; i++) {
+    let chips = [], i;
+    for (i = 0; i < this.props.count; i++) {
       chips.push(<div className='off-chip' key={i}></div>)
     }
 
     const divs = []
-    for (var i = 0; i < 15; i++) {
+    for (i = 0; i < 15; i++) {
       const box =
         <div
           id={'box_off_' + this.props.player + '_' + i}
