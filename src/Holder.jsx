@@ -1,5 +1,5 @@
 import React from 'react';
-import { PLAYER_CHIP_COUNT } from './helpers/constants.js'
+import { PLAYER_CHIP_COUNT } from './util/constants.js'
 
 export default class Holder extends React.Component {
 

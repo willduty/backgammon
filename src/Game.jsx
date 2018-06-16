@@ -2,8 +2,8 @@ import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
-import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './helpers/gamesHelper.js'
-import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './helpers/constants.js'
+import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './util/gamesHelper.js'
+import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './util/constants.js'
 
 export default class Game extends React.Component {
   constructor(props) {

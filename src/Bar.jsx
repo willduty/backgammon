@@ -1,6 +1,6 @@
 import React from 'react';
 import Chip from './Chip';
-import { PLAYER_CHIP_COUNT } from './helpers/constants.js'
+import { PLAYER_CHIP_COUNT } from './util/constants.js'
 
 export default class Bar extends React.Component {
   constructor(props) {
