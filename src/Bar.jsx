@@ -1,5 +1,6 @@
 import React from 'react';
 import Chip from './Chip';
+import { PLAYER_CHIP_COUNT } from './helpers/constants.js'
 
 export default class Bar extends React.Component {
   constructor(props) {
@@ -28,7 +29,7 @@ export default class Bar extends React.Component {
     }
 
     const divs = [];
-    for (var i=0; i<15; i++) {
+    for (var i=0; i < PLAYER_CHIP_COUNT; i++) {
       const box =
         <div
           id={'box_' + parentIndex + '_' + i}

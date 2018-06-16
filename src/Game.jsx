@@ -3,13 +3,11 @@ import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
 import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './helpers/gamesHelper.js'
+import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './helpers/constants.js'
 
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
-    this.TIMEOUT = 1000;
-    this.SHORT_TIMEOUT = 500;
-    this.LONG_TIMEOUT = 2000;
     this.startNew = this.startNew.bind(this);
     this.playerRoll = this.playerRoll.bind(this);
     this.hideDice = this.hideDice.bind(this);
@@ -42,7 +40,7 @@ export default class Game extends React.Component {
   coverText() {
     let text;
     const game = this.state.game;
-    const player = (game.currentPlayer === 'dark') ? ' Player ' : ' Computer ';
+    const player = this.currentPlayerDark() ? ' Player ' : ' Computer ';
 
     if (this.state.winner) {
       text = player + ' has won the game!';
@@ -60,6 +58,10 @@ export default class Game extends React.Component {
       }
     }
     return text;
+  }
+
+  currentPlayerDark() {
+    return this.state.game && this.state.game.currentPlayer === 'dark';
   }
 
   startNew(resume) {
@@ -86,7 +88,7 @@ export default class Game extends React.Component {
 
     setTimeout(lastGame ? (function() {
       lastGame.currentPlayer === 'light' && _this.doAutomatedMove();
-    }) : this.doDecidingRoll, this.TIMEOUT);
+    }) : this.doDecidingRoll, TIMEOUT);
 
     window.addEventListener('beforeunload', this.handleUnload);
   }
@@ -101,7 +103,7 @@ export default class Game extends React.Component {
     this.setState({
       showDecision: false,
     });
-    setTimeout(this.doDecidingRoll, this.TIMEOUT);
+    setTimeout(this.doDecidingRoll, TIMEOUT);
   }
 
   // decide who gets opening move
@@ -115,7 +117,7 @@ export default class Game extends React.Component {
       tie: tie,
       showDecision: roll
     })
-    setTimeout( tie ? this.hideDice : this.playerRoll, this.LONG_TIMEOUT);
+    setTimeout( tie ? this.hideDice : this.playerRoll, LONG_TIMEOUT);
   }
 
   playerRoll() {
@@ -135,9 +137,9 @@ export default class Game extends React.Component {
       if (game.lastRoll && game.lastRoll.length) {
         this.setState({noMoves: true})
       }
-      setTimeout(this.turnComplete, this.TIMEOUT);
+      setTimeout(this.turnComplete, TIMEOUT);
     } else if (game.currentPlayer === 'light') {
-      setTimeout(this.doAutomatedMove, this.SHORT_TIMEOUT);
+      setTimeout(this.doAutomatedMove, SHORT_TIMEOUT);
     }
   }
 
@@ -163,7 +165,7 @@ export default class Game extends React.Component {
         if (game.lastRoll && game.lastRoll.length) {
           this.setState({noMoves: true})
         }
-        setTimeout(this.turnComplete, this.TIMEOUT);
+        setTimeout(this.turnComplete, TIMEOUT);
       }
     }
   }
@@ -208,7 +210,7 @@ export default class Game extends React.Component {
     });
 
     window.removeEventListener('beforeunload', this.handleUnload);
-    setTimeout(this.showGameOptions, this.LONG_TIMEOUT);
+    setTimeout(this.showGameOptions, LONG_TIMEOUT);
   }
 
   // TODO move all this anim stuff to a util file
@@ -315,7 +317,7 @@ export default class Game extends React.Component {
       let blottedChip;
       // if a blot occurs, animate blotted chip to bar
       if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
-        const barIndex = _this.state.game.currentPlayer === 'dark' ? 24 : -1;
+        const barIndex = _this.currentPlayerDark() ? 24 : -1;
         pathpoints = _this.buildPath(fromTo[1], barIndex , true);
         const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
 
@@ -383,10 +385,10 @@ export default class Game extends React.Component {
         if (game.lastRoll.length) {
           if(!game.canMove()) {
             this.setState({noMoves: true})
-            setTimeout(this.turnComplete, this.TIMEOUT);
+            setTimeout(this.turnComplete, TIMEOUT);
           }
         } else {
-          setTimeout(this.turnComplete, this.TIMEOUT);
+          setTimeout(this.turnComplete, TIMEOUT);
         }
       }
     }
@@ -396,7 +398,7 @@ export default class Game extends React.Component {
     let game = this.state.game;
     let move = game.doMove(from, to);
     if(move) {
-      if (game.currentPlayer === 'dark' && game.currentPlayerHasWon()) {
+      if (this.currentPlayerDark() && game.currentPlayerHasWon()) {
         this.completeGame();
       } else if (game.currentPlayer === 'light' && move) {
         this.animateMove(move, game);
@@ -411,8 +413,8 @@ export default class Game extends React.Component {
               game: game,
             })
           }
-          setTimeout(_this.turnComplete, _this.TIMEOUT);
-        }, this.SHORT_TIMEOUT);
+          setTimeout(_this.turnComplete, TIMEOUT);
+        }, SHORT_TIMEOUT);
       }
     } else {
       this.setState({game: game})
@@ -430,7 +432,7 @@ export default class Game extends React.Component {
       rolling: true,
     });
 
-    setTimeout(this.playerRoll, this.TIMEOUT);
+    setTimeout(this.playerRoll, TIMEOUT);
   }
 
   showGameOptions() {

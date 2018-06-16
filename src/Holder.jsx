@@ -1,4 +1,5 @@
 import React from 'react';
+import { PLAYER_CHIP_COUNT } from './helpers/constants.js'
 
 export default class Holder extends React.Component {
 
@@ -18,7 +19,7 @@ export default class Holder extends React.Component {
     }
 
     const divs = []
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < PLAYER_CHIP_COUNT; i++) {
       const box =
         <div
           id={'box_off_' + this.props.player + '_' + i}

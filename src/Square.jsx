@@ -1,5 +1,6 @@
 import React from 'react';
 import Chip from './Chip';
+export const OVERFLOW_BOX_COUNT = 7;
 
 export default class Square extends React.Component {
 
@@ -55,8 +56,8 @@ export default class Square extends React.Component {
     chips = chips.concat(this.makeChips(this.props.chips.light, 'chip_light'));
 
     let count, className;
-    if (chips.length < 7) {
-      count = 7;
+    if (chips.length < OVERFLOW_BOX_COUNT) {
+      count = OVERFLOW_BOX_COUNT;
       className = 'box box1';
     } else {
       count = chips.length + 1;
