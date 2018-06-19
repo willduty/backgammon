@@ -3,6 +3,7 @@ import Board from './Board';
 import GameLogic from './gameLogic.js';
 import _ from 'lodash';
 import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './util/gamesHelper.js'
+import ChipAnimation from './util/animation.js'
 import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './util/constants.js'
 
 export default class Game extends React.Component {
@@ -19,7 +20,6 @@ export default class Game extends React.Component {
     this.animatePlayerClick = this.animatePlayerClick.bind(this);
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
-    this.animateMove = this.animateMove.bind(this);
     this.afterAnimation = this.afterAnimation.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
     this.animationInProgress = false;
@@ -213,195 +213,33 @@ export default class Game extends React.Component {
     setTimeout(this.showGameOptions, LONG_TIMEOUT);
   }
 
-  // TODO move all this anim stuff to a util file
   // TODO make animation optional
-
-  // returns dom element where chips can be placed, based on position index.
-  // this will be either a point, a spot on the center bar, or an offboard chip holder.
-  findContainer(index) {
-    let id;
-    if(index > -1 && index < 24) {
-      id = 'square_' + index;
-    } else if (index === -1) {
-      id = 'bar-holder-dark';
-    } else if (index === 24) {
-      id = 'bar-holder-light';
-    } else if (index === 'off') {
-      id = 'light-offboard';
-    }
-    return document.getElementById(id);
-  }
-
-  findAnimationChipBox(targetIndex, isStart) {
-    const targetContainer = this.findContainer(targetIndex);
-    let boxIds = [];
-    const off = (targetIndex === 'off') ? (this.state.game.currentPlayer + '_') : '';
-    for(let i = 0; i < targetContainer.firstChild.children.length; i++) {
-      boxIds.push('box_' + targetIndex + '_' + (off) + i);
-    }
-
-    const _this = this;
-    let lastBoxIndex = _.findLastIndex(boxIds, function(boxId) {
-      const chips = document.getElementById(boxId).children;
-      if (targetIndex === 'off') {
-        return chips.length;
-      } else {
-        return chips.length && (chips[0].className.indexOf(_this.state.game.currentPlayer) !== -1);
-      }
-    });
-
-    (!isStart && lastBoxIndex > -1) && lastBoxIndex++;
-    (lastBoxIndex === -1) && (lastBoxIndex = 0);
-
-    const lastBox = 'box_' + targetIndex + '_' + off + lastBoxIndex;
-
-    return document.getElementById(lastBox);
-  }
-
-  // returns the position ([x, y]) of where a chip should be given targetIndex for a board element
-  // if isStart is true, accounts for the chip itself being present, else calculates hypothetical position
-  findAnimationTarget(targetIndex, isStart) {
-    const boardRect = document.getElementById('board').getBoundingClientRect();
-    const chipBox = this.findAnimationChipBox(targetIndex, isStart);
-    return [chipBox.getBoundingClientRect().x - boardRect.x,
-     chipBox.getBoundingClientRect().y - boardRect.y - (targetIndex === 'off' ? 43 : 0)];
-  }
-
-  // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
-  buildPath(startIndex, targetIndex, isStart) {
-    const start = this.findAnimationTarget(startIndex, isStart);
-    const end = this.findAnimationTarget(targetIndex, false);
-    const diffX = end[0] - start[0];
-    const diffY = end[1] - start[1];
-    let path = [start.slice()];
-
-    // calculate intermediate points
-    const frame_count = 20;
-    for (var i = 0; i < frame_count; i++) {
-      const last = _.last(path).slice();
-      last[0] = start[0] + (diffX / frame_count * i);
-      last[1] = start[1] + (diffY / frame_count * i);
-      path.push(last);
-    }
-
-    path.push(end.slice());
-    return path;
-  }
-
-  // Returns an array of animation steps for an entire move, including blots moving to bar.
-  // Each array item is either an animation step (hash of position and chip)
-  // or a directive string like 'highlight' or 'pause'.
-  buildPaths(chip, startIndex, moveSummary) {
-    const move = moveSummary.move
-    let pathPoints = _.flatten([move[0], move[1]]);
-    let subMoves = [];
-    const _this = this;
-    for(var n = 0; n < pathPoints.length - 1; n++) {
-      subMoves.push([pathPoints[n], pathPoints[n + 1]]);
-    }
-
-    let path = ['highlight'];
-
-    _.each(subMoves, function(fromTo) {
-      let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
-
-      pathpoints = pathpoints.map(function(arr) {
-        return {position: arr.slice(), chip: chip};
-      }).slice();
-
-      path  = _.concat(path, pathpoints);
-      path  = _.concat(path, ['pause']);
-
-      _this.lastBlotIndex = null;
-
-      let blottedChip;
-      // if a blot occurs, animate blotted chip to bar
-      if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
-        const barIndex = _this.currentPlayerDark() ? 24 : -1;
-        pathpoints = _this.buildPath(fromTo[1], barIndex , true);
-        const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
-
-        // TODO: bad, render should take care of chip position...
-        if (!_this.lastBlotIndex) {
-          _this.lastBlotIndex = fromTo[1];
-        }
-
-        blottedChip = blotContainer.firstChild;
-
-        pathpoints = pathpoints.map(function(arr) {
-          return {position: arr.slice(), chip: blottedChip};
-        });
-
-        path  = _.concat(path, pathpoints);
-        path  = _.concat(path, ['pause']);
-      }
-    });
-    return path;
-  }
-
-  animateMove(moveSummary, game, path, chip) {
-    const move = moveSummary.move;
-    const _this = this;
-    const startIndex = move[0];
-    chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
-    path = path || this.buildPaths(chip, startIndex, moveSummary);
-
-    this.animationInProgress = true;
-    if (path.length) {
-      let FRAME_RATE, frameInfo = path[0];
-      if(frameInfo === 'highlight') {
-        FRAME_RATE = 100;
-        chip.className = 'chip selectable-light';
-      } else if (frameInfo === 'pause') {
-        FRAME_RATE = 200;
-      } else {
-        FRAME_RATE = 15;
-        frameInfo.chip.style.left = frameInfo.position[0] + 'px';
-        frameInfo.chip.style.top = frameInfo.position[1] + 'px';
-        frameInfo.chip.style.zIndex = 1000000;
-      }
-
-      path = path.slice(1);
-      setTimeout(function() {
-        _this.animateMove(moveSummary, game, path, frameInfo.chip);
-      }, FRAME_RATE);
-    } else {
-      this.setState({game: this.state.game});
-
-      if(this.lastBlotIndex || this.lastBlotIndex === 0) {
-        const box = document.getElementById('box_' + this.lastBlotIndex + '_0');
-        const chip = box.firstChild;
-        chip.style.left = box.style.left;
-        chip.style.top = box.style.top;
-        chip.style.zIndex = box.style.zIndex;
-        this.lastBlotIndex = null;
-      }
-
-      this.animationInProgress = false;
-
-      if (game.currentPlayerAutomated()) {
-        this.doAutomatedMove();
-      } else {
-        if (game.lastRoll.length) {
-          if(!game.canMove()) {
-            this.setState({noMoves: true})
-            setTimeout(this.turnComplete, TIMEOUT);
-          }
-        } else {
-          setTimeout(this.turnComplete, TIMEOUT);
-        }
-      }
-    }
-  }
 
   updateGame(from, to) {
     let game = this.state.game;
     let move = game.doMove(from, to);
+    const _this = this;
     if(move) {
       if (this.currentPlayerDark() && game.currentPlayerHasWon()) {
         this.completeGame();
       } else if (game.currentPlayer === 'light' && move) {
-        this.animateMove(move, game);
+        const anim = new ChipAnimation(game.currentPlayer);
+        anim.animateMove(move, game, function() {
+          _this.setState({game: _this.state.game});
+
+          if (game.currentPlayerAutomated()) {
+            _this.doAutomatedMove();
+          } else {
+            if (game.lastRoll.length) {
+              if(!game.canMove()) {
+                _this.setState({noMoves: true})
+                setTimeout(_this.turnComplete, TIMEOUT);
+              }
+            } else {
+              setTimeout(_this.turnComplete, TIMEOUT);
+            }
+          }
+        });
       } else if(game.canMove()) {
          this.setState({game: game});
       } else {
