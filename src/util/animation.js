@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './constants.js'
-
+const HIGHLIGHT = 'highlight';
 
 export default class ChipAnimation {
   constructor(currentPlayer) {
@@ -14,10 +14,9 @@ export default class ChipAnimation {
     chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
     path = path || this.buildPaths(chip, startIndex, moveSummary);
 
-    this.animationInProgress = true;
     if (path.length) {
       let FRAME_RATE, frameInfo = path[0];
-      if(frameInfo === 'highlight') {
+      if(frameInfo === HIGHLIGHT) {
         FRAME_RATE = 100;
         chip.className = 'chip selectable-light';
       } else if (frameInfo === 'pause') {
@@ -45,25 +44,11 @@ export default class ChipAnimation {
         this.lastBlotIndex = null;
       }
 
-      this.animationInProgress = false;
-      callback();
-
-//      if (game.currentPlayerAutomated()) {
-//      if (this.currentPlayer === 'light') {
-//        this.doAutomatedMove();
-//      } else {
-//        if (game.lastRoll.length) {
-//          if(!game.canMove()) {
-//            this.setState({noMoves: true})
-//            setTimeout(this.turnComplete, TIMEOUT);
-//          }
-//        } else {
-//          setTimeout(this.turnComplete, TIMEOUT);
-//        }
-//      }
+      if (callback) {
+        callback();
+      }
     }
   }
-
 
   // Returns an array of positions ([x, y]) for the path from container at startIndex to container at targetIndex.
   buildPath(startIndex, targetIndex, isStart) {
@@ -134,7 +119,7 @@ export default class ChipAnimation {
       subMoves.push([pathPoints[n], pathPoints[n + 1]]);
     }
 
-    let path = ['highlight'];
+    let path = [HIGHLIGHT];
 
     _.each(subMoves, function(fromTo) {
       let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
@@ -173,7 +158,6 @@ export default class ChipAnimation {
     return path;
   }
 
-
   // returns dom element where chips can be placed, based on position index.
   // this will be either a point, a spot on the center bar, or an offboard chip holder.
   findContainer(index) {
@@ -189,5 +173,4 @@ export default class ChipAnimation {
     }
     return document.getElementById(id);
   }
-
 }

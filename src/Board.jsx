@@ -43,11 +43,13 @@ export default class Board extends React.Component {
   hideMoves() {
     // TODO needs to be a promise from game to execute after animation
     const _this = this;
+
     this.props.afterAnimation().then(function() {
       _this.setState({
         highlightTargets: []
       });
     })
+
   }
 
   startDrag(event, chipIndex) {

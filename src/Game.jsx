@@ -21,6 +21,7 @@ export default class Game extends React.Component {
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
     this.afterAnimation = this.afterAnimation.bind(this);
+    this.handleAnimationFinish = this.handleAnimationFinish.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
     this.animationInProgress = false;
 
@@ -146,8 +147,10 @@ export default class Game extends React.Component {
   afterAnimation() {
     const _this = this;
     return new Promise(function(resolve, reject) {
-      if(!_this.animationInProgress) {
+      if (!_this.animationInProgress) {
         resolve();
+      } else {
+        _this.outsideResolve = resolve;
       }
     });
   }
@@ -181,7 +184,9 @@ export default class Game extends React.Component {
       if (game.currentPlayerHasWon()) {
         this.completeGame();
       } else if (move) {
-        this.animateMove(move, game);
+        this.animationInProgress = true;
+        const anim = new ChipAnimation(game.currentPlayer);
+        anim.animateMove(move, game, this.handleAnimationFinish);
       }
     }
   }
@@ -213,33 +218,40 @@ export default class Game extends React.Component {
     setTimeout(this.showGameOptions, LONG_TIMEOUT);
   }
 
-  // TODO make animation optional
+  handleAnimationFinish() {
+    this.animationInProgress = false;
+
+    if (this.outsideResolve) {
+      this.outsideResolve();
+    }
+    const game = this.state.game;
+    this.setState({game: game});
+    
+    if (game.currentPlayerAutomated()) {
+      this.doAutomatedMove();
+    } else {
+      if (game.lastRoll.length) {
+        if(!game.canMove()) {
+          this.setState({noMoves: true})
+          setTimeout(this.turnComplete, TIMEOUT);
+        }
+      } else {
+        setTimeout(this.turnComplete, TIMEOUT);
+      }
+    }
+  }
 
   updateGame(from, to) {
     let game = this.state.game;
     let move = game.doMove(from, to);
-    const _this = this;
     if(move) {
       if (this.currentPlayerDark() && game.currentPlayerHasWon()) {
         this.completeGame();
       } else if (game.currentPlayer === 'light' && move) {
+        this.animationInProgress = true;
         const anim = new ChipAnimation(game.currentPlayer);
-        anim.animateMove(move, game, function() {
-          _this.setState({game: _this.state.game});
-
-          if (game.currentPlayerAutomated()) {
-            _this.doAutomatedMove();
-          } else {
-            if (game.lastRoll.length) {
-              if(!game.canMove()) {
-                _this.setState({noMoves: true})
-                setTimeout(_this.turnComplete, TIMEOUT);
-              }
-            } else {
-              setTimeout(_this.turnComplete, TIMEOUT);
-            }
-          }
-        });
+        this.outsideResolve && this.outsideResolve();
+        anim.animateMove(move, game, this.handleAnimationFinish);
       } else if(game.canMove()) {
          this.setState({game: game});
       } else {
