@@ -37,19 +37,20 @@ export default class Board extends React.Component {
 
   showMoves(rolloverIndex) {
     const targets = this.state.game.currentPlayerTargets(rolloverIndex);
-    this.setState({highlightTargets: targets});
+    const _this = this;
+
+    this.props.ifNoAnimation(function(){
+       _this.setState({highlightTargets: targets});
+    });
   }
 
   hideMoves() {
-    // TODO needs to be a promise from game to execute after animation
     const _this = this;
-
     this.props.afterAnimation().then(function() {
       _this.setState({
         highlightTargets: []
       });
-    })
-
+    });
   }
 
   startDrag(event, chipIndex) {

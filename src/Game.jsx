@@ -1,7 +1,6 @@
 import React from 'react';
 import Board from './Board';
 import GameLogic from './gameLogic.js';
-import _ from 'lodash';
 import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './util/gamesHelper.js'
 import ChipAnimation from './util/animation.js'
 import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './util/constants.js'
@@ -21,6 +20,7 @@ export default class Game extends React.Component {
     this.showGameOptions = this.showGameOptions.bind(this);
     this.undoLastMove = this.undoLastMove.bind(this);
     this.afterAnimation = this.afterAnimation.bind(this);
+    this.ifNoAnimation = this.ifNoAnimation.bind(this);
     this.handleAnimationFinish = this.handleAnimationFinish.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
     this.animationInProgress = false;
@@ -144,6 +144,13 @@ export default class Game extends React.Component {
     }
   }
 
+  ifNoAnimation(callback) {
+    if (!this.animationInProgress) {
+      callback();
+    }
+  }
+
+  // returns promise that resolves when animation is complete, or immediately if no animation.
   afterAnimation() {
     const _this = this;
     return new Promise(function(resolve, reject) {
@@ -221,9 +228,7 @@ export default class Game extends React.Component {
   handleAnimationFinish() {
     this.animationInProgress = false;
 
-    if (this.outsideResolve) {
-      this.outsideResolve();
-    }
+    this.outsideResolve && this.outsideResolve();
     const game = this.state.game;
     this.setState({game: game});
     
@@ -328,6 +333,7 @@ export default class Game extends React.Component {
             turnComplete={this.turnComplete}
             animatePlayerClick={this.animatePlayerClick}
             afterAnimation={this.afterAnimation}
+            ifNoAnimation={this.ifNoAnimation}
             clearDice={this.state.clearDice}
             handleStartGame={this.startNew}
             startButton={this.state.startButton}

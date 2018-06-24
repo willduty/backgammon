@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './constants.js'
 const HIGHLIGHT = 'highlight';
 
 export default class ChipAnimation {
