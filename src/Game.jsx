@@ -1,6 +1,6 @@
 import React from 'react';
 import Board from './Board';
-import GameLogic from './gameLogic.js';
+import Backgammon from './util/backgammon.js';
 import { clearGame, saveGame, savedActiveGame, savedTally, seriesInProgress } from './util/gamesHelper.js'
 import ChipAnimation from './util/animation.js'
 import { TIMEOUT, SHORT_TIMEOUT, LONG_TIMEOUT } from './util/constants.js'
@@ -26,10 +26,10 @@ export default class Game extends React.Component {
     this.animationInProgress = false;
 
     // TODO should probably do this in startNew()
-    let gameLogic = new GameLogic();
+    let backgammon = new Backgammon();
 
     this.state = {
-      game: gameLogic,
+      game: backgammon,
       tie: false,
       startButton: true,
       resumeButton: !!savedActiveGame(),

@@ -20,7 +20,8 @@ export const BLANK_GAME = {
   light: {},
 };
 
-export default class GameLogic {
+// main game object for backgammon
+export default class Backgammon {
   constructor() {
     this.GAME_PROPS = Object.keys(STANDARD_OPENING);
     this.history = [];
