@@ -37,17 +37,14 @@ export default class Board extends React.Component {
 
   showMoves(rolloverIndex) {
     const targets = this.state.game.currentPlayerTargets(rolloverIndex);
-    const _this = this;
-
-    this.props.ifNoAnimation(function(){
-       _this.setState({highlightTargets: targets});
+    this.props.ifNoAnimation(() => {
+       this.setState({highlightTargets: targets});
     });
   }
 
   hideMoves() {
-    const _this = this;
-    this.props.afterAnimation().then(function() {
-      _this.setState({
+    this.props.afterAnimation().then(() => {
+      this.setState({
         highlightTargets: []
       });
     });

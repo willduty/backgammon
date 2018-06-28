@@ -8,7 +8,6 @@ export default class ChipAnimation {
 
   animateMove(moveSummary, game, callback, path, chip) {
     const move = moveSummary.move;
-    const _this = this;
     const startIndex = move[0];
     chip = chip || this.findAnimationChipBox(startIndex, true).firstChild;
     path = path || this.buildPaths(chip, startIndex, moveSummary);
@@ -28,8 +27,8 @@ export default class ChipAnimation {
       }
 
       path = path.slice(1);
-      setTimeout(function() {
-        _this.animateMove(moveSummary, game, callback, path, frameInfo.chip);
+      setTimeout(() => {
+        this.animateMove(moveSummary, game, callback, path, frameInfo.chip);
       }, FRAME_RATE);
     } else {
       //this.setState({game: this.state.game});
@@ -87,13 +86,12 @@ export default class ChipAnimation {
       boxIds.push('box_' + targetIndex + '_' + (off) + i);
     }
 
-    const _this = this;
-    let lastBoxIndex = _.findLastIndex(boxIds, function(boxId) {
+    let lastBoxIndex = _.findLastIndex(boxIds, (boxId) => {
       const chips = document.getElementById(boxId).children;
       if (targetIndex === 'off') {
         return chips.length;
       } else {
-        return chips.length && (chips[0].className.indexOf(_this.currentPlayer) !== -1);
+        return chips.length && (chips[0].className.indexOf(this.currentPlayer) !== -1);
       }
     });
 
@@ -113,15 +111,14 @@ export default class ChipAnimation {
     const move = moveSummary.move
     let pathPoints = _.flatten([move[0], move[1]]);
     let subMoves = [];
-    const _this = this;
     for(var n = 0; n < pathPoints.length - 1; n++) {
       subMoves.push([pathPoints[n], pathPoints[n + 1]]);
     }
 
     let path = [HIGHLIGHT];
 
-    _.each(subMoves, function(fromTo) {
-      let pathpoints = _this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
+    _.each(subMoves, (fromTo) => {
+      let pathpoints = this.buildPath(fromTo[0], fromTo[1], startIndex === fromTo[0]);
 
       pathpoints = pathpoints.map(function(arr) {
         return {position: arr.slice(), chip: chip};
@@ -130,18 +127,18 @@ export default class ChipAnimation {
       path  = _.concat(path, pathpoints);
       path  = _.concat(path, ['pause']);
 
-      _this.lastBlotIndex = null;
+      this.lastBlotIndex = null;
 
       let blottedChip;
       // if a blot occurs, animate blotted chip to bar
       if (moveSummary.blots && moveSummary.blots.indexOf(fromTo[1]) !== -1) {
-        const barIndex = _this.currentPlayer === 'dark' ? 24 : -1;
-        pathpoints = _this.buildPath(fromTo[1], barIndex , true);
-        const blotContainer = _this.findAnimationChipBox(fromTo[1], true);
+        const barIndex = this.currentPlayer === 'dark' ? 24 : -1;
+        pathpoints = this.buildPath(fromTo[1], barIndex , true);
+        const blotContainer = this.findAnimationChipBox(fromTo[1], true);
 
         // TODO: bad, render should take care of chip position...
-        if (!_this.lastBlotIndex) {
-          _this.lastBlotIndex = fromTo[1];
+        if (!this.lastBlotIndex) {
+          this.lastBlotIndex = fromTo[1];
         }
 
         blottedChip = blotContainer.firstChild;

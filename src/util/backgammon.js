@@ -42,9 +42,8 @@ export default class Backgammon {
   undo() {
     this.history.pop();
     const last = _.last(this.history);
-    const _this = this;
-    _.each(last, function(value, key) {
-      _this[key] = JSON.parse(JSON.stringify(value));
+    _.each(last, (value, key) => {
+      this[key] = JSON.parse(JSON.stringify(value));
     });
   }
 
@@ -195,8 +194,7 @@ export default class Backgammon {
   // This can be called again partway through a move as the moves are set on the current value of this.lastRoll
   // return a summary of the move and what points, if any, where a blot occurred.
   doMove(from, to) {
-    const possibleMoves = this.currentPlayerMoves(from),
-      _this = this;
+    const possibleMoves = this.currentPlayerMoves(from);
 
     // TODO: this should return an array if 2 different compound moves are possible
     // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
@@ -218,10 +216,10 @@ export default class Backgammon {
           subMoves.push([target[n], to]);
         }
 
-        _.each(subMoves, function(move) {
+        _.each(subMoves, (move) => {
           const item = move[1] - move[0];
-          const dieIndex = _this.lastRoll.indexOf(item);
-          _this.lastRoll.splice(dieIndex, 1);
+          const dieIndex = this.lastRoll.indexOf(item);
+          this.lastRoll.splice(dieIndex, 1);
         });
 
       } else {
@@ -255,9 +253,8 @@ export default class Backgammon {
     if (typeof target !== 'undefined') {
       let blots = [];
       if (Array.isArray(target)) {
-        const _this = this;
-        _.each(target, function(i){
-          if(_this.opponentSpikes()[i] === 1) {
+        _.each(target, (i) => {
+          if(this.opponentSpikes()[i] === 1) {
             blots.push(i);
           }
         })
@@ -267,12 +264,11 @@ export default class Backgammon {
 
       // if one or more blots occurred during move
       if (blots.length) {
-        const _this = this;
-        _.each(blots, function(to) {
-          _this.decrementOpponentAt(to);
-          const opponentBarIndex = _this.opponent === 'dark' ? '-1' : 24;
-          const curr = _this.opponentSpikes()[opponentBarIndex];
-          _this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
+        _.each(blots, (to) => {
+          this.decrementOpponentAt(to);
+          const opponentBarIndex = this.opponent === 'dark' ? '-1' : 24;
+          const curr = this.opponentSpikes()[opponentBarIndex];
+          this.opponentSpikes()[opponentBarIndex] = curr ? curr + 1 : 1;
         })
       }
 
@@ -458,9 +454,8 @@ export default class Backgammon {
 
   currentHistoryState() {
     let hist = {};
-    const _this = this;
-    _.each(this.GAME_PROPS, function(prop) {
-      hist[prop] = JSON.parse(JSON.stringify(_this[prop]));
+    _.each(this.GAME_PROPS, (prop) => {
+      hist[prop] = JSON.parse(JSON.stringify(this[prop]));
     });
     return hist;
   }

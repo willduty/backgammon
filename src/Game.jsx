@@ -66,7 +66,7 @@ export default class Game extends React.Component {
   }
 
   startNew(resume) {
-    const game = this.state.game, _this = this;
+    const game = this.state.game;
     let lastGame;
 
     game.start();
@@ -87,8 +87,8 @@ export default class Game extends React.Component {
       rolling: lastGame ? false : true,
     });
 
-    setTimeout(lastGame ? (function() {
-      lastGame.currentPlayer === 'light' && _this.doAutomatedMove();
+    setTimeout(lastGame ? (() => {
+      lastGame.currentPlayer === 'light' && this.doAutomatedMove();
     }) : this.doDecidingRoll, TIMEOUT);
 
     window.addEventListener('beforeunload', this.handleUnload);
@@ -152,12 +152,11 @@ export default class Game extends React.Component {
 
   // returns promise that resolves when animation is complete, or immediately if no animation.
   afterAnimation() {
-    const _this = this;
-    return new Promise(function(resolve, reject) {
-      if (!_this.animationInProgress) {
+    return new Promise((resolve, reject) => {
+      if (!this.animationInProgress) {
         resolve();
       } else {
-        _this.outsideResolve = resolve;
+        this.outsideResolve = resolve;
       }
     });
   }
@@ -260,15 +259,14 @@ export default class Game extends React.Component {
       } else if(game.canMove()) {
          this.setState({game: game});
       } else {
-        const _this = this;
-        setTimeout(function() {
+        setTimeout(() => {
           if (game.lastRoll && game.lastRoll.length) {
-            _this.setState({
+            this.setState({
               noMoves: true,
               game: game,
             })
           }
-          setTimeout(_this.turnComplete, TIMEOUT);
+          setTimeout(this.turnComplete, TIMEOUT);
         }, SHORT_TIMEOUT);
       }
     } else {
