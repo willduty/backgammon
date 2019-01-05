@@ -105,10 +105,9 @@ export default class Backgammon {
   }
 
   // returns true if the current player has any possible moves.
-  // TODO this shouldn't rely on automatedMove directly since automatedMove might eventually have heavy logic for "computer" player
-  //  instead have an intermediate method that returns the possible moves to service both canMove and automatedMove
   canMove(from) {
-    return !!this.automatedMove(from);
+    let moves = (typeof from === 'undefined') ? this.currentPlayerMoves() : this.currentPlayerMoves(from);
+    return !_.isEmpty(moves);
   }
 
   // returns count of chips for a given player at a point on the board.
@@ -123,7 +122,7 @@ export default class Backgammon {
   // if not provided, a hash of all 'from' indices with value array of moves is returned
   // array of moves is either target (a number) or array of numbers which are the steps in a compound move
   currentPlayerMoves(index) {
-    const moves = this[this.currentPlayer + 'Moves'];
+    const moves = this[this.currentPlayer + 'Moves'] || {};
     if (moves) {
       return arguments.length ? moves[index] : moves;
     }
@@ -434,8 +433,7 @@ export default class Backgammon {
     const possibleMoves = this.currentPlayerMoves();
     let movablePieceKeys  = Object.keys(this.currentPlayerMoves());
 
-    // TODO shouldn't really need this. setPossibleMoves shouldn't populate key if there's no moves
-    if (!movablePieceKeys || !_.find(movablePieceKeys, function(i) { return possibleMoves[i] }) ) {
+    if (!movablePieceKeys.length) {
       return;
     }
 
