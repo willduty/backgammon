@@ -194,6 +194,7 @@ export default class Backgammon {
   // return a summary of the move and what points, if any, where a blot occurred.
   doMove(from, to) {
     const possibleMoves = this.currentPlayerMoves(from);
+    const offIndex = this.currentPlayer === 'dark' ? 24 : -1;
 
     // TODO: this should return an array if 2 different compound moves are possible
     // then, if either compound move involves an intermediate blot, return a Clarify object as to which is intended.
@@ -210,7 +211,7 @@ export default class Backgammon {
         let subMoves = [[from, target[0]]];
         for(var n = 0; n < target.length - 1; n++) {
           const last = target[n + 1],
-            to = last === 'off' ? (this.currentPlayer === 'dark' ? 24 : -1) : last;
+            to = last === 'off' ? offIndex : last;
           const item = to - target[n]
           subMoves.push([target[n], to]);
         }
@@ -227,19 +228,20 @@ export default class Backgammon {
           this.lastRoll = [];
         } else {
           for(var i in target) {
-            // TODO: use slice here instead?
             this.lastRoll.pop();
           }
         }
       }
     } else if (typeof target !== 'undefined') {
-      let diff = Math.abs(to - from);
+      let diff;
       if (target === 'off') {
         // find first die value large enough to get off board
-        const requiredDie = Math.abs((to === 'off' ? 24 : to) - from);
+        const requiredDie = Math.abs((to === 'off' ? offIndex : to) - from);
         diff = _.find(_.sortBy(this.lastRoll), function(die) {
           return requiredDie <= die;
         });
+      } else {
+        diff = Math.abs(to - from);
       }
 
       const dieIndex = this.lastRoll.indexOf(diff);
@@ -376,7 +378,7 @@ export default class Backgammon {
               possibleMoves[i] = move.length === 1 ? 'off' : move;
             }
           } else if (move > 23 || move < 0) {
-            possibleMoves[i] = 'off'
+            possibleMoves[i] = 'off';
           }
         })
 
@@ -398,16 +400,16 @@ export default class Backgammon {
           moveTarget = _.last(moveTarget);
         }
 
+        const opponentSpikes = this.opponentSpikes();
         if (compound) {
-          const opponentSpikes = this.opponentSpikes();
           const point = _.find(possibleMoves[i], function(point) {
             return opponentSpikes[Array.isArray(point) ? _.last(point) : point] > 1;
           });
           if (typeof point !== 'undefined') {
-            taken = opponentSpikes[Array.isArray(point) ? _.last(point) : point]
+            taken = opponentSpikes[Array.isArray(point) ? _.last(point) : point];
           }
         } else {
-          taken = this.opponentSpikes()[moveTarget] || 0
+          taken = opponentSpikes[moveTarget] || 0;
         }
         taken = taken > 1;
 
