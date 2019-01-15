@@ -432,9 +432,22 @@ export default class Backgammon {
   }
 
   selectRandomMove(index) {
-    const possibleMoves = this.currentPlayerMoves();
-    let movablePieceKeys  = Object.keys(this.currentPlayerMoves());
+    let possibleMoves = this.currentPlayerMoves();
 
+    // "AI"
+    if (this.opponent === 'dark') {
+      // attack when possible
+      const hittable = this.filterHittable(possibleMoves);
+      const avoidSingles = this.filterAvoidSingles(possibleMoves);
+
+      // TODO: avoid singles
+      // TODO: build pairs in home board
+      // TODO: optimize endgame
+
+      possibleMoves = hittable;
+    }
+
+    let movablePieceKeys  = Object.keys(possibleMoves);
     if (!movablePieceKeys.length) {
       return;
     }
@@ -443,9 +456,27 @@ export default class Backgammon {
     if (!possibleMoves[whichKey]) {
       return;
     }
+
     const move = _.sample(possibleMoves[whichKey]),
       to = Array.isArray(move) ? _.last(move) : move;
     return [this.int(whichKey), to];
+  }
+
+  filterAvoidSingles(moves) {
+    return moves;
+  }
+
+  filterHittable(moves) {
+      const opponentPieces = this[this.opponent];
+      let hash = {};
+      _.forEach(moves, function (move, k) {
+        return _.find(move, function(target) {
+          if (opponentPieces[target] === 1) {
+            hash[k] = move;
+          }
+        })
+      });
+      return _.isEmpty(hash) ? moves : hash;
   }
 
   rollDecidingDice() {
