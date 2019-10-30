@@ -18,7 +18,7 @@
     "react-scripts": "1.0.17",
     "sshpk": "^1.16.1",
     "stringstream": "0.0.6",
-    "tar": "^2.2.2",
+    "tar": "^4.4.2",
     "universal-cookie": "^2.1.2",
     "url-parse": "^1.4.7"
   },
