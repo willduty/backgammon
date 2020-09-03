@@ -11,7 +11,7 @@
     "hoek": "^5.0.3",
     "js-yaml": "^3.13.1",
     "merge": "^1.2.1",
-    "puppeteer": "^0.13.0",
+    "puppeteer": "^1.13.0",
     "querystringify": "^2.1.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
