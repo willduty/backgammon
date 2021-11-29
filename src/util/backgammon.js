@@ -52,7 +52,7 @@ export default class Backgammon {
     let count = 0;
     const spikes = this[player];
     for(var i in spikes) {
-      count += (this.int(spikes[i]) * Math.abs(((player == 'dark' ? 24 : -1) - this.int(i))));
+      count += (this.int(spikes[i]) * Math.abs(((player === 'dark' ? 24 : -1) - this.int(i))));
     }
     return count;
   }
@@ -212,7 +212,7 @@ export default class Backgammon {
         for(var n = 0; n < target.length - 1; n++) {
           const last = target[n + 1],
             to = last === 'off' ? offIndex : last;
-          const item = to - target[n]
+          // const item = to - target[n]
           subMoves.push([target[n], to]);
         }
 
@@ -438,9 +438,10 @@ export default class Backgammon {
     if (this.opponent === 'dark') {
       // attack when possible
       const hittable = this.filterHittable(possibleMoves);
-      const avoidSingles = this.filterAvoidSingles(possibleMoves);
 
       // TODO: avoid singles
+      // const avoidSingles = this.filterAvoidSingles(possibleMoves);
+
       // TODO: build pairs in home board
       // TODO: optimize endgame
 
