@@ -227,9 +227,9 @@ export default class Backgammon {
         if (this.lastInitialRoll.length === 2) {
           this.lastRoll = [];
         } else {
-          for(var i in target) {
+          _.each(target, () => {
             this.lastRoll.pop();
-          }
+          });
         }
       }
     } else if (typeof target !== 'undefined') {
