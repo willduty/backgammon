@@ -20,7 +20,7 @@
     "stringstream": "0.0.6",
     "tar": "^4.4.18",
     "universal-cookie": "^2.1.2",
-    "url-parse": "^1.5.2"
+    "url-parse": "^1.5.8"
   },
   "scripts": {
     "start": "react-scripts start",
