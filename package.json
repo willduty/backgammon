@@ -15,7 +15,7 @@
     "querystringify": "^2.1.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17",
+    "react-scripts": "5.0.1",
     "sshpk": "^1.16.1",
     "stringstream": "0.0.6",
     "tar": "^4.4.18",
